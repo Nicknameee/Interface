@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Handlee&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Roboto+Condensed:ital@1&display=swap&family=Orbitron&display=swap');
+body::-webkit-scrollbar {
+    display: none;
+}
+body {
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Orbitron', sans-serif;
+}
+.page {
+    width: 100vw;
+    height: fit-content;
+    min-height: 100vh;
+}
+.password-input-container {
+    position: relative;
+}
+.password-toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px; /* Adjust as needed */
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+.custom-form {
+    width: 30vw;
+    margin: auto;
+    padding: 30px; /* Adjust padding as needed */
+    background: linear-gradient(to bottom right, #ff9966, #ff5e62); /* Gradient background */
+    border-radius: 15px; /* Rounded borders */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Box shadow for depth effect */
+    height: auto;
+}
+.icon:hover {
+    color: #ff9966;
+}
+.icon {
+    color: white;
+    font-size: 1.5em;
+}
+.navLink:hover {
+    background-color: #123456; /* Change to the desired hover color */
+}
+.tone {
+    background: linear-gradient(to bottom right, #3c0d70 53%, #9575cd);
+    color: white;
+}
+.link-with-borders {
+    position: relative;
+    text-decoration: none;
+    overflow: hidden;
+}
+.link-with-borders::before,
+.link-with-borders::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 3px;
+    background-color: #ffffff;
+    transition: width 0.5s ease; /* Transition effect for the width */
+}
+.link-with-borders::before {
+    top: 0;
+    right: 0;
+}
+.link-with-borders::after {
+    bottom: 0;
+    left: 0;
+}
+.link-with-borders:hover::before,
+.link-with-borders:hover::after {
+    width: 100%; /* Expand the width on hover */
+}
+.link-with-border {
+    position: relative;
+    text-decoration: none;
+    overflow: hidden;
+    padding-bottom: 5px;
+}
+.link-with-border::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 3px;
+    background-color: #ffffff;
+    transition: width 0.5s ease; /* Transition effect for the width */
+}
+.link-with-border::after {
+    bottom: 0;
+    left: 0;
+}
+.link-with-border:hover::after {
+    width: 100%; /* Expand the width on hover */
+}
+.logo {
+    max-width: 30%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    height: auto;
+    border: 1px solid #000;
+    cursor: pointer;
+}
+.logo:hover {
+    max-width: 30%;
+    transition: max-width 0.5s ease-in-out;
+}
+.notification-dot {
+    margin-left: 10px;
+    font-size: 10px;
+    margin-top: 5px;
+}
+.scroll-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 12px; /* Adjust padding as needed */
+    border: none;
+    border-radius: 3px; /* Add subtle rounded corners */
+    background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent black */
+    color: white; /* Text color */
+    font-size: 14px; /* Font size */
+    cursor: pointer;
+    transition: all 0.2s ease-in-out; /* Smooth transition on hover */
+}
+
+.scroll-button:hover {
+    background-color: rgba(0, 0, 0, 0.5); /* Darker background on hover */
+}
+
+.scroll-button.left::before {
+    border-left: none; /* Remove left border for left arrow */
+    border-right: 2px solid white; /* Right border for left arrow */
+}
+

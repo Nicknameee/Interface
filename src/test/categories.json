@@ -1,0 +1,85 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Category",
+      "categoryId": "cd7cb83f-dd87-48bf-8dea-207a2add7faa",
+      "parentCategoryId": null,
+      "pictureUrl": null,
+      "enabled": true
+    },
+    {
+      "id": 2,
+      "name": "Category2",
+      "categoryId": "cd7cb83f-dd87-48bf-8dea-207a2add7faf",
+      "parentCategoryId": null,
+      "pictureUrl": "https://cdn.shopify.com/s/files/1/0070/7032/files/trending-products_c8d0d15c-9afc-47e3-9ba2-f7bad0505b9b.png?v=1614559651",
+      "enabled": false
+    },
+    {
+      "id": 3,
+      "name": "Category3",
+      "categoryId": "cd7cb83f-dd87-48bf-8dea-207a2add7fa3",
+      "parentCategoryId": null,
+      "pictureUrl": "https://cdn.corporatefinanceinstitute.com/assets/products-and-services.jpeg",
+      "enabled": true
+    },
+    {
+      "id": 4,
+      "name": "BobbiJhon",
+      "categoryId": "cd7cb83f-dd87-48bf-8Fea-207a2add7f51",
+      "parentCategoryId": "cd7cb83f-dd87-48bf-8dea-207a2add7f55",
+      "pictureUrl": "https://t4.ftcdn.net/jpg/00/47/30/15/360_F_47301594_mLvjoHeB4UvNvZ0zOotvrhPfqLQlIDRv.jpg",
+      "enabled": true
+    },
+    {
+      "id": 4,
+      "name": "ChilD",
+      "categoryId": "cd7cb83f-dd87-48bf-8deaFFFFFFFFFF",
+      "parentCategoryId": "cd7cb83f-dd87-48bf-8dea-207a2add7f55",
+      "pictureUrl": "https://t4.ftcdn.net/jpg/00/47/30/15/360_F_47301594_mLvjoHeB4UvNvZ0zOotvrhPfqLQlIDRv.jpg",
+      "enabled": true
+    },
+    {
+      "id": 4,
+      "name": "CHILD",
+      "categoryId": "cd7cb83f-dd87-48bf-8dea-207a2FFFFFF",
+      "parentCategoryId": "cd7cb83f-dd87-48bf-8dea-207a2add7f55",
+      "pictureUrl": "https://t4.ftcdn.net/jpg/00/47/30/15/360_F_47301594_mLvjoHeB4UvNvZ0zOotvrhPfqLQlIDRv.jpg",
+      "enabled": true
+    },
+    {
+      "id": 4,
+      "name": "Child",
+      "categoryId": "cd7cb83f-dd87-48bf-8dea-207a2add7sss",
+      "parentCategoryId": "cd7cb83f-dd87-48bf-8dea-207a2add7f55",
+      "pictureUrl": "https://t4.ftcdn.net/jpg/00/47/30/15/360_F_47301594_mLvjoHeB4UvNvZ0zOotvrhPfqLQlIDRv.jpg",
+      "enabled": true
+    },
+    {
+      "id": 5,
+      "name": "Category5",
+      "categoryId": "cd7cb83f-dd87-48bf-8dea-207a2add7f55",
+      "parentCategoryId": null,
+      "pictureUrl": null,
+      "enabled": true
+    },
+    {
+      "id": 6,
+      "name": "Category6",
+      "categoryId": "cd7cb83f-dd87-48bf-8dea-207a2add7f56",
+      "parentCategoryId": null,
+      "pictureUrl": null,
+      "enabled": false
+    },
+    {
+      "id": 7,
+      "name": "Category7",
+      "categoryId": "cd7cb83f-dd87-48bf-8dea-207a2add7f57",
+      "parentCategoryId": null,
+      "pictureUrl": null,
+      "enabled": true
+    }
+  ],
+  "status": "OK"
+}
