@@ -5,10 +5,12 @@ import App from './App';
 import reportWebVitals from './test/reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as endpoints from './constants/endpoints.js'
-import {redirectToUI} from "./constants/redirect";
+import {redirectToUI} from "./utilities/redirect";
 import {CategoryFilter} from "./schemas/CategoryFilter.ts";
 import {Category} from "./schemas/Category.ts";
 import categoryResponse from './test/categories.json'
+import novaPostCities from './test/novaPostCities.json'
+import novaPostWarehouses from './test/novaPostWarehouses.json'
 import productResponse from './test/products.json'
 import {ProductFilter} from "./schemas/ProductFilter.ts";
 import {CustomerProduct} from "./schemas/CustomerProduct.ts";
@@ -17,6 +19,11 @@ import {CartProduct} from "./schemas/CartProduct.ts";
 import moment from 'moment';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+/**
+ * Default headers for communication with backend
+ * @returns {Headers}
+ */
 export function getDefaultHeaders() {
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
@@ -26,11 +33,13 @@ export function getDefaultHeaders() {
 
     return headers;
 }
+
 export function setCookie(name, value, expirationDate) {
     const expires = new Date(expirationDate);
     console.log(expires)
     document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
 }
+
 export function getCookie(cookieName) {
     const name = cookieName + '=';
     const decodedCookie = decodeURIComponent(document.cookie);
@@ -48,6 +57,7 @@ export function getCookie(cookieName) {
 
     return null;
 }
+
 export const signIn = async (login, password) => {
     const requestData = {
         username: login,
@@ -60,6 +70,7 @@ export const signIn = async (login, password) => {
         headers: getDefaultHeaders(),
         body: JSON.stringify(requestData),
     };
+
     await fetch(`${endpoints.signInEndpoint}${queryParams}`, requestOptions)
         .then(response => {
             if (!response.ok) {
@@ -76,6 +87,7 @@ export const signIn = async (login, password) => {
             console.error('Error:', error);
         });
 };
+
 export const logout = async () => {
     const apiUrl = process.env.REACT_APP_USER_SERVICE_ADDRESS;
     const requestOptions: RequestInit = {
@@ -98,36 +110,32 @@ export const logout = async () => {
             console.error('Error:', error);
         });
 };
+
 export function clearCookies() {
     document.cookie = ''
 }
+
 export function isLoggedIn() {
     return getCookie('token');
 }
-export function getCategories(categoryFilter: CategoryFilter): Category[] {
+
+export async function getCategories(categoryFilter: CategoryFilter): Category[] {
     if (categoryFilter === undefined) {
         categoryFilter = CategoryFilter.build({enabled: false})
     }
 
     if (process.env.REACT_APP_PROFILE === 'test') {
         try {
-            console.log('Category response:', categoryResponse);
-            console.log('Category filter:', categoryFilter);
-
             if (categoryResponse.status === 'OK') {
                 const applyFilters = (data: any[], filter: CategoryFilter) => {
                     const filteredData = data.filter((categoryData: any) => {
-                        let meetsEnabledFilter = true;
+                        let meetsEnabledFilter: boolean = true;
+
                         if (filter.enabled !== undefined && filter.enabled !== null) {
                             meetsEnabledFilter = categoryData.enabled === filter.enabled;
-                            console.log(categoryData.enabled + ' COMPARED enabled TO ' + filter.enabled + ' = ' + (categoryData.enabled === filter.enabled))
                         }
 
                         const meetsParentCategoryIdFilter = categoryData.parentCategoryId === filter.parentCategoryId;
-
-                        console.log(categoryData.parentCategoryId + ' COMPARED TO ' + filter.parentCategoryId + ' = ' + (categoryData.parentCategoryId === filter.parentCategoryId))
-
-                        console.log(meetsEnabledFilter + ' ' + meetsParentCategoryIdFilter)
 
                         return meetsEnabledFilter && meetsParentCategoryIdFilter;
                     });
@@ -155,11 +163,43 @@ export function getCategories(categoryFilter: CategoryFilter): Category[] {
             throw new Error('Error fetching categories');
         }
     } else {
-        return []
-    }
+        const requestData = categoryFilter.formAsRequestParameters();
 
+        const requestFilteredData = Object.fromEntries(
+            Object.entries(requestData).filter(([_, value]) => value !== null && value !== undefined)
+        );
+
+        const queryParams = new URLSearchParams(requestFilteredData).toString();
+
+        const requestOptions = {
+            method: 'GET',
+            headers: getDefaultHeaders()
+        };
+
+        let response = await fetch(`${endpoints.getCategoriesEndpoint}?${queryParams}`, requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                return response.json();
+            })
+            .catch(error => {
+                console.error('Error: ', error);
+            });
+
+        return response.data.map((categoryData: any) => ({
+            id: categoryData.id,
+            name: categoryData.name,
+            categoryId: categoryData.categoryId,
+            parentCategoryId: categoryData.parentCategoryId,
+            pictureUrl: categoryData.pictureUrl,
+            enabled: categoryData.enabled
+        }));
+    }
 }
-export function getProducts(productFilter: ProductFilter): CustomerProduct[] {
+
+export async function getProducts(productFilter: ProductFilter): CustomerProduct[] {
     if (productFilter === undefined) {
         productFilter = CategoryFilter.build({blocked: false})
     }
@@ -226,7 +266,50 @@ export function getProducts(productFilter: ProductFilter): CustomerProduct[] {
             throw new Error('Error fetching categories');
         }
     } else {
-        return []
+        const requestData = productFilter.formAsRequestParameters();
+
+        const queryParams = new URLSearchParams(requestData).toString();
+
+        const requestOptions = {
+            method: 'POST',
+            headers: getDefaultHeaders(),
+            body: JSON.stringify(productFilter.formAsRequestBody())
+        };
+
+        let response = await fetch(`${endpoints.getProductsEndpoint}?${queryParams}`, requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                return response.json();
+            })
+            .catch(error => {
+                console.error('Error: ', error);
+            });
+
+        if (response === undefined || response === null || response.status !== 'OK') {
+            console.log('Product retrieving response is undefined or null')
+            return [];
+        }
+
+        return response.data.map((productData: any) => ({
+            id: productData.id,
+            name: productData.name,
+            brand: productData.brand,
+            parameters: productData.parameters,
+            description: productData.description,
+            vendorId: productData.vendorId,
+            productId: productData.productId,
+            cost: productData.cost,
+            currency: productData.currency,
+            itemsLeft: productData.itemsLeft,
+            blocked: productData.blocked,
+            categoryId: productData.categoryId,
+            introductionPictureUrl: productData.introductionPictureUrl,
+            pictureUrls: productData.pictureUrls,
+            marginRate: productData.marginRate
+        }));
     }
 }
 
@@ -264,6 +347,55 @@ export function removeFromCart(cartProduct: CartProduct) {
     let newExpirationDate = moment().add(1, 'day').toDate();
 
     setCookie('cart', JSON.stringify(cartItems), newExpirationDate);
+}
+
+export function getNovaPostCities(searchString: string) {
+    if (process.env.REACT_APP_PROFILE === 'test') {
+        try {
+            if (novaPostCities.status === 'OK') {
+                const applyFilters = (data: any[], searchString: string) => {
+                    return data.filter((novaPostCity: any) => {
+                        return String(novaPostCity.Description).startsWith(searchString)
+                    });
+                };
+
+                let value = applyFilters(novaPostCities.data, searchString);
+
+                return value;
+            } else {
+                console.error('Failed to fetch categories:', novaPostCities.error);
+            }
+        } catch (error) {
+            throw new Error('Error fetching data');
+        }
+    } else {
+        return []
+    }
+};
+
+
+export function getNovaPostWarehouses(city: string) {
+    if (process.env.REACT_APP_PROFILE === 'test') {
+        try {
+            if (novaPostWarehouses.status === 'OK') {
+                const applyFilters = (data: any[], city: string) => {
+                    return data.filter((novaPostWarehouses: any) => {
+                        return String(novaPostWarehouses.CityDescription) === (city)
+                    });
+                };
+
+                let uwu = applyFilters(novaPostWarehouses.data, city);
+
+                return uwu;
+            } else {
+                console.error('Failed to fetch warehouses:', novaPostWarehouses.error);
+            }
+        } catch (error) {
+            throw new Error('Error fetching data');
+        }
+    } else {
+        return []
+    }
 }
 export default endpoints;
 

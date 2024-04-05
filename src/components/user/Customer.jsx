@@ -1,11 +1,11 @@
-import {Button, Col, Container, Form, FormControl, Nav, Row} from "react-bootstrap";
+import {Button, Col, Container, Form, FormControl, Row} from "react-bootstrap";
 import {getCategories, getCookie, getProducts, getQueryParam, isLoggedIn, logout} from "../../index";
 import logo from '../../resources/logo.png'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faCircle, faInfo, faShoppingCart, faSignOutAlt, faUser} from '@fortawesome/free-solid-svg-icons';
+import {faInfo, faShoppingCart, faSignOutAlt, faUser} from '@fortawesome/free-solid-svg-icons';
 import React, {useEffect, useState} from "react";
 import {User} from '../../schemas/User.ts'
-import {redirectToPersonal, redirectToSignIn, redirectToSignUp, redirectToUI} from "../../constants/redirect";
+import {redirectToPersonal, redirectToSignIn, redirectToSignUp, redirectToUI} from "../../utilities/redirect";
 import Categories from './customer/Categories';
 import Products from "./customer/Products";
 import {useLocation} from "react-router-dom";
@@ -25,15 +25,28 @@ const Customer = () => {
 
     useEffect(() => {
         setUser(User.ReadUser(getCookie('userInfo')));
-
         const categoryId = getQueryParam('categoryId', location);
         console.log('CategoryID' + categoryId)
-        if (categoryId) {
-            setCategories(getCategories(CategoryFilter.build({parentCategoryId: categoryId.toString()})))
-            setProducts(getProducts(ProductFilter.build({categoryId: categoryId.toString()})))
-        } else {
-            setCategories(getCategories(CategoryFilter.build({parentCategoryId: null})));
-        }
+
+        const fetchData = async () => {
+            try {
+                let categoriesData, productsData;
+                if (categoryId) {
+                    [categoriesData, productsData] = await Promise.all([getCategories(CategoryFilter.build({parentCategoryId: categoryId.toString()})),
+                        getProducts(ProductFilter.build({categoryId: categoryId.toString()}))]);
+                } else {
+                    [categoriesData] = await Promise.all([getCategories(CategoryFilter.build({parentCategoryId: null}))]);
+                }
+                setCategories(categoriesData);
+                if (productsData) {
+                    setProducts(productsData);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData().then(response => console.log('Data fetched successfully'));
     }, [location]);
 
 

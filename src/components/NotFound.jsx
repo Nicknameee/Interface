@@ -1,7 +1,7 @@
 import React from 'react';
 import {Col, Container, Row} from "react-bootstrap";
 import logo from "../resources/logo.png";
-import {redirectToUI} from "../constants/redirect";
+import {redirectToUI} from "../utilities/redirect";
 
 const NotFound = () => {
     return (

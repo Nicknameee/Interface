@@ -46,7 +46,7 @@ export class ProductFilter {
     static build(filteringBy: { page: any; size: any; sortBy: any; direction: any; name: any; brand: any; vendorId: any; productIds: any; priceFrom: any; priceTo: any; isPresent: any; isBlocked: any; categoryId: any;}) {
         return new ProductFilter(filteringBy.page || 1,
             filteringBy.size || 100,
-            filteringBy.sortBy || 'parentCategoryId',
+            filteringBy.sortBy || 'cost',
             filteringBy.direction || 'ASC',
             filteringBy.name || null,
             filteringBy.brand || null,
@@ -58,5 +58,28 @@ export class ProductFilter {
             filteringBy.isBlocked || null,
             filteringBy.categoryId || null
             );
+    }
+
+    formAsRequestParameters() {
+        return {
+            page: this.page,
+            size: this.size,
+            sortBy: this.sortBy,
+            direction: this.direction
+        };
+    }
+
+    formAsRequestBody() {
+        return {
+            name: this.name,
+            brand: this.brand,
+            vendorId: this.vendorId,
+            productIds: this.productIds,
+            priceFrom: this.priceFrom,
+            priceTo: this.priceTo,
+            isPresent: this.isPresent,
+            isBlocked: this.isBlocked,
+            categoryId: this.categoryId
+        };
     }
 }

@@ -28,4 +28,15 @@ export class CategoryFilter {
             filteringBy.enabled || null,
             filteringBy.parentCategoryId || null);
     }
+
+    formAsRequestParameters() {
+        return {
+            page: this.page,
+            size: this.size,
+            sortBy: this.sortBy,
+            direction: this.direction,
+            enabled: this.enabled,
+            parentCategoryId: this.parentCategoryId
+        }
+    }
 }

@@ -1,6 +1,6 @@
 import React, {useRef} from 'react';
 import defaultImage from '../../../resources/imageNotFoundResource.png';
-import {redirectToCategory} from "../../../constants/redirect";
+import {redirectToCategory} from "../../../utilities/redirect";
 import {Category} from "../../../schemas/Category.ts";
 import {getQueryParam} from "../../../index";
 import {useLocation} from "react-router-dom";

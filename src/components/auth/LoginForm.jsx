@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {Button, Col, Container, Form, FormControl, Row} from 'react-bootstrap';
 import {isLoggedIn, signIn} from '../../index.js'
-import * as utility from '../../constants/utility.js'
-import {redirectToSignIn, redirectToSignUp, redirectToUI} from "../../constants/redirect";
+import * as utility from '../../constants/pattern.js'
+import {redirectToSignIn, redirectToSignUp, redirectToUI} from "../../utilities/redirect";
 import logo from "../../resources/logo.png";
 import {faShoppingCart, faSignOutAlt, faUser} from "@fortawesome/free-solid-svg-icons";
 

@@ -4,7 +4,7 @@ import {getDefaultHeaders, signIn} from '../../index.js'
 import '@fortawesome/fontawesome-free/css/all.css'
 import {certificationEndpoint, checkCredentialsAvailabilityEndpoint, signUpEndpoint} from "../../constants/endpoints";
 import {Client} from '@stomp/stompjs';
-import {redirectToSignIn, redirectToUI} from "../../constants/redirect";
+import {redirectToSignIn, redirectToUI} from "../../utilities/redirect";
 import logo from "../../resources/logo.png";
 
 const SignUpForm = () => {

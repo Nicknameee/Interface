@@ -131,4 +131,15 @@ body {
     border-left: none; /* Remove left border for left arrow */
     border-right: 2px solid white; /* Right border for left arrow */
 }
-
+.paymentSelect {
+    font-size: 19px;
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    color: #282626;
+    cursor: pointer;
+}
+.paymentSelect:hover {
+    color: #646363;
+    transition: all 0.1s ease-in-out;
+}

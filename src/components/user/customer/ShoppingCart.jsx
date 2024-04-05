@@ -5,6 +5,8 @@ import {CartProduct} from "../../../schemas/CartProduct.ts";
 import defaultImage from '../../../resources/imageNotFoundResource.png'
 import {faTrash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import emptyCart from '../../../resources/emptyCart.png'
+import {redirectToPurchase} from "../../../utilities/redirect";
 
 const ShoppingCart = React.forwardRef(({showCartValue}, ref) => {
     const [cart, setCart] = useState([]);
@@ -88,7 +90,6 @@ const ShoppingCart = React.forwardRef(({showCartValue}, ref) => {
                 <div style={{ width: '100%'}}>
                     <div className="cart-container" style={{ overflowY: 'scroll' }}>
                         <Container style={{overflowY: 'scroll'}}>
-                            {cart.length === 0 && <h1>Cart is empty</h1>}
                             {cart.map((item: CartProduct, index: number) => (
                                 <div key={index} className="cart-item py-1 d-flex justify-content-between flex-wrap position-relative">
                                     <FontAwesomeIcon icon={faTrash} className="position-absolute" style={{width: '19px', height: '19px', left: '89%', border: 'none', top: '3%', cursor: 'pointer'}} onClick={() => removeProductFromCart(item.productId)}/>
@@ -106,11 +107,19 @@ const ShoppingCart = React.forwardRef(({showCartValue}, ref) => {
                     </div>
                 </div>
             </Nav>
-            <FormGroup>
-                <ButtonGroup>
-                    <Button className="btn btn-success m-3">Checkout</Button>
-                </ButtonGroup>
-            </FormGroup>
+            {cart.length > 0
+                ?
+                <FormGroup>
+                    <ButtonGroup>
+                        <Button className="btn btn-success m-3" onClick={() => redirectToPurchase()}>Checkout</Button>
+                    </ButtonGroup>
+                </FormGroup>
+                :
+                <div className="w-100 d-flex justify-content-center flex-wrap py-3">
+                    <img src={emptyCart} style={{maxWidth: '11vw', height: 'auto', marginBottom: '1em'}} alt="Empty"/>
+                    <p className="w-100 font-monospace px-3" style={{fontStyle: 'italic', fontSize: '19px' }}>Cart is empty, but it's never too late to fill it up</p>
+                </div>
+            }
         </Col>
     );
 }, null);

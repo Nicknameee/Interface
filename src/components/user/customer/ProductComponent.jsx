@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import {addToCart, getProducts, isLoggedIn, logout} from "../../../index";
 import {ProductFilter} from "../../../schemas/ProductFilter.ts";
 import {CustomerProduct} from "../../../schemas/CustomerProduct.ts";
-import {Button, Col, Container, Form, FormControl, Nav, Row} from "react-bootstrap";
+import {Button, Col, Container, Form, FormControl, Row} from "react-bootstrap";
 import logo from "../../../resources/logo.png";
 import happyAssistant from "../../../resources/assistant.png";
 import {
@@ -11,7 +11,7 @@ import {
     redirectToSignIn,
     redirectToSignUp,
     redirectToUI
-} from "../../../constants/redirect";
+} from "../../../utilities/redirect";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCartFlatbed, faInfo, faPenNib, faShoppingCart, faSignOutAlt, faUser} from "@fortawesome/free-solid-svg-icons";
 import {Location, useLocation} from "react-router-dom";
@@ -26,6 +26,7 @@ const ProductComponent = () => {
     const [showSidebar: boolean, setShowSidebar] = useState(false);
     const [showCart: boolean, setShowCart] = useState(false);
     const location: Location = useLocation();
+    const [indexOfMainPicture, setIndexOfMainPicture] = useState(0);
     const [mainPicture, setMainPicture] = useState(defaultImage);
     const imagesRef = useRef(null);
     const shoppingCart = useRef(null);
@@ -37,41 +38,50 @@ const ProductComponent = () => {
         if (productId === undefined || productId === null) {
             redirectToNotFound()
         }
+        const fetchData = async () => {
+            try {
+                let [productData] = await Promise.all([getProducts(ProductFilter.build({productIds: [productId]}))])
+                if (productData.length > 0) {
+                    if (productData[0].introductionPictureUrl) {
+                        if (productData[0].pictureUrls) {
+                            productData[0].pictureUrls.unshift(productData[0].introductionPictureUrl)
+                        }
+                        setMainPicture(productData[0].introductionPictureUrl)
+                    } else {
+                        if (productData[0].pictureUrls && productData[0].pictureUrls.length > 0) {
+                            productData[0].introductionPictureUrl = productData[0].pictureUrls[0]
+                            setMainPicture(productData[0].introductionPictureUrl)
+                        }
+                    }
 
-        let productData = getProducts(ProductFilter.build({productIds: [productId]}))
-        if (productData.length > 0) {
-            if (productData[0].introductionPictureUrl) {
-                productData[0].pictureUrls.unshift(productData[0].introductionPictureUrl)
-                setMainPicture(productData[0].introductionPictureUrl)
-            } else {
-                if (productData[0].pictureUrls && productData[0].pictureUrls.length > 0) {
-                    productData[0].introductionPictureUrl = productData[0].pictureUrls[0]
-                    setMainPicture(productData[0].introductionPictureUrl)
+                    setProduct(productData[0])
                 }
+            } catch (error) {
+                console.error('Error fetching data:', error);
             }
+        };
 
-            setProduct(productData[0])
-        }
+        fetchData().then(() => console.log('Data fetched successfully'));
+
+
     }, [location]);
 
-    const handleImageClick = (imageUrl) => {
+    const handleImageClick = (imageUrl, index) => {
+        setIndexOfMainPicture(index)
         setMainPicture(imageUrl);
     };
 
     const handleScroll = (direction) => {
-        if (imagesRef.current) {
-            const scrollAmount = 190;
-            const container = imagesRef.current;
-            let scrollPos = container.scrollLeft;
-            if (direction === 'left') {
-                scrollPos -= scrollAmount;
-            } else if (direction === 'right') {
-                scrollPos += scrollAmount;
+        if (direction === 'left') {
+            if (indexOfMainPicture >= 1) {
+                setMainPicture(product.pictureUrls[indexOfMainPicture - 1])
+                setIndexOfMainPicture(indexOfMainPicture - 1)
             }
-            container.scrollTo({
-                left: scrollPos,
-                behavior: 'smooth'
-            });
+        } else {
+            if (indexOfMainPicture < product.pictureUrls.length - 1) {
+                setMainPicture(product.pictureUrls[indexOfMainPicture + 1])
+                setIndexOfMainPicture(indexOfMainPicture + 1)
+            }
         }
     };
 
@@ -155,7 +165,7 @@ const ProductComponent = () => {
                                                         alt={`Product Image ${index + 1}`}
                                                         className="img-fluid mr-2"
                                                         style={{ cursor: 'pointer', height: '70%', margin: '0 15px 0 15px' }}
-                                                        onClick={() => handleImageClick(url)}
+                                                        onClick={() => handleImageClick(url, index)}
                                                     />
                                                 ))
                                             )}
@@ -166,12 +176,11 @@ const ProductComponent = () => {
                                             <h2 className="mb-4">{product.name}</h2>
                                             <div className="p-3 rounded" style={{ backgroundColor: '#252626' }}>
                                                 <p className="mb-3"><strong>Brand:</strong> {product.brand || 'Unknown'}</p>
-                                                <p className="mb-3"><strong>Description:</strong> {product.description || 'Unknown'}</p>
                                                 <p className="mb-3"><strong>Price:</strong> {product.cost} {product.currency}</p>
                                                 {Object.entries(product.parameters).map(([key, value]) => (
                                                     <p key={key} className="mb-3"><strong>{key}:</strong> {value || 'Unknown'}</p>
                                                 ))}
-
+                                                <p className="mb-3" style={{maxWidth: '900px'}}><strong>Description:</strong> {product.description || 'Unknown'}</p>
                                             </div>
                                             <div className="d-flex w-50 justify-content-between">
                                                 {product.blocked === false && product.itemsLeft > 0 ?
@@ -182,7 +191,7 @@ const ProductComponent = () => {
                                                 <button className="btn btn-primary">Add To Waiting List <FontAwesomeIcon icon={faPenNib}/></button>
                                             </div>
                                         </div>
-                                        <img src={happyAssistant} style={{maxWidth: '40%', position: 'absolute', top: '10%', left: '50%'}} alt=""/>
+                                        <img src={happyAssistant} style={{maxWidth: '30%', position: 'absolute', top: '10%', left: '50%'}} alt=""/>
                                     </div>
                                 </div>
                             )}
