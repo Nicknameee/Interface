@@ -8,14 +8,15 @@ export class DeliveryData {
     cityRecipient: string;
     postDepartmentNumberRecipient: number;
     postDepartmentTypeRecipient: string;
+    postDepartmentIdRecipient: string;
     streetRecipient: string;
     buildingRecipient: string;
 
     constructor() {
-        this.countrySender = 'Ukraine';
-        this.regionSender = 'Kyivska';
-        this.citySender = 'Kyiv';
-        this.countryRecipient = 'Ukraine';
+        this.countrySender = 'Україна';
+        this.regionSender = 'Київська область';
+        this.citySender = 'Київ';
+        this.countryRecipient = 'Україна';
     }
 
     serialize(): any {
@@ -30,6 +31,7 @@ export class DeliveryData {
         data.set('CITY_RECIPIENT', this.cityRecipient);
         data.set('POST_DEPARTMENT_NUMBER_RECIPIENT', this.postDepartmentNumberRecipient);
         data.set('POST_DEPARTMENT_TYPE_RECIPIENT', this.postDepartmentTypeRecipient);
+        data.set('POST_DEPARTMENT_ID_RECIPIENT', this.postDepartmentIdRecipient)
         data.set('STREET_RECIPIENT', this.streetRecipient);
         data.set('BUILDING_RECIPIENT', this.buildingRecipient);
 

@@ -1,0 +1,133 @@
+[
+  {
+    "letter": "а",
+    "count": 611
+  },
+  {
+    "letter": "б",
+    "count": 2098
+  },
+  {
+    "letter": "в",
+    "count": 2110
+  },
+  {
+    "letter": "г",
+    "count": 1513
+  },
+  {
+    "letter": "д",
+    "count": 1143
+  },
+  {
+    "letter": "е",
+    "count": 95
+  },
+  {
+    "letter": "ё"
+  },
+  {
+    "letter": "ж",
+    "count": 287
+  },
+  {
+    "letter": "з",
+    "count": 1198
+  },
+  {
+    "letter": "и",
+    "count": 360
+  },
+  {
+    "letter": "й",
+    "count": 38
+  },
+  {
+    "letter": "к",
+    "count": 2950
+  },
+  {
+    "letter": "л",
+    "count": 1197
+  },
+  {
+    "letter": "м",
+    "count": 2110
+  },
+  {
+    "letter": "н",
+    "count": 1842
+  },
+  {
+    "letter": "о",
+    "count": 977
+  },
+  {
+    "letter": "п",
+    "count": 2355
+  },
+  {
+    "letter": "р",
+    "count": 1024
+  },
+  {
+    "letter": "с",
+    "count": 2494
+  },
+  {
+    "letter": "т",
+    "count": 978
+  },
+  {
+    "letter": "у",
+    "count": 263
+  },
+  {
+    "letter": "ф",
+    "count": 168
+  },
+  {
+    "letter": "х",
+    "count": 388
+  },
+  {
+    "letter": "ц",
+    "count": 99
+  },
+  {
+    "letter": "ч",
+    "count": 754
+  },
+  {
+    "letter": "ш",
+    "count": 560
+  },
+  {
+    "letter": "щ",
+    "count": 79
+  },
+  {
+    "letter": "ъ",
+    "count": 0
+  },
+  {
+    "letter": "ы",
+    "count": 0
+  },
+  {
+    "letter": "ь",
+    "count": 0
+  },
+  {
+    "letter": "э",
+    "count": 6
+  },
+  {
+    "letter": "ю",
+    "count": 90
+  },
+  {
+    "letter": "я",
+    "count": 383
+  }
+]

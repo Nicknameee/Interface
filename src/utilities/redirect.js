@@ -5,6 +5,7 @@ export function redirectToPersonal() {
     window.location.href = '/personal'
 }
 export function redirectToSignIn() {
+    localStorage.setItem('previousLoginUrl', window.location.href)
     window.location.href = '/sign/in'
 }
 export function redirectToSignUp() {
@@ -21,4 +22,11 @@ export function redirectToNotFound() {
 }
 export function redirectToPurchase() {
     window.location.href = '/purchase'
+}
+export function redirectToOrderHistory() {
+    window.location.href = '/personal/orders'
+}
+export function redirectToPreviousLoginUrl() {
+    window.location.href = localStorage.getItem('previousLoginUrl')
+    localStorage.removeItem('previousLoginUrl')
 }

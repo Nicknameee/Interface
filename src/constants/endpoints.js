@@ -1,3 +1,5 @@
+export let createOrder = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/orders/save'; //POST
+export let initiateTransaction = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/transactions/initiate'; //POST
 export const getUserInfoEndpoint = process.env.REACT_APP_USER_SERVICE_ADDRESS + '/api/v1/users'; //GET
 export const signUpEndpoint = process.env.REACT_APP_USER_SERVICE_ADDRESS + '/api/v1/users/allowed'; //POST
 export const signInEndpoint = process.env.REACT_APP_USER_SERVICE_ADDRESS + '/login'; //POST
@@ -6,3 +8,4 @@ export const certificationEndpoint = process.env.REACT_APP_CERTIFICATION_SERVICE
 export const requestAdditionalApprovalUserMessage = process.env.REACT_APP_USER_SERVICE_ADDRESS + '/api/v1/users/approving/request/allowed';
 export const getCategoriesEndpoint = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/categories/allowed'; //GET
 export const getProductsEndpoint = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/products/allowed'; //GET
+export const getNovaPostDepartments = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/util/v1/services/post/nova/warehouses'; //GET

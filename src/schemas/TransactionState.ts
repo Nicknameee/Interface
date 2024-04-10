@@ -1,5 +1,8 @@
 export class TransactionState {
     customerId: number;
-    success: boolean;
+    amount: number;
+    sourceCurrency: string;
     status: string;
+    authorized: boolean;
+    settled: boolean;
 }

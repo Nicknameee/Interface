@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {getNovaPostCities, getNovaPostWarehouses} from "../../../index";
 import {FormCheck, FormGroup, ListGroup, ListGroupItem} from "react-bootstrap";
 import {DELIVERY_SERVICE_TYPE} from "../../../constants/constants";
@@ -8,20 +8,22 @@ const DeliveryAddress = ({country, deliveryData, setDeliveryTypeExt}) => {
     const [novaPostCities, setNovaPostCities] = useState([]);
     const [novaPostDepartments, setNovaPostDepartments] = useState([]);
     const [searchCityString, setSearchCityString] = useState('')
-    const [deliveryType, setDeliveryType] = useState([]);
+    const [deliveryType, setDeliveryType] = useState('NONE');
     const [cityInputFocused: boolean, setCityInputIsFocused] = useState(false);
     const [warehouseInputFocused: boolean, setWarehouseInputIsFocused] = useState(false);
 
     const handleCitySearchStringChange = (e) => {
         setSearchCityString(e.target.value)
-        setNovaPostCities(getNovaPostCities(searchCityString))
+        console.log('City change hook')
+        setNovaPostCities([])
+        setNovaPostCities(getNovaPostCities(e.target.value))
     }
 
-    const handleCityChange = (city) => {
+    const handleCityChange = async (city) => {
         deliveryData.cityRecipient = city.Description;
         deliveryData.regionRecipient = city.AreaDescription;
         setSearchCityString(city.Description)
-        setNovaPostDepartments(getNovaPostWarehouses(city.Description))
+        setNovaPostDepartments(await getNovaPostWarehouses(city.Description))
         setCityInputIsFocused(false)
     };
 
@@ -29,6 +31,7 @@ const DeliveryAddress = ({country, deliveryData, setDeliveryTypeExt}) => {
         setDeliveryDetails(deliveryPoint.Description)
         deliveryData.postDepartmentNumberRecipient = deliveryPoint.Number;
         deliveryData.postDepartmentTypeRecipient = deliveryPoint.CategoryOfWarehouse;
+        deliveryData.postDepartmentIdRecipient = deliveryPoint.TypeOfWarehouse;
         let address = deliveryPoint.ShortAddress.split(',');
         deliveryData.streetRecipient = address[1].trim();
         deliveryData.buildingRecipient = address[address.length - 1].trim();
@@ -42,11 +45,6 @@ const DeliveryAddress = ({country, deliveryData, setDeliveryTypeExt}) => {
             setDeliveryType(value);
         }
     };
-
-    useEffect(() => {
-        setNovaPostCities(getNovaPostCities(searchCityString));
-    }, []);
-
     const renderDeliveryForm = () => {
         switch (deliveryType) {
             case 'NOVA_POST': {

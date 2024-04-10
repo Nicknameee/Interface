@@ -5,26 +5,30 @@ import App from './App';
 import reportWebVitals from './test/reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as endpoints from './constants/endpoints.js'
-import {redirectToUI} from "./utilities/redirect";
+import {redirectToOrderHistory, redirectToUI} from "./utilities/redirect";
 import {CategoryFilter} from "./schemas/CategoryFilter.ts";
 import {Category} from "./schemas/Category.ts";
 import categoryResponse from './test/categories.json'
 import novaPostCities from './test/novaPostCities.json'
 import novaPostWarehouses from './test/novaPostWarehouses.json'
+import cities from './handbook/cities.json'
+import citiesCount from './handbook/citiesCountByName.json'
 import productResponse from './test/products.json'
 import {ProductFilter} from "./schemas/ProductFilter.ts";
 import {CustomerProduct} from "./schemas/CustomerProduct.ts";
 import {Location} from "react-router-dom";
 import {CartProduct} from "./schemas/CartProduct.ts";
 import moment from 'moment';
+import {TransactionInitiativeModel} from "./schemas/TransactionInitiativeModel.ts";
+import {CreateOrder} from "./schemas/CreateOrder.ts";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 /**
- * Default headers for communication with backend
- * @returns {Headers}
+ * Function that return new Headers() {Content-Type and Auth if user is authenticated}
+ * @returns {Headers} - Default headers for communication with backend
  */
-export function getDefaultHeaders() {
+export function getDefaultHeaders(): Headers {
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
     if (getCookie('token')) {
@@ -34,13 +38,23 @@ export function getDefaultHeaders() {
     return headers;
 }
 
-export function setCookie(name, value, expirationDate) {
+/**
+ *
+ * @param name - name of cookie param
+ * @param value - value of cookie param
+ * @param expirationDate - any possible constructor arg for Date, expiration of cookie entry
+ */
+export function setCookie(name: string, value: string, expirationDate) {
     const expires = new Date(expirationDate);
-    console.log(expires)
     document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
 }
 
-export function getCookie(cookieName) {
+/**
+ *
+ * @param cookieName - name of cookie entry to search for
+ * @returns {null|string} - cookie value if entry was found, null otherwise
+ */
+export function getCookie(cookieName: string): string {
     const name = cookieName + '=';
     const decodedCookie = decodeURIComponent(document.cookie);
     const cookieArray = decodedCookie.split(';');
@@ -58,11 +72,18 @@ export function getCookie(cookieName) {
     return null;
 }
 
+/**
+ * Sign In endpoint - performs request to backend server
+ * @param login - user login
+ * @param password - user password
+ * @returns {Promise<void>} - return value is not used, the result of invocation of this function is setting auth token to cookie
+ */
 export const signIn = async (login, password) => {
     const requestData = {
-        username: login,
+        login: login,
         password: password
     };
+
     const queryParams = new URLSearchParams(requestData).toString();
 
     const requestOptions = {
@@ -71,7 +92,7 @@ export const signIn = async (login, password) => {
         body: JSON.stringify(requestData),
     };
 
-    await fetch(`${endpoints.signInEndpoint}${queryParams}`, requestOptions)
+    await fetch(`${endpoints.signInEndpoint}?${queryParams}`, requestOptions)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -80,20 +101,31 @@ export const signIn = async (login, password) => {
             return response.json();
         })
         .then(json => {
-            setCookie('token', json.data['token'], json.data['expires_at'])
-            redirectToUI()
+            if (json.status === 'OK') {
+                setCookie('token', json.data['token'], json.data['expires_at'])
+            } else {
+                console.error(json.data)
+            }
         })
         .catch(error => {
             console.error('Error:', error);
         });
+
+    await getUserInfo()
 };
 
+/**
+ * Log Out endpoint - performs request to backend server
+ * @returns {Promise<void>} - return value is not used, the result of invocation of this function is clearing cookies except cart's one
+ */
 export const logout = async () => {
     const apiUrl = process.env.REACT_APP_USER_SERVICE_ADDRESS;
+
     const requestOptions: RequestInit = {
         method: 'POST',
         headers: getDefaultHeaders()
     };
+
     await fetch(`${apiUrl}/logout`, requestOptions)
         .then(response => {
             if (!response.ok) {
@@ -102,23 +134,47 @@ export const logout = async () => {
 
             return response.json();
         })
-        .then(() => {
-            clearCookies()
-            redirectToUI()
+        .then(response => {
+            if (String(response['logout']) === 'true') {
+                clearCookiesExcept('cart')
+                redirectToUI()
+            }
         })
         .catch(error => {
             console.error('Error:', error);
         });
 };
 
-export function clearCookies() {
-    document.cookie = ''
+/**
+ *
+ * @param keepCookies - list of names of cookies to be kept
+ */
+export function clearCookiesExcept(keepCookies: string[]): void {
+    const cookies = document.cookie.split(';');
+
+    cookies.forEach(cookie => {
+        const cookieParts = cookie.split('=');
+        const cookieName = cookieParts[0].trim();
+
+        if (!keepCookies.includes(cookieName)) {
+            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        }
+    });
 }
 
-export function isLoggedIn() {
+/**
+ *
+ * @returns {string} - cookie's auth token, if present therefore user is authenticated, otherwise he's not
+ */
+export function isLoggedIn(): string {
     return getCookie('token');
 }
 
+/**
+ *
+ * @param categoryFilter
+ * @returns {Promise<{pictureUrl: *, name: *, parentCategoryId: *, id: *, categoryId: *, enabled: *}[]|*>}
+ */
 export async function getCategories(categoryFilter: CategoryFilter): Category[] {
     if (categoryFilter === undefined) {
         categoryFilter = CategoryFilter.build({enabled: false})
@@ -199,6 +255,11 @@ export async function getCategories(categoryFilter: CategoryFilter): Category[] 
     }
 }
 
+/**
+ *
+ * @param productFilter
+ * @returns {Promise<CustomerProduct[]|*|*[]>}
+ */
 export async function getProducts(productFilter: ProductFilter): CustomerProduct[] {
     if (productFilter === undefined) {
         productFilter = CategoryFilter.build({blocked: false})
@@ -313,13 +374,24 @@ export async function getProducts(productFilter: ProductFilter): CustomerProduct
     }
 }
 
-export function getQueryParam(paramName: string, location: Location) {
+/**
+ *
+ * @param paramName - query param name
+ * @param location - from useLocation() hook
+ * @returns {string} - query param value
+ */
+export function getQueryParam(paramName: string, location: Location): string {
     const searchParams = new URLSearchParams(location.search);
     return searchParams.get(paramName);
 }
 
-export function addToCart(cartProduct: CartProduct) {
+/**
+ *
+ * @param cartProduct
+ */
+export function addToCart(cartProduct: CartProduct): void {
     let cart = getCookie('cart');
+    let newExpirationDate = moment().add(1, 'day').toDate();
     let cartItems: CartProduct[] = cart ? JSON.parse(cart) : [];
     let matchInCart: CartProduct | undefined = cartItems.find((item: CartProduct) => item.productId === cartProduct.productId);
 
@@ -329,16 +401,22 @@ export function addToCart(cartProduct: CartProduct) {
         cartItems.push(cartProduct)
     }
 
-    let newExpirationDate = moment().add(1, 'day').toDate();
-
     setCookie('cart', JSON.stringify(cartItems), newExpirationDate);
 }
 
+/**
+ *
+ * @returns {any|*[]}
+ */
 export function getCart(): CartProduct[] {
     let cart = getCookie('cart');
     return cart ? JSON.parse(cart) : [];
 }
 
+/**
+ * Function removes entry from cart in cookies and updates or removes cart if no other products are left
+ * @param cartProduct
+ */
 export function removeFromCart(cartProduct: CartProduct) {
     let cart = getCookie('cart');
     let cartItems: CartProduct[] = cart ? JSON.parse(cart) : [];
@@ -346,9 +424,21 @@ export function removeFromCart(cartProduct: CartProduct) {
 
     let newExpirationDate = moment().add(1, 'day').toDate();
 
-    setCookie('cart', JSON.stringify(cartItems), newExpirationDate);
+    if (cartItems.length > 0) {
+        setCookie('cart', JSON.stringify(cartItems), newExpirationDate);
+    } else {
+        setCookie('cart', null, new Date(0))
+    }
 }
 
+/**
+ *
+ * @param searchString - prefix for city to be searched by
+ * @returns {*|*[]} - list of JSON from cities.json
+ * function is optimised, the data is loaded to JSON file, one contains alphabetically sorted list of cities with region, other contains count for cities by first letter
+ * that allows to slice array of data only for required samples using first letter of searching prompt, which saves time
+ * possible ways to improve it even more to include into slicing a second letter, but this logic might be a bit of preprocessing kind of dependable solution
+ */
 export function getNovaPostCities(searchString: string) {
     if (process.env.REACT_APP_PROFILE === 'test') {
         try {
@@ -359,9 +449,7 @@ export function getNovaPostCities(searchString: string) {
                     });
                 };
 
-                let value = applyFilters(novaPostCities.data, searchString);
-
-                return value;
+                return applyFilters(novaPostCities.data, searchString);
             } else {
                 console.error('Failed to fetch categories:', novaPostCities.error);
             }
@@ -369,12 +457,38 @@ export function getNovaPostCities(searchString: string) {
             throw new Error('Error fetching data');
         }
     } else {
-        return []
+        try {
+            const letter = String(searchString).length > 0 ? String(searchString).at(0) : '0';
+
+            const applyFilters = (data, searchString) => {
+
+                let min = 0;
+                let max = data.length;
+
+                for (let loopI = 0; loopI < citiesCount.length; loopI++) {
+                    let counts = citiesCount[loopI];
+
+                    if (counts.letter !== String(letter).toLowerCase()) {
+                        if (counts.count !== undefined && counts.count !== null) {
+                            min += counts.count;
+                        }
+                    } else {
+                        max = min + counts.count;
+                        break;
+                    }
+                }
+
+                return data.slice(min, max).filter(city => String(city.Description).startsWith(searchString));
+            };
+
+            return applyFilters(cities, searchString);
+        } catch (error) {
+            throw new Error('Error fetching data');
+        }
     }
-};
+}
 
-
-export function getNovaPostWarehouses(city: string) {
+export async function getNovaPostWarehouses(city: string) {
     if (process.env.REACT_APP_PROFILE === 'test') {
         try {
             if (novaPostWarehouses.status === 'OK') {
@@ -384,9 +498,7 @@ export function getNovaPostWarehouses(city: string) {
                     });
                 };
 
-                let uwu = applyFilters(novaPostWarehouses.data, city);
-
-                return uwu;
+                return applyFilters(novaPostWarehouses.data, city);
             } else {
                 console.error('Failed to fetch warehouses:', novaPostWarehouses.error);
             }
@@ -394,9 +506,127 @@ export function getNovaPostWarehouses(city: string) {
             throw new Error('Error fetching data');
         }
     } else {
-        return []
+        const requestData = {
+            cityName: city
+        }
+
+        const queryParams = new URLSearchParams(requestData).toString();
+
+        const requestOptions = {
+            method: 'GET',
+            headers: getDefaultHeaders()
+        };
+
+        let response = await fetch(`${endpoints.getNovaPostDepartments}?${queryParams}`, requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                return response.json();
+            })
+            .catch(error => {
+                console.error('Error: ', error);
+            });
+
+        if (response === undefined || response === null || response.status !== 'OK') {
+            console.log('Product retrieving response is undefined or null')
+            return [];
+        }
+
+        return response.data.map((novaPostDepartment: any) => ({
+            Description: novaPostDepartment.Description,
+            ShortAddress: novaPostDepartment.ShortAddress,
+            Number: novaPostDepartment.Number,
+            CategoryOfWarehouse: novaPostDepartment.CategoryOfWarehouse,
+            TypeOfWarehouse: novaPostDepartment.TypeOfWarehouse
+        }));
     }
 }
+
+export async function processPayment(paymentToken: any, amount: number, currency: string, customerId: number) {
+    let transactionInitiativeModel: TransactionInitiativeModel = new TransactionInitiativeModel();
+    transactionInitiativeModel.amount = amount;
+    transactionInitiativeModel.paymentToken = paymentToken;
+    transactionInitiativeModel.currency = currency;
+    transactionInitiativeModel.customerId = customerId;
+
+    const requestOptions = {
+        method: 'POST',
+        headers: getDefaultHeaders(),
+        body: JSON.stringify(transactionInitiativeModel)
+    };
+
+    let response = await fetch(`${endpoints.initiateTransaction}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Error: ', error);
+        });
+
+    if (response === undefined || response === null || response.status !== 'OK') {
+        console.log('Transaction initiation response is undefined or null')
+    }
+}
+
+export function createOrder(createOrderModel: CreateOrder) {
+    const requestOptions = {
+        method: 'POST',
+        headers: getDefaultHeaders(),
+        body: JSON.stringify(createOrderModel)
+    };
+
+    console.log(JSON.stringify(createOrderModel))
+
+    fetch(`${endpoints.createOrder}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === 'OK') {
+                setCookie('cart', null, new Date(0))
+                redirectToOrderHistory();
+            }
+        })
+        .catch(error => {
+            console.log('Order registering response error')
+            console.error('Error: ', error);
+        });
+}
+
+export async function getUserInfo() {
+    const requestOptions = {
+        method: 'GET',
+        headers: getDefaultHeaders()
+    };
+
+    await fetch(`${endpoints.getUserInfoEndpoint}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                setCookie('userInfo', JSON.stringify(data['data']));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
 export default endpoints;
 
 root.render(

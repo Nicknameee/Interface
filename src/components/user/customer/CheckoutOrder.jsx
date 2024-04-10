@@ -2,9 +2,18 @@ import React, {useEffect, useState} from "react";
 import {Button, Col, Container, Form, FormCheck, FormControl, FormGroup, Nav, Row} from "react-bootstrap";
 import GooglePayButton from "@google-pay/button-react";
 import {CartProduct} from "../../../schemas/CartProduct.ts";
-import {addToCart, getCart, getCookie, isLoggedIn, logout, removeFromCart} from "../../../index";
+import {
+    addToCart,
+    createOrder,
+    getCart,
+    getCookie,
+    isLoggedIn,
+    logout,
+    processPayment,
+    removeFromCart
+} from "../../../index";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faShoppingCart, faSignOutAlt, faTrash, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faSignOutAlt, faTrash, faUser} from "@fortawesome/free-solid-svg-icons";
 import defaultImage from "../../../resources/imageNotFoundResource.png";
 import logo from "../../../resources/logo.png";
 import {redirectToPersonal, redirectToSignIn, redirectToSignUp, redirectToUI} from "../../../utilities/redirect";
@@ -17,6 +26,8 @@ import {CreateOrder} from "../../../schemas/CreateOrder.ts";
 import {OrderedProduct} from "../../../schemas/OrderedProduct.ts";
 import {DeliveryData} from "../../../schemas/DeliveryData.ts";
 import {OrderShipmentAddress} from "../../../schemas/OrderShipmentAddress.ts";
+import {TransactionState} from "../../../schemas/TransactionState.ts";
+import {Client} from "@stomp/stompjs";
 
 const CheckoutOrder = () => {
     const [user: User, setUser] = useState({});
@@ -28,7 +39,7 @@ const CheckoutOrder = () => {
     const [currency, setCurrency] = useState('UAH');
     const [deliveryData: DeliveryData] = useState(new DeliveryData());
     const [deliveryType: string, setDeliveryType] = useState('NONE');
-
+    const [transactionStatusMessage, setTransactionStatusMessage] = useState(null);
 
     const handleWheel = (e) => {
         document.getElementById('cart').scrollTop += e.deltaY;
@@ -127,66 +138,76 @@ const CheckoutOrder = () => {
         createOrderModel.customerId = user.id;
         createOrderModel.paymentType = paymentType;
         createOrderModel.paid = paid;
-        createOrderModel.orderedProducts = cart.map((cartProduct: CartProduct) => {
+        createOrderModel.orderedProducts = cart.map((cartProduct: CartProduct): OrderedProduct => {
           return new OrderedProduct(cartProduct.productId, cartProduct.itemsBooked)
         });
+
+        createOrderModel.deliveryServiceType = deliveryType;
+
         if (deliveryType !== 'NONE') {
-            createOrderModel.orderShipmentAddress = new OrderShipmentAddress(deliveryData.serialize());
+            createOrderModel.orderShipmentAddress = OrderShipmentAddress.build(deliveryData.serialize());
         } else {
             createOrderModel.orderShipmentAddress = null;
         }
-        createOrderModel.deliveryServiceType = deliveryType;
 
-        //Completed CreateOrderModel is ready to be sent to backend
-        console.log(JSON.stringify(createOrderModel));
+        createOrder(createOrderModel);
     };
 
     const canCheckout = () => {
-        return paymentType === 'COD' || (paymentType === 'PREPAYMENT' && paid);
-    }
+        return (paymentType === 'COD' || (paymentType === 'PREPAYMENT')) && isLoggedIn();
+    };
+
+    const changePaymentType = (paymentType) => {
+        setPaymentType(paymentType);
+    };
 
     useEffect(() => {
         let cartProducts: CartProduct[] = getCart();
         setCart(cartProducts);
-        setUser(User.ReadUser(getCookie('userInfo')));
+
+        let userData: User = User.ReadUser(getCookie('userInfo'));
+        setUser(userData);
+
         if (cartProducts.length > 0) {
             setCurrency(cartProducts[0].currency)
         }
-        setUserCountry(getCookie('country'))
 
-        // const client = new Client({
-        //     brokerURL: process.env.REACT_APP_ORDER_SERVICE_WEB_SOCKET_ADDRESS,
-        //     debug: function (str) {
-        //         console.log(str);
-        //     },
-        //     reconnectDelay: 15000,
-        //     heartbeatIncoming: 1000,
-        //     heartbeatOutgoing: 1000,
-        // });
-        //
-        // client.activate();
-        //
-        // client.onConnect = () => {
-        //     console.log('Connected to WebSocket server');
-        //
-        //     client.subscribe('/topic/transaction/state/' + user.id, (message) => {
-        //         console.log('Received message:', message.body);
-        //
-        //         let transactionState: TransactionState = JSON.parse(message.body);
-        //
-        //         if (transactionState.success) {
-        //             setPaid(true)
-        //         } else {
-        //             alert('Transaction not succeeded with status', transactionState.status)
-        //             setPaid(false)
-        //         }
-        //     });
-        // };
-        //
-        // client.onStompError = (frame) => {
-        //     console.log('WebSocket error:', frame.headers.message);
-        // };
-    }, [cartUpdate, user.timezone]);
+        setUserCountry(getCookie('country'));
+
+        const client = new Client({
+            brokerURL: process.env.REACT_APP_ORDER_SERVICE_WEB_SOCKET_ADDRESS,
+            debug: function (str) {
+                console.debug(str);
+            },
+            reconnectDelay: 5000,
+            heartbeatIncoming: 1000,
+            heartbeatOutgoing: 1000,
+        });
+
+        client.activate();
+
+        client.onConnect = () => {
+            client.subscribe('/topic/transaction/state/' + user.id, (message) => {
+                console.log(`Socket message /topic/transaction/state/${user.id} ${message.body}`);
+                let transactionState: TransactionState = JSON.parse(message.body).data;
+
+                if (transactionState.authorized && transactionState.settled) {
+                    setTransactionStatusMessage('Transaction settle process is completed, payment is processed');
+                    setPaid(true);
+                } else {
+                    setTransactionStatusMessage('Transaction settle process has not succeeded, payment is not processed');
+                    console.log('Transaction status ', transactionState.status);
+                    setPaid(false);
+                }
+            });
+        };
+    }, [cartUpdate, user.id]);
+
+    useEffect(() => {
+        if (paid) {
+            initiateOrderCreation();
+        }
+    }, [paid]);
 
     return (
         <div className="page" style={{background: '#cea4a4'}}>
@@ -194,22 +215,34 @@ const CheckoutOrder = () => {
             <Container fluid className="h-100">
                 <Row className="align-items-center justify-content-between" xs={12}>
                     <Col xs={1} className="d-flex align-items-center justify-content-center">
-                        <img src={logo} alt="Logo" style={{ maxWidth: '30%', height: 'auto', cursor: 'pointer' }} onClick={redirectToUI}  />
+                        <img src={logo} alt="Logo" title={'Home'} style={{ maxWidth: '30%', height: 'auto', cursor: 'pointer' }} onClick={redirectToUI}  />
                     </Col>
                     <Col xs={2} className="d-flex align-items-center justify-content-center">
                         <h1>CRM Assistant</h1>
                     </Col>
-                    <Col xs={6} className="d-flex align-items-center justify-content-center">
+                    <Col xs={8} className="d-flex align-items-center justify-content-center">
                         <Form inline className="w-100 d-inline-flex justify-content-around">
-                            <FormControl type="text" placeholder="Search" className="mr-sm-2 w-75" />
+                            {/*<FormControl type="text" placeholder="Search" className="mr-sm-2 w-75" />*/}
                         </Form>
                     </Col>
-                    <Col xs={3} className="d-flex align-items-center justify-content-around">
-                        <Button variant="outline-light" className="mr-2 w-25" onClick={redirectToSignIn}>Login</Button>
-                        <Button variant="outline-light" className="mr-2 w-25" onClick={redirectToSignUp}>Register</Button>
-                        {isLoggedIn() && <FontAwesomeIcon icon={faUser} className="icon" onClick={redirectToPersonal}/> &&
-                            <FontAwesomeIcon icon={faShoppingCart} className="icon" /> &&
-                            <FontAwesomeIcon icon={faSignOutAlt} className="icon" onClick={logout}/>}
+                    <Col xs={1} className="d-flex align-items-center justify-content-around">
+                        {!isLoggedIn() ?
+                            <div>
+                                <Button variant="outline-light" className="mr-2 w-25" title={'Login'} onClick={redirectToSignIn}>Login</Button>
+                                <Button variant="outline-light" className="mr-2 w-25" title={'Sign Up'} onClick={redirectToSignUp}>Register</Button>
+                            </div>
+                            :
+                            null
+                        }
+                        {isLoggedIn() ?
+                            <div className="d-flex justify-content-around w-100">
+                                <FontAwesomeIcon icon={faUser} className="icon" title={'Personal'} onClick={redirectToPersonal}/>
+                                {/*<FontAwesomeIcon icon={faShoppingCart} className="icon" />*/}
+                                <FontAwesomeIcon icon={faSignOutAlt} className="icon" title={'Logout'} onClick={logout}/>
+                            </div>
+                            :
+                            null
+                        }
                     </Col>
                 </Row>
             </Container>
@@ -234,14 +267,15 @@ const CheckoutOrder = () => {
                             <Container style={{overflowY: 'scroll', width: '100%', height: '100%', borderRight: '3px solid black'}} className="py-1">
                                 {cart.map((item: CartProduct, index: number) => (
                                     <div key={index} className="cart-item py-5 px-5 d-flex justify-content-between position-relative w-100" style={{borderBottom: '1px dashed gray'}}>
-                                        <FontAwesomeIcon icon={faTrash} className="position-absolute" style={{width: '19px', height: '19px', left: '89%', border: 'none', top: '3%', cursor: 'pointer'}} onClick={() => removeProductFromCart(item.productId)}/>
+                                        <FontAwesomeIcon icon={faTrash} className="position-absolute"
+                                                         style={{width: '19px', height: '19px', left: '89%', border: 'none', top: '3%', cursor: 'pointer'}} onClick={() => {removeProductFromCart(item.productId)}} />
                                         <img src={item.introductionPictureUrl || defaultImage} alt={item.name} className="cart-item-image" style={{maxWidth: '150px', maxHeight: '150px', borderRadius: '15%', marginRight: '1em'}} />
                                         <div className="cart-item-details w-100">
                                             <p className="font-monospace" style={{fontWeight: "bold"}}>{item.name}</p>
                                             <p className="font-monospace" style={{fontWeight: "bold"}}>  Cost: {item.cost} {item.currency}</p>
                                             <p className="font-monospace" style={{fontWeight: "bold"}}>Items: {item.itemsBooked}</p>
-                                            <button className="btn btn-success w-50 m-1" onClick={() => handleChangeQuantity(item.productId, '+')}>+</button>
-                                            <button className="btn btn-danger w-50 m-1" onClick={() => handleChangeQuantity(item.productId, '-')} disabled={item.itemsBooked === 0}>-</button>
+                                            <button className="btn btn-success w-50 m-1" onClick={() => handleChangeQuantity(item.productId, '+')} disabled={paid}>+</button>
+                                            <button className="btn btn-danger w-50 m-1" onClick={() => handleChangeQuantity(item.productId, '-')} disabled={item.itemsBooked === 0 || paid}>-</button>
                                         </div>
                                     </div>
                                 ))}
@@ -250,7 +284,7 @@ const CheckoutOrder = () => {
                     </div>
                 </Nav>
             </Col>
-            <div className="w-50 d-flex flex-wrap flex-column">
+            <div className="w-50 d-flex flex-wrap flex-column px-5">
                 <div style={{ width: '100%', height: '90%', display: 'flex', justifyContent: 'space-around', flexDirection: 'column'}} id="delivery">
                     <h1>Delivery</h1>
                     <FormGroup>
@@ -273,13 +307,18 @@ const CheckoutOrder = () => {
                                 label={option}
                                 value={option}
                                 checked={paymentType === option}
-                                onChange={() => setPaymentType(option)}
+                                onChange={() => changePaymentType(option)}
                             />
                         ))}
                     </FormGroup>
                     {
                         paymentType === 'PREPAYMENT' &&
                         <GooglePayButton
+                            onReadyToPayChange={(result) => {
+                                if (!result.isReadyToPay) {
+                                    alert('Seems like your browser does not support Google Pay options, try to change settings/browser client or use Cash-on-Delivery type of payment')
+                                }
+                            }}
                             environment="TEST"
                             paymentRequest={{
                                 apiVersion: 2,
@@ -294,30 +333,39 @@ const CheckoutOrder = () => {
                                         tokenizationSpecification: {
                                             type: "PAYMENT_GATEWAY",
                                             parameters: {
-                                                gateway: "paytech",
+                                                gateway: "datatrans",
                                                 gatewayMerchantId: "CRMAssistant",
                                             },
                                         },
                                     },
                                 ],
                                 merchantInfo: {
-                                    merchantId: "12345678901234567890",
+                                    merchantId: "CRM",
                                     merchantName: "Google Pay Purchase",
                                 },
                                 transactionInfo: getTransactionInfo(),
                                 callbackIntents: ["PAYMENT_AUTHORIZATION"],
                             }}
-                            onPaymentAuthorized={paymentData => {
-                                console.log(JSON.stringify(paymentData.paymentMethodData.tokenizationData.token));
-                                return { transactionState: 'SUCCESS' };
+                            onPaymentAuthorized={async paymentData => {
+                                await processPayment(paymentData.paymentMethodData.tokenizationData.token, getTotalCost(), currency, user.id)
+
+                                return {transactionState: 'SUCCESS'};
                             }}
                             existingPaymentMethodRequired='true'
                             buttonColor="black"
                             buttonType="buy"
-                            buttonSizeMode="fill"></GooglePayButton>
+                            buttonSizeMode="fill" />
+                    }
+                    {
+                        paymentType === 'PREPAYMENT' &&
+                        <p className="w-100 text-center font-monospace">{transactionStatusMessage}</p>
                     }
                 </div>
                 <Button className="my-3 btn btn-success" disabled={!canCheckout()} onClick={initiateOrderCreation}>Checkout</Button>
+                {!isLoggedIn()
+                    &&
+                    <Button className="my-3 btn btn-secondary" onClick={redirectToSignIn}>You need to authorize first!</Button>
+                }
             </div>
         </Container>
         }

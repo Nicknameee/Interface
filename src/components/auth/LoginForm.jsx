@@ -1,10 +1,9 @@
 import {useState} from 'react';
-import {Button, Col, Container, Form, FormControl, Row} from 'react-bootstrap';
-import {isLoggedIn, signIn} from '../../index.js'
+import {Button, Col, Container, Form, Row} from 'react-bootstrap';
+import {signIn} from '../../index.js'
 import * as utility from '../../constants/pattern.js'
-import {redirectToSignIn, redirectToSignUp, redirectToUI} from "../../utilities/redirect";
+import {redirectToPreviousLoginUrl, redirectToSignUp, redirectToUI} from "../../utilities/redirect";
 import logo from "../../resources/logo.png";
-import {faShoppingCart, faSignOutAlt, faUser} from "@fortawesome/free-solid-svg-icons";
 
 const LoginForm = () => {
     const [login, setLogin] = useState('');
@@ -12,6 +11,7 @@ const LoginForm = () => {
     const [loginException, setLoginException] = useState('');
     const [passwordException, setPasswordException] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+
 
     const handleLoginChange = (value) => {
         setLogin(value)
@@ -43,7 +43,11 @@ const LoginForm = () => {
 
     const handleSignIn = () => {
         if (login && password) {
-            signIn(login, password).then((r) => console.log(JSON.stringify(r)))
+            signIn(login, password)
+                .then(() => {
+                    console.log('Sign in invocation is done');
+                    redirectToPreviousLoginUrl()
+                })
         } else {
             if (!login) {
                 setLoginException('Invalid login')

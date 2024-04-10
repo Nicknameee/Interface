@@ -1,10 +1,10 @@
 import {useEffect, useState} from 'react';
-import {Button, Col, Container, Form, FormControl, Row} from 'react-bootstrap';
+import {Button, Col, Container, Form, Row} from 'react-bootstrap';
 import {getDefaultHeaders, signIn} from '../../index.js'
 import '@fortawesome/fontawesome-free/css/all.css'
 import {certificationEndpoint, checkCredentialsAvailabilityEndpoint, signUpEndpoint} from "../../constants/endpoints";
 import {Client} from '@stomp/stompjs';
-import {redirectToSignIn, redirectToUI} from "../../utilities/redirect";
+import {redirectToPreviousLoginUrl, redirectToSignIn, redirectToUI} from "../../utilities/redirect";
 import logo from "../../resources/logo.png";
 
 const SignUpForm = () => {
@@ -229,6 +229,10 @@ const SignUpForm = () => {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 } else {
                     signIn(username, password)
+                        .then(() => {
+                            console.log('Sign in invocation is done');
+                            redirectToPreviousLoginUrl();
+                        })
                 }
             })
             .catch(error => {
