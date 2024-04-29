@@ -1,12 +1,15 @@
 import React from 'react';
 import defaultImage from "../../../resources/imageNotFoundResource.png";
 import {redirectToProductPage} from "../../../utilities/redirect";
-import {CustomerProduct} from "../../../schemas/CustomerProduct.ts";
+import {Product} from "../../../schemas/responses/models/Product.ts";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faShoppingCart} from "@fortawesome/free-solid-svg-icons";
+import {faFeather} from "@fortawesome/free-solid-svg-icons";
+import {addToWaitingList} from "../../../index";
+import {WaitingListProduct} from "../../../schemas/data/WaitingListProduct.ts";
+import {Button} from "react-bootstrap";
 
-const Products = ({products}) => {
-    const list = (products: CustomerProduct[]) => {
+const Products = ({products, productPage, setProductPage, categoriesPresent}) => {
+    const list = (products: Product[]) => {
         if (products.length > 0) {
             return (
                 products.map((product) => (
@@ -35,8 +38,8 @@ const Products = ({products}) => {
                                     <button className="btn btn-dark" disabled={true}>Not Available</button>
                                     :
                                     <div>
-                                        <button className="btn btn-success" style={{marginRight: '10px'}} onClick={() => redirectToProductPage(product.productId)}>Check It Up</button>
-                                        <button className="btn btn-primary" onClick={() => redirectToProductPage(product.productId)}><FontAwesomeIcon icon={faShoppingCart}/></button>
+                                        <button className="btn btn-success" style={{marginRight: '10px'}} onClick={() => redirectToProductPage(product.productId)} title={'Check Up Product Page'}>Check It Up</button>
+                                        <button className="btn btn-primary" onClick={() => addToWaitingList(WaitingListProduct.getOfProduct(product))} title={'Add Product To Waiting List'}><FontAwesomeIcon icon={faFeather}/></button>
                                     </div>
                                 }
                             </div>
@@ -52,6 +55,25 @@ const Products = ({products}) => {
         <div className="w-100 py-0">
             <div className="row justify-content-center w-100 py-0">
                 {list(products)}
+                {
+                    products.length < 1 && categoriesPresent &&
+                    <h4 className="w-100 text-center">No products were found....</h4>
+                }
+                {
+                    categoriesPresent &&
+                    <div className="w-100 d-flex justify-content-center">
+                        <Button className="mx-3" style={{width: '100px'}} onClick={() => {
+                            if (productPage > 1) {
+                                setProductPage(productPage - 1)
+                            }
+                        }}>Prev</Button>
+                        <Button className="mx-3" style={{width: '100px'}} onClick={() => {
+                            if (products.length > 0) {
+                                setProductPage(productPage + 1)
+                            }
+                        }}>Next</Button>
+                    </div>
+                }
             </div>
         </div>
     );

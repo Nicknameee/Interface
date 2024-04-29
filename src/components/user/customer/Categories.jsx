@@ -1,11 +1,12 @@
 import React, {useRef} from 'react';
 import defaultImage from '../../../resources/imageNotFoundResource.png';
 import {redirectToCategory} from "../../../utilities/redirect";
-import {Category} from "../../../schemas/Category.ts";
+import {Category} from "../../../schemas/responses/models/Category.ts";
 import {getQueryParam} from "../../../index";
 import {useLocation} from "react-router-dom";
+import {Button} from "react-bootstrap";
 
-const Categories = ({categories}) => {
+const Categories = ({categories, isSubCategoryOpened, categoriesPage, setCategoriesPage, productPresent}) => {
     const location = useLocation();
     const imagesRef = useRef(null);
 
@@ -95,6 +96,24 @@ const Categories = ({categories}) => {
         <div className="w-100 py-0">
             <div className="row justify-content-center w-100 py-0">
                 {list(categories)}
+                {
+                    categories.length < 1 && isSubCategoryOpened && productPresent &&
+                    <h4 className="w-100 text-center">No categories were found....</h4>
+                }
+                {
+                    <div className="w-100 d-flex justify-content-center">
+                        <Button className="mx-3" style={{width: '100px'}} onClick={() => {
+                            if (categoriesPage > 1) {
+                                setCategoriesPage(categoriesPage - 1)
+                            }
+                        }}>Prev</Button>
+                        <Button className="mx-3" style={{width: '100px'}} onClick={() => {
+                            if (categories.length > 0) {
+                                setCategoriesPage(categoriesPage + 1)
+                            }
+                        }}>Next</Button>
+                    </div>
+                }
             </div>
         </div>
     );

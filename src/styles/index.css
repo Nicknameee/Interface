@@ -13,21 +13,33 @@ body {
     height: fit-content;
     min-height: 100vh;
 }
-.password-input-container {
+.input-container {
     position: relative;
+}
+.required-field {
+    position: absolute;
+    z-index: 100;
+    top: 30%;
+    left: 10px; /* Adjust as needed */
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: chocolate;
+    width: 10px;
 }
 .password-toggle-icon {
     position: absolute;
+    z-index: 100;
     top: 50%;
     right: 10px; /* Adjust as needed */
     transform: translateY(-50%);
     cursor: pointer;
+    color: black;
 }
 .custom-form {
     width: 30vw;
     margin: auto;
     padding: 30px; /* Adjust padding as needed */
-    background: linear-gradient(to bottom right, #ff9966, #ff5e62); /* Gradient background */
+    background: linear-gradient(to bottom right, #02789a, #26184b); /* Gradient background */
     border-radius: 15px; /* Rounded borders */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Box shadow for depth effect */
     height: auto;
@@ -142,4 +154,11 @@ body {
 .paymentSelect:hover {
     color: #646363;
     transition: all 0.1s ease-in-out;
+}
+.select {
+    transition: background ease-in-out 0.3s;
+    cursor: pointer;
+}
+.select:hover {
+    background: #255d6e;
 }

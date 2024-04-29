@@ -1,26 +1,208 @@
-import {useEffect, useState} from "react";
-import {Col, Container, Nav, Navbar, Row} from "react-bootstrap";
+import {CustomerOrder} from "../../../schemas/responses/models/CustomerOrder.ts";
+import {Button, Card, CardBody, CardHeader, Collapse, ListGroup, ListGroupItem} from "react-bootstrap";
+import React, {useEffect, useState} from "react";
+import {redirectToUI} from "../../../utilities/redirect";
+import {ShipmentAddress} from "../../../schemas/responses/models/ShipmentAddress.ts";
+import {getOrderHistory, isLoggedIn} from "../../../index";
+import {OrderHistory} from "../../../schemas/responses/models/OrderHistory.ts";
+import {OrderFilter} from "../../../schemas/requests/filters/OrderFilter.ts";
+import OrderedProducts from "./OrderedProducts";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faAngleDown, faAngleUp} from "@fortawesome/free-solid-svg-icons";
 
-const Orders = ({userInfo}) => {
-    const [orders, setOrders] = useState([])
+const Orders = ({orders}) => {
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
+    const [selectedProductId, setSelectedProductId] = useState(null);
+    const [selectedAddressId, setSelectedAddressId] = useState(null);
+    const [selectedTransactionId, setSelectedTransactionId] = useState(null);
+    const [orderHistoryView: OrderHistory[], setOrderHistoryView] = useState([]);
+    const [historyClicked: boolean, setHistoryClicked] = useState(false);
 
-    useEffect(() => {
-
-    }, []);
-
-    const fetchOrders = () => {
-
+    const toggleOrder = (orderId) => {
+        setOrderHistoryView([])
+        setHistoryClicked(false)
+        setSelectedProductId(null);
+        setSelectedOrderId(selectedOrderId === orderId ? null : orderId);
     };
 
-    return (
-        <div>
-            {orders.map((item, index) => (
-                <div>
+    const toggleProduct = (productId) => {
+        setSelectedProductId(selectedProductId === productId ? null : productId);
+    };
 
-                </div>
-            ))}
+    const formatDate = (dateDate: string): string => {
+        const date: Date = new Date(dateDate);
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+    };
+
+    const toggleAddress = (addressId) => {
+        setSelectedAddressId(selectedAddressId === addressId ? null : addressId);
+    };
+
+    const toggleHistory = (orderNumber: string) => {
+        setHistoryClicked(!historyClicked);
+
+        if (orderHistoryView.length > 0) {
+            setOrderHistoryView([])
+        } else {
+            const initHistory = async (num) => {
+                const orderFilter: OrderFilter = new OrderFilter();
+                orderFilter.orderNumber = num;
+                const history = await getOrderHistory(orderFilter);
+
+                setOrderHistoryView(history)
+            };
+
+            initHistory(orderNumber).then(() => console.log('Orders were fetched successfully'));
+        }
+    };
+
+    const toggleTransaction = (transactionId: string) => {
+        if (selectedTransactionId) {
+            setSelectedTransactionId(null)
+        } else {
+            setSelectedTransactionId(transactionId)
+        }
+    }
+
+    useEffect(() => {
+        if (!isLoggedIn()) {
+            alert('You are not authorized to view this page!')
+            redirectToUI()
+        }
+    }, []);
+
+    return (
+        <div className="container">
+            <h2>Orders</h2>
+            <div className="row">
+                {
+                    orders.length > 0 ?
+                        orders.map((customerOrder: CustomerOrder) => (
+                            <div className="col-md-6 w-100" key={customerOrder.order.id}>
+                                <Card className="mb-3"  key={crypto.randomUUID()}>
+                                    <CardHeader onClick={() => toggleOrder(customerOrder.order.id)} style={{ cursor: 'pointer' }}>
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            <span>Order Number: {customerOrder.order.number} | Status: {customerOrder.order.status} | Date: {formatDate(customerOrder.order.creationDate)}</span>
+                                            <FontAwesomeIcon icon={selectedOrderId === customerOrder.order.id ? faAngleUp : faAngleDown} />
+                                        </div>
+                                    </CardHeader>
+                                    <Collapse in={selectedOrderId === customerOrder.order.id}>
+                                        <CardBody>
+                                            <ListGroup>
+                                                <ListGroupItem key={crypto.randomUUID()}>Ordered Product Cost: {customerOrder.order.orderedProductCost}</ListGroupItem>
+                                                <ListGroupItem key={crypto.randomUUID()}>Status: {customerOrder.order.status}</ListGroupItem>
+                                                <ListGroupItem key={crypto.randomUUID()}>Payment Type: {customerOrder.order.paymentType}</ListGroupItem>
+                                                <ListGroupItem key={crypto.randomUUID()}>Creation Date: {formatDate(customerOrder.order.creationDate)}</ListGroupItem>
+                                                <ListGroupItem key={crypto.randomUUID()}>Processing Operator ID: {customerOrder.order.processingOperatorId || 'UNKNOWN'}</ListGroupItem>
+                                                <ListGroupItem key={crypto.randomUUID()}>Paid: {String(customerOrder.order.paid).toUpperCase()}</ListGroupItem>
+                                                <ListGroupItem key={crypto.randomUUID()}>Last Update Date: {formatDate(customerOrder.order.lastUpdateDate)}</ListGroupItem>
+                                                <ListGroupItem key={crypto.randomUUID()}>Delivery Service: {customerOrder.order.deliveryServiceType}</ListGroupItem>
+                                                {
+                                                    customerOrder.order.deliveryServiceType !== 'NONE' &&
+                                                    <ListGroupItem key={crypto.randomUUID()}>Delivery Cost: {customerOrder.order.deliveryCost}</ListGroupItem>
+                                                }
+                                            </ListGroup>
+                                            {
+                                                customerOrder.order.shipmentAddress !== undefined && customerOrder.order.shipmentAddress !== null &&
+                                                    <Card className="my-3" key={crypto.randomUUID()}>
+                                                        <CardHeader onClick={() => toggleAddress(customerOrder.order.shipmentAddress.id)} style={{ cursor: 'pointer' }}>
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <span>Delivery Address</span>
+                                                                <FontAwesomeIcon icon={selectedAddressId === customerOrder.order.shipmentAddress.id ? faAngleUp : faAngleDown} />
+                                                            </div>
+                                                        </CardHeader>
+                                                        <Collapse in={selectedAddressId === customerOrder.order.shipmentAddress.id}>
+                                                            <CardBody>
+                                                                <ListGroup>
+                                                                    {
+                                                                        Object.entries(customerOrder.order.shipmentAddress.address).filter(([key: string, value: string]) => ShipmentAddress.customerViewAllowed(key)).map(([key: string, value: string]) => (
+                                                                            <ListGroupItem key={crypto.randomUUID()}>{ShipmentAddress.getAddressLocaleByName(key)} : {value ? value : 'UNKNOWN'}</ListGroupItem>
+                                                                        ))
+                                                                    }
+                                                                </ListGroup>
+                                                            </CardBody>
+                                                        </Collapse>
+                                                    </Card>
+                                            }
+                                            {
+                                                customerOrder.transaction !== undefined && customerOrder.transaction !== null &&
+                                                    <Card className="my-3" key={crypto.randomUUID()}>
+                                                        <CardHeader onClick={() => toggleTransaction(customerOrder.order.transactionId)} style={{ cursor: 'pointer' }}>
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <span>Transaction</span>
+                                                                <FontAwesomeIcon icon={selectedTransactionId === customerOrder.order.transactionId ? faAngleUp : faAngleDown} />
+                                                            </div>
+                                                        </CardHeader>
+                                                        <Collapse in={selectedTransactionId === customerOrder.order.transactionId}>
+                                                            <CardBody>
+                                                                <ListGroup>
+                                                                    <ListGroupItem key={crypto.randomUUID()}>Transaction Fee: {customerOrder.transaction.amount} {customerOrder.transaction.sourceCurrency}</ListGroupItem>
+                                                                    <ListGroupItem key={crypto.randomUUID()}>Status: {customerOrder.transaction.status}</ListGroupItem>
+                                                                    <ListGroupItem key={crypto.randomUUID()}>Is Authorized: {String(customerOrder.transaction.authorized).toUpperCase()}</ListGroupItem>
+                                                                    <ListGroupItem key={crypto.randomUUID()}>Is Settled: {String(customerOrder.transaction.settled).toUpperCase()}</ListGroupItem>
+                                                                </ListGroup>
+                                                            </CardBody>
+                                                        </Collapse>
+                                                    </Card>
+                                            }
+                                            <hr />
+                                            <h5>Ordered Products:</h5>
+                                            <OrderedProducts orderedProducts={customerOrder.order.orderedProducts} toggleProduct={toggleProduct} selectedProductId={selectedProductId} />
+                                            <Button className="my-3" onClick={() => toggleHistory(customerOrder.order.number)}>{orderHistoryView.length <= 0 ? 'Order History' : 'Close'}</Button>
+                                            {
+                                                orderHistoryView.length > 0 && orderHistoryView.map((view: OrderHistory) => (
+                                                    <div className="flex-wrap w-100 d-flex my-1 border-bottom border-black">
+                                                        <h5 className="w-100">Update # {view.iteration} at {formatDate(view.updateTime)}</h5>
+                                                        <ListGroup className="w-50 font-monospace">
+                                                            <ListGroupItem key={crypto.randomUUID()}>Ordered Product Cost: {view.oldOrder.orderedProductCost} {view.isParamChanged('orderedProductCost') ? '->' : ''}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()}>Status: {view.oldOrder.status} {view.isParamChanged('status') ? '->' : ''}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()}>Payment Type: {view.oldOrder.paymentType}                                {view.isParamChanged('paymentType') ? '->' : ''}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()}>Creation Date: {formatDate(view.oldOrder.creationDate)}                  {view.isParamChanged('creationDate') ? '->' : ''}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()}>Processing Operator ID: {view.oldOrder.processingOperatorId || 'UNKNOWN'}{view.isParamChanged('processingOperatorId') ? '->' : ''}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()}>Paid: {String(view.oldOrder.paid).toUpperCase()}                         {view.isParamChanged('paid') ? '->' : ''}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()}>Last Update Date: {formatDate(view.oldOrder.lastUpdateDate)}             {view.isParamChanged('lastUpdateDate') ? '->' : ''}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()}>Delivery Service: {view.oldOrder.deliveryServiceType} {view.isParamChanged('deliveryServiceType') ? '->' : ''}</ListGroupItem>
+                                                            {
+                                                                view.oldOrder.deliveryServiceType !== 'NONE' &&
+                                                                <ListGroupItem key={crypto.randomUUID()}>Delivery Cost: {view.oldOrder.deliveryCost}</ListGroupItem>
+                                                            }
+                                                        </ListGroup>
+                                                        <ListGroup className="w-50 font-monospace">
+                                                            <ListGroupItem key={crypto.randomUUID()} className={view.isParamChanged('orderedProductCost') ? 'text-decoration-underline' : ''}>Ordered Product Cost: {view.updatedOrder.orderedProductCost}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()} className={view.isParamChanged('status') ? 'text-decoration-underline' : ''}>Status: {view.updatedOrder.status}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()} className={view.isParamChanged('paymentType') ? 'text-decoration-underline' : ''}>Payment Type: {view.updatedOrder.paymentType}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()} className={view.isParamChanged('creationDate') ? 'text-decoration-underline' : ''}>Creation Date: {formatDate(view.updatedOrder.creationDate)}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()} className={view.isParamChanged('processingOperatorId') ? 'text-decoration-underline' : ''}>Processing Operator ID: {view.updatedOrder.processingOperatorId || 'UNKNOWN'}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()} className={view.isParamChanged('paid') ? 'text-decoration-underline' : ''}>Paid: {String(view.updatedOrder.paid).toUpperCase()}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()} className={view.isParamChanged('lastUpdateDate') ? 'text-decoration-underline' : ''}>Last Update Date: {formatDate(view.updatedOrder.lastUpdateDate)}</ListGroupItem>
+                                                            <ListGroupItem key={crypto.randomUUID()} className={view.isParamChanged('deliveryServiceType') ? 'text-decoration-underline' : ''}>Delivery Service: {view.updatedOrder.deliveryServiceType}</ListGroupItem>
+                                                            {
+                                                                view.updatedOrder.deliveryServiceType !== 'NONE' &&
+                                                                <ListGroupItem key={crypto.randomUUID()}>Delivery Cost: {view.updatedOrder.deliveryCost}</ListGroupItem>
+                                                            }
+                                                        </ListGroup>
+                                                    </div>
+                                                    )
+                                                )
+                                            }
+                                            {
+                                                historyClicked && orderHistoryView.length < 1 &&
+                                                <h5 className="font-monospace my-3">No history records were found</h5>
+                                            }
+                                        </CardBody>
+                                    </Collapse>
+                                </Card>
+                            </div>
+                        ))
+                        :
+                        <div>
+                            <h1 className="font-monospace my-3">You seem to not have any orders...</h1>
+                            <h3 onClick={() => redirectToUI()} className="text-decoration-underline" style={{cursor: 'pointer'}}>Go to main</h3>
+                        </div>
+                }
+            </div>
         </div>
-    );
+    )
 }
 
 export default Orders;

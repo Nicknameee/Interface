@@ -1,11 +1,22 @@
 import {useEffect, useState} from 'react';
-import {Button, Col, Container, Form, Row} from 'react-bootstrap';
-import {getDefaultHeaders, signIn} from '../../index.js'
+import {Button, Form} from 'react-bootstrap';
+import {
+    checkTelegramUsernameExists,
+    getDefaultHeaders, initiateCredentialsAvailabilityChecking,
+    isLoggedIn,
+    requestAdditionalApprovalCode,
+    signIn
+} from '../../index.js'
 import '@fortawesome/fontawesome-free/css/all.css'
-import {certificationEndpoint, checkCredentialsAvailabilityEndpoint, signUpEndpoint} from "../../constants/endpoints";
+import * as endpoints from "../../constants/endpoints";
 import {Client} from '@stomp/stompjs';
 import {redirectToPreviousLoginUrl, redirectToSignIn, redirectToUI} from "../../utilities/redirect";
-import logo from "../../resources/logo.png";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import * as utility from '../../constants/pattern.js'
+import {notifyError, notifySuccess} from "../../utilities/notify";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faAsterisk, faEye, faEyeSlash} from "@fortawesome/free-solid-svg-icons";
 
 const SignUpForm = () => {
     const [username, setUsername] = useState('');
@@ -26,6 +37,9 @@ const SignUpForm = () => {
     const [showTelegramInput, setShowTelegramInput] = useState(false);
     const [telegramSigningUp, setTelegramSigningUp] = useState(false);
     const [emailSigningUp, setEmailSigningUp] = useState(false);
+
+    const [lastTimePoint: number, setLastTimePoint] = useState(new Date(0).getTime());
+    let webSocketClient;
 
     const handleUsernameChange = (value) => {
         setUsername(value)
@@ -67,6 +81,10 @@ const SignUpForm = () => {
         } else {
             setPasswordException('')
         }
+
+        if (value === passwordConfirmation) {
+            setPasswordConfirmationException('')
+        }
     };
 
     const handlePasswordConfirmationChange = (value) => {
@@ -81,7 +99,7 @@ const SignUpForm = () => {
         } else {
             setPasswordConfirmationException('')
         }
-    }
+    };
 
     const handleTelegramNicknameChange = (value) => {
         setTelegramUsername(value)
@@ -90,8 +108,8 @@ const SignUpForm = () => {
             return
         }
 
-        if (!(/^[A-Za-z0-9_]{5,}$/).test(value) && value) {
-            setTelegramUsernameException('Invalid telegram username')
+        if (!utility.TELEGRAM_USERNAME_PATTERN.test(value) && value) {
+            setTelegramUsernameException('Invalid telegram username, must be in format @Username 5 list of username at least')
         } else {
             setTelegramUsernameException('')
         }
@@ -111,53 +129,20 @@ const SignUpForm = () => {
         }
     };
 
-    const initiateCredentialsAvailabilityChecking = async () => {
-        const requestData = {
-            username: username,
-            email: email === '' ? null : email,
-            telegramUsername: telegramUsername === '' ? null : telegramUsername
-        };
-
-        const requestOptions = {
-            method: 'POST',
-            headers: getDefaultHeaders() ,
-            body: JSON.stringify(requestData),
-        };
-
-        let result = true
-
-        await fetch(`${checkCredentialsAvailabilityEndpoint}`, requestOptions)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                return response.json();
-            })
-            .then(json => {
-                if (json.data.email === false && email !== '') {
-                    setEmailException('User with this email already exists')
-                    result = false
-                }
-                if (json.data.username === false) {
-                    setUsernameException('User with this username already exists')
-                    result = false
-                }
-                if (json.data.telegramUsername === false && telegramUsername !== '') {
-                    setTelegramUsernameException('User with this telegram already exists')
-                    result = false
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-
-        return result;
-    }
+    const initiateCredentialsAvailabilityCheckingHook = async () => {
+        await initiateCredentialsAvailabilityChecking(username, email, telegramUsername, setUsernameException, setEmailException, setTelegramUsernameException)
+    };
 
     const handleSignUp = async () => {
-        if (await initiateCredentialsAvailabilityChecking() && infoValid()) {
-            await initiateSigningUp()
+        if (await initiateCredentialsAvailabilityCheckingHook() && infoValid()) {
+            notifySuccess('Initiating verification process...')
+            if (telegramUsername !== '') {
+                if (await checkTelegramUsernameExists(telegramUsername)) {
+                    await initiateSigningUp()
+                }
+            } else {
+                await initiateSigningUp()
+            }
         } else {
             if (!username) {
                 setUsernameException('Invalid username')
@@ -183,7 +168,7 @@ const SignUpForm = () => {
             email: email === '' ? null : email,
             password: password,
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            telegramUsername: telegramUsername === '' ? null : telegramUsername
+            telegramUsername: telegramUsername === '' ? null : telegramUsername.replace('@', '')
         };
 
         const requestOptions = {
@@ -192,7 +177,7 @@ const SignUpForm = () => {
             body: JSON.stringify(requestData),
         };
 
-        await fetch(`${signUpEndpoint}`, requestOptions)
+        await fetch(`${endpoints.signUpEndpoint}`, requestOptions)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -212,8 +197,13 @@ const SignUpForm = () => {
     };
 
     const initiateVerification = async () => {
+        if (code === '') {
+            notifyError('Code for verification is not set');
+            return;
+        }
+
         const requestData = {
-            identifier: telegramUsername,
+            identifier: telegramUsername.replace('@', ''),
             code: code
         };
 
@@ -223,33 +213,45 @@ const SignUpForm = () => {
             body: JSON.stringify(requestData),
         };
 
-        await fetch(`${certificationEndpoint}`, requestOptions)
-            .then(response => {
+        await fetch(`${endpoints.certificationEndpoint}`, requestOptions)
+            .then(async response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.status === 'OK') {
+                    const success: boolean = signIn(username, password);
+
+                    if (success) {
+                        redirectToPreviousLoginUrl();
+                    }
                 } else {
-                    signIn(username, password)
-                        .then(() => {
-                            console.log('Sign in invocation is done');
-                            redirectToPreviousLoginUrl();
-                        })
+                    notifyError(data['exception']['exception'])
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                notifyError(error)
             });
     };
 
     const infoValid = () => {
         return usernameException === '' && passwordException === '' && passwordConfirmationException === '' && emailException === '' && telegramUsernameException === ''
             && username !== '' && password !== '' && passwordConfirmation === password && (email !== '' || telegramUsername !== '');
-    }
+    };
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword)
-    }
+    };
 
     const toggleTelegramCheckbox = () => {
+        if (!showTelegramInput) {
+            notifySuccess('Subscribe to telegram BOT(send message)')
+        }
+
         setShowTelegramInput(!showTelegramInput);
         setEmail('')
         setTelegramUsername('')
@@ -257,48 +259,44 @@ const SignUpForm = () => {
         setTelegramUsernameException('')
     };
 
-    useEffect(() => {
-        // WebSocket endpoint URL
-        const websocketUrl = 'ws://localhost:9005/ws';
+    const requestAdditionalApprovalCodeHook = () => {
+        const delay: number = Math.abs(lastTimePoint - new Date().getTime());
+        if (delay < 60) {
+            notifyError('Too often invocation, wait another ' + (60 - delay))
+        } else {
+            if (telegramUsername !== '') {
+                requestAdditionalApprovalCode(telegramUsername.replace('@', ''))
+            } else if (email !== '') {
+                requestAdditionalApprovalCode(email)
+            }
+        }
+    }
 
-        // Create a WebSocket client instance
-        const client = new Client({
-            brokerURL: websocketUrl,
+    useEffect(() => {
+        if (isLoggedIn()) {
+            redirectToUI()
+        }
+
+        webSocketClient = new Client({
+            brokerURL: process.env.REACT_APP_MESSAGE_SERVICE_WEB_SOCKET_ADDRESS,
             debug: function (str) {
                 console.log(str);
             },
             reconnectDelay: 5000,
-            heartbeatIncoming: 4000,
-            heartbeatOutgoing: 4000,
+            heartbeatIncoming: 1000,
+            heartbeatOutgoing: 1000,
         });
 
-        // Connect to the WebSocket server
-        client.activate();
-
-        // Handle connection open event
-        client.onConnect = () => {
+        webSocketClient.onConnect = () => {
             console.log('Connected to WebSocket server');
-
-            // Subscribe to a destination
-            client.subscribe('/topic/telegram/subscription/Nick1nameee', (message) => {
-                console.log('Received message:', message.body);
-                // Handle received message
-            });
-
-            // Send a message
-            client.publish({
-                destination: '/socket/example',
-                body: 'Hello from React!',
-            });
         };
 
-        // Handle connection error
-        client.onStompError = (frame) => {
+        webSocketClient.onStompError = (frame) => {
             console.log('WebSocket error:', frame.headers.message);
-            // Handle error
         };
 
-    }, [])
+        webSocketClient.activate();
+    }, [telegramUsername])
 
     const render = () => {
          if (!telegramSigningUp && !emailSigningUp) {
@@ -306,76 +304,64 @@ const SignUpForm = () => {
                  <Form style={{ width: '30vw', margin: 'auto' }} className="custom-form">
                      <Form.Group controlId="formUsername" className="m-3">
                          <Form.Label>Username</Form.Label>
-                         <Form.Control
-                             type="text"
-                             placeholder="Enter your username"
-                             value={username}
-                             onChange={(e) => handleUsernameChange(e.target.value) }
-                         />
-                         {
-                             usernameException === '' ? null :
-                                 <Form.Control
-                                     type="text"
-                                     readOnly={true}
-                                     value={usernameException}/>
-                         }
+                         <div className="input-container">
+                             <Form.Control
+                                 type="text"
+                                 placeholder="Enter your username"
+                                 style={{paddingLeft: '30px'}}
+                                 value={username}
+                                 onChange={(e) => handleUsernameChange(e.target.value) } />
+                             <FontAwesomeIcon icon={faAsterisk} className="required-field" title='This field is required'/>
+                         </div>
+                         <p style={{wordBreak: 'break-word', marginTop: '1em', color: 'white', fontSize: '1.1em'}} hidden={usernameException === ''}>{usernameException}</p>
                      </Form.Group>
 
                      {!showTelegramInput ?
                          <Form.Group controlId="formEmail" className="m-3">
                              <Form.Label>Email</Form.Label>
-                             <Form.Control
-                                 type="text"
-                                 placeholder="Enter your email"
-                                 value={email}
-                                 onChange={(e) => handleEmailChange(e.target.value)}
-                             />
-                             {
-                                 emailException === '' ? null :
-                                     <Form.Control
-                                         type="text"
-                                         readOnly={true}
-                                         value={emailException}/>
-                             }
+                             <div className="input-container">
+                                 <Form.Control
+                                     type="text"
+                                     placeholder="Enter your email"
+                                     style={{paddingLeft: '30px'}}
+                                     value={email}
+                                     onChange={(e) => handleEmailChange(e.target.value)} />
+                                 <FontAwesomeIcon icon={faAsterisk} className="required-field" title='This field is required'/>
+                             </div>
+                             <p style={{wordBreak: 'break-word', marginTop: '1em', color: 'white', fontSize: '1.1em'}} hidden={emailException === ''}>{emailException}</p>
                          </Form.Group>
-                         : null}
+                         :
+                         null
+                     }
 
                      <Form.Group controlId="formPassword" className="m-3">
                          <Form.Label>Password</Form.Label>
-                         <div className="password-input-container">
+                         <div className="input-container">
                              <Form.Control
                                  type={showPassword ? 'text' : 'password'}
                                  placeholder="Enter your password"
+                                 style={{paddingLeft: '30px'}}
                                  value={password}
-                                 onChange={(e) => handlePasswordChange(e.target.value)}
-                             />
-                             <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'} password-toggle-icon`} onClick={togglePasswordVisibility}></i>
+                                 onChange={(e) => handlePasswordChange(e.target.value)} />
+                             <FontAwesomeIcon icon={faAsterisk} className="required-field" title='This field is required'/>
+                             <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye}  className="password-toggle-icon" onClick={togglePasswordVisibility}  title='Toggle password'/>
                          </div>
-                         {
-                             passwordException === '' ? null :
-                                 <Form.Control
-                                     type="text"
-                                     readOnly={true}
-                                     value={passwordException}/>
-                         }
+                         <p style={{wordBreak: 'break-word', marginTop: '1em', color: 'white', fontSize: '1.1em'}} hidden={passwordException === ''}>{passwordException}</p>
                      </Form.Group>
 
                      <Form.Group controlId="formConfirmationPassword" className="m-3">
                          <Form.Label>Repeat Password</Form.Label>
-                         <Form.Control
-                             type={showPassword ? 'text' : 'password'}
-                             placeholder="Repeat your password"
-                             value={passwordConfirmation}
-                             readOnly={passwordException !== ''}
-                             onChange={(e) => handlePasswordConfirmationChange(e.target.value)}
-                         />
-                         {
-                             passwordConfirmationException === '' ? null :
-                                 <Form.Control
-                                     type="text"
-                                     readOnly={true}
-                                     value={passwordConfirmationException}/>
-                         }
+                         <div className="input-container">
+                             <Form.Control
+                                 type={showPassword ? 'text' : 'password'}
+                                 placeholder="Repeat your password"
+                                 style={{paddingLeft: '30px'}}
+                                 value={passwordConfirmation}
+                                 readOnly={passwordException !== ''}
+                                 onChange={(e) => handlePasswordConfirmationChange(e.target.value)} />
+                             <FontAwesomeIcon icon={faAsterisk} className="required-field" title='This field is required'/>
+                         </div>
+                         <p style={{wordBreak: 'break-word', marginTop: '1em', color: 'white', fontSize: '1.1em'}} hidden={passwordConfirmationException === ''}>{passwordConfirmationException}</p>
                      </Form.Group>
 
                      <Form.Group controlId="formTelegram" className="m-3">
@@ -386,23 +372,28 @@ const SignUpForm = () => {
                              className="mb-3"
                          />
                          {showTelegramInput &&
-                             <Form.Control
-                                 type="text"
-                                 placeholder="Enter your Telegram nickname => TELEGRAM"
-                                 value={telegramUsername}
-                                 onChange={(e) => handleTelegramNicknameChange(e.target.value)}
-                             />
-                         }
-                         {
-                             telegramUsernameException === '' ? null :
+                             <div className="input-container">
+
+                                 <FontAwesomeIcon icon={faAsterisk} className="required-field" title='This field is required'/>
                                  <Form.Control
                                      type="text"
-                                     readOnly={true}
-                                     value={telegramUsernameException}/>
+                                     placeholder="Enter your Telegram nickname => TELEGRAM"
+                                     style={{paddingLeft: '30px'}}
+                                     value={telegramUsername}
+                                     onChange={(e) => handleTelegramNicknameChange(e.target.value)}
+                                 />
+                                 <FontAwesomeIcon icon={faAsterisk} className="required-field" />
+                             </div>
                          }
+                         {showTelegramInput &&
+                             <Button type="button" className="mt-3" onClick={() => window.open(process.env.REACT_APP_TELEGRAM_BOT_ADDRESS, '_blank', 'noopener,noreferrer')}>
+                                 Subscribe To Bot
+                             </Button>
+                         }
+                         <p style={{wordBreak: 'break-word', marginTop: '1em', color: 'white', fontSize: '1.1em'}} hidden={telegramUsernameException === ''}>{telegramUsernameException}</p>
                      </Form.Group>
 
-                     <Button variant={infoValid() ? 'primary' : 'secondary'} type="button" className="m-3" onClick={() => handleSignUp()}>
+                     <Button variant={infoValid() ? 'primary' : 'secondary'} type="button" className="m-3" disabled={!infoValid()} onClick={() => handleSignUp()}>
                          Sign Up
                      </Button>
                      <Button variant="secondary" type="button" className="m-3" onClick={() => redirectToSignIn()}>
@@ -422,17 +413,14 @@ const SignUpForm = () => {
                              value={code}
                              onChange={(e) => handleCodeChange(e.target.value) }
                          />
-                         {
-                             codeException === '' ? null :
-                                 <Form.Control
-                                     type="text"
-                                     readOnly={true}
-                                     value={codeException}/>
-                         }
+                         <p style={{wordBreak: 'break-word', marginTop: '1em', color: 'white', fontSize: '1.1em'}} hidden={codeException === ''}>{codeException}</p>
                      </Form.Group>
 
-                     <Button variant={codeException === '' ? 'primary' : 'secondary'} type="button" className="m-3" onClick={() => initiateVerification()}>
+                     <Button variant={codeException === '' ? 'primary' : 'secondary'} type="button" className="m-3" disabled={codeException !== '' && code !== ''} onClick={() => initiateVerification()}>
                          Confirm
+                     </Button>
+                     <Button type={'button'} onClick={() => requestAdditionalApprovalCodeHook()}>
+                         Request Additional Code
                      </Button>
                  </Form>
              );
@@ -452,25 +440,14 @@ const SignUpForm = () => {
          }
      }
     return (
-        <div>
-            <header style={{ position: 'sticky', top: 0, height: '6vh', background: '#333', color: '#fff', zIndex: 1000 }}>
-                <Container fluid>
-                    <Row className="align-items-center justify-content-between" xs={12}>
-                        <Col xs={1} className="d-flex align-items-center justify-content-center">
-                            <img src={logo} alt="Logo" style={{ maxWidth: '30%', height: 'auto' }} onClick={redirectToUI}/>
-                        </Col>
-                        <Col xs={10} className="d-flex align-items-center justify-content-center">
-                            <h1>CRM</h1>
-                        </Col>
-                        <Col xs={1}></Col>
-                    </Row>
-                </Container>
-            </header>
-            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+        <div className="tone">
+            <Header />
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '84vh', fontFamily: 'monospace', fontSize: '1.1em'}}>
             {
                 render()
             }
             </div>
+            <Footer />
         </div>
     );
 };

@@ -1,28 +1,36 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM, {Root} from 'react-dom/client';
 import './styles/index.css';
-import App from './App';
+import Application from './Application';
 import reportWebVitals from './test/reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as endpoints from './constants/endpoints.js'
 import {redirectToOrderHistory, redirectToUI} from "./utilities/redirect";
-import {CategoryFilter} from "./schemas/CategoryFilter.ts";
-import {Category} from "./schemas/Category.ts";
+import {CategoryFilter} from "./schemas/requests/filters/CategoryFilter.ts";
+import {Category} from "./schemas/responses/models/Category.ts";
 import categoryResponse from './test/categories.json'
 import novaPostCities from './test/novaPostCities.json'
 import novaPostWarehouses from './test/novaPostWarehouses.json'
 import cities from './handbook/cities.json'
 import citiesCount from './handbook/citiesCountByName.json'
 import productResponse from './test/products.json'
-import {ProductFilter} from "./schemas/ProductFilter.ts";
-import {CustomerProduct} from "./schemas/CustomerProduct.ts";
+import {ProductFilter} from "./schemas/requests/filters/ProductFilter.ts";
+import {Product} from "./schemas/responses/models/Product.ts";
 import {Location} from "react-router-dom";
-import {CartProduct} from "./schemas/CartProduct.ts";
+import {CartProduct} from "./schemas/data/CartProduct.ts";
 import moment from 'moment';
-import {TransactionInitiativeModel} from "./schemas/TransactionInitiativeModel.ts";
-import {CreateOrder} from "./schemas/CreateOrder.ts";
+import {TransactionInitiativeModel} from "./schemas/requests/models/TransactionInitiativeModel.ts";
+import {CreateOrder} from "./schemas/requests/models/CreateOrder.ts";
+import {ProductLink} from "./schemas/responses/models/ProductLink.ts";
+import {OrderFilter} from "./schemas/requests/filters/OrderFilter.ts";
+import {CustomerOrder} from "./schemas/responses/models/CustomerOrder.ts";
+import {User} from "./schemas/responses/models/User.ts";
+import {OrderHistory} from "./schemas/responses/models/OrderHistory.ts";
+import {WaitingListProduct} from "./schemas/data/WaitingListProduct.ts";
+import {notifyError, notifySuccess} from "./utilities/notify";
+import {ToastContainer} from "react-toastify";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root: Root = ReactDOM.createRoot(document.getElementById('root'));
 
 /**
  * Function that return new Headers() {Content-Type and Auth if user is authenticated}
@@ -78,7 +86,7 @@ export function getCookie(cookieName: string): string {
  * @param password - user password
  * @returns {Promise<void>} - return value is not used, the result of invocation of this function is setting auth token to cookie
  */
-export const signIn = async (login, password) => {
+export const signIn = async (login, password): boolean => {
     const requestData = {
         login: login,
         password: password
@@ -92,7 +100,7 @@ export const signIn = async (login, password) => {
         body: JSON.stringify(requestData),
     };
 
-    await fetch(`${endpoints.signInEndpoint}?${queryParams}`, requestOptions)
+    let isSuccessful: boolean = await fetch(`${endpoints.signInEndpoint}?${queryParams}`, requestOptions)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -101,32 +109,37 @@ export const signIn = async (login, password) => {
             return response.json();
         })
         .then(json => {
-            if (json.status === 'OK') {
-                setCookie('token', json.data['token'], json.data['expires_at'])
-            } else {
-                console.error(json.data)
+            if (json && json.status === 'OK') {
+                setCookie('token', json.data['token'], json.data['expires_at']);
+
+                return true;
             }
+
+            return false;
         })
         .catch(error => {
             console.error('Error:', error);
+            notifyError(error)
         });
 
-    await getUserInfo()
+    if (isSuccessful) {
+        await fetchUserInfo();
+    }
+
+    return isSuccessful;
 };
 
 /**
  * Log Out endpoint - performs request to backend server
  * @returns {Promise<void>} - return value is not used, the result of invocation of this function is clearing cookies except cart's one
  */
-export const logout = async () => {
-    const apiUrl = process.env.REACT_APP_USER_SERVICE_ADDRESS;
-
+export const logout = async (): void => {
     const requestOptions: RequestInit = {
         method: 'POST',
         headers: getDefaultHeaders()
     };
 
-    await fetch(`${apiUrl}/logout`, requestOptions)
+    await fetch(`${process.env.REACT_APP_USER_SERVICE_ADDRESS}/logout`, requestOptions)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -142,6 +155,7 @@ export const logout = async () => {
         })
         .catch(error => {
             console.error('Error:', error);
+            notifyError(error)
         });
 };
 
@@ -150,10 +164,10 @@ export const logout = async () => {
  * @param keepCookies - list of names of cookies to be kept
  */
 export function clearCookiesExcept(keepCookies: string[]): void {
-    const cookies = document.cookie.split(';');
+    const cookies: string[] = document.cookie.split(';');
 
-    cookies.forEach(cookie => {
-        const cookieParts = cookie.split('=');
+    cookies.forEach((cookie: string) => {
+        const cookieParts: string[] = cookie.split('=');
         const cookieName = cookieParts[0].trim();
 
         if (!keepCookies.includes(cookieName)) {
@@ -242,9 +256,10 @@ export async function getCategories(categoryFilter: CategoryFilter): Category[] 
             })
             .catch(error => {
                 console.error('Error: ', error);
+                notifyError('Error in fetching categories detected: '+ error)
             });
 
-        return response.data.map((categoryData: any) => ({
+        const categories =  response.data.map((categoryData: any) => ({
             id: categoryData.id,
             name: categoryData.name,
             categoryId: categoryData.categoryId,
@@ -252,15 +267,21 @@ export async function getCategories(categoryFilter: CategoryFilter): Category[] 
             pictureUrl: categoryData.pictureUrl,
             enabled: categoryData.enabled
         }));
+
+        if (!categories || categories.length < 1) {
+            notifyError('No categories were found')
+        }
+
+        return categories;
     }
 }
 
 /**
  *
  * @param productFilter
- * @returns {Promise<CustomerProduct[]|*|*[]>}
+ * @returns {Promise<Product[]|*|*[]>}
  */
-export async function getProducts(productFilter: ProductFilter): CustomerProduct[] {
+export async function getProducts(productFilter: ProductFilter): Product[] {
     if (productFilter === undefined) {
         productFilter = CategoryFilter.build({blocked: false})
     }
@@ -297,7 +318,7 @@ export async function getProducts(productFilter: ProductFilter): CustomerProduct
                     const endIndex = startIndex + filter.size;
                     const paginatedData = filteredData.slice(startIndex, endIndex);
 
-                    const mappedProducts: CustomerProduct[] = paginatedData.map((productData: any) => ({
+                    const mappedProducts: Product[] = paginatedData.map((productData: any) => ({
                         id: productData.id,
                         name: productData.name,
                         brand: productData.brand,
@@ -324,7 +345,7 @@ export async function getProducts(productFilter: ProductFilter): CustomerProduct
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
-            throw new Error('Error fetching categories');
+            notifyError('Error fetching categories: ' + error)
         }
     } else {
         const requestData = productFilter.formAsRequestParameters();
@@ -347,14 +368,16 @@ export async function getProducts(productFilter: ProductFilter): CustomerProduct
             })
             .catch(error => {
                 console.error('Error: ', error);
+                notifyError('Error fetching categories: ' + error)
             });
 
         if (response === undefined || response === null || response.status !== 'OK') {
             console.log('Product retrieving response is undefined or null')
+            notifyError('Product retrieving response is undefined or null')
             return [];
         }
 
-        return response.data.map((productData: any) => ({
+        const products = response.data.map((productData: any) => ({
             id: productData.id,
             name: productData.name,
             brand: productData.brand,
@@ -371,6 +394,14 @@ export async function getProducts(productFilter: ProductFilter): CustomerProduct
             pictureUrls: productData.pictureUrls,
             marginRate: productData.marginRate
         }));
+
+
+
+        if (!products || products.length < 1) {
+            notifyError('No product were found')
+        }
+
+        return products;
     }
 }
 
@@ -397,11 +428,60 @@ export function addToCart(cartProduct: CartProduct): void {
 
     if (matchInCart) {
         matchInCart.itemsBooked = cartProduct.itemsBooked;
+        notifySuccess('Product already was in cart, ordered number was updated')
     } else {
         cartItems.push(cartProduct)
+        notifySuccess('Product was added to cart')
     }
 
     setCookie('cart', JSON.stringify(cartItems), newExpirationDate);
+}
+
+export async function addToWaitingList(waitingListProduct: WaitingListProduct): void {
+    const user: User = getUserInfo();
+    const requestOptions = {
+        method: 'POST',
+        headers: getDefaultHeaders()
+    };
+    const requestData = {
+        customerId: user.id,
+        productId: waitingListProduct.productId
+    };
+
+    const queryParams = new URLSearchParams(requestData).toString();
+
+    fetch(`${endpoints.waitingList}?${queryParams}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === 'OK') {
+                notifySuccess('Product added to waiting list')
+            } else {
+                notifyError(response['exception']['exception'])
+            }
+        })
+        .catch(error => {
+            console.error('Error: ', error);
+            notifyError(error)
+        });
+    // let waitingList = getCookie('waitingList');
+    // let newExpirationDate = moment().add(30, 'day').toDate();
+    // let waitingListProducts: WaitingListProduct[] = waitingList ? JSON.parse(waitingList) : [];
+    // let matchInWaitingList: WaitingListProduct | undefined = waitingListProducts.find((item: WaitingListProduct) => item.productId === waitingListProduct.productId);
+    //
+    // if (!matchInWaitingList) {
+    //     waitingListProducts.push(waitingListProduct);
+    //     setCookie('waitingList', JSON.stringify(waitingListProducts), newExpirationDate);
+    //     notifySuccess('Product added to waiting list')
+    // } else {
+    //     notifyError('Product is already in waiting list')
+    // }
+
 }
 
 /**
@@ -409,15 +489,57 @@ export function addToCart(cartProduct: CartProduct): void {
  * @returns {any|*[]}
  */
 export function getCart(): CartProduct[] {
-    let cart = getCookie('cart');
+    let cart: string = getCookie('cart');
     return cart ? JSON.parse(cart) : [];
+}
+
+export async function getWaitingList(): WaitingListProduct[] {
+    const user: User = getUserInfo();
+    const requestOptions = {
+        method: 'GET',
+        headers: getDefaultHeaders()
+    };
+    const requestData = {
+        customerId: user.id
+    };
+
+    const queryParams = new URLSearchParams(requestData).toString();
+
+    return await fetch(`${endpoints.waitingList}?${queryParams}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === 'OK') {
+                return response['data'];
+            } else {
+                notifyError(response['exception']['exception'])
+            }
+        })
+        .catch(error => {
+            console.error('Error: ', error);
+            notifyError(error)
+        });
+    // let waitingList: string = getCookie('waitingList');
+    //
+    // let waitingListData: any[] = waitingList ? JSON.parse(waitingList) : [];
+    //
+    // if (waitingListData.length < 1) {
+    //     notifyError('Waiting list is empty')
+    // }
+    //
+    // return waitingListData;
 }
 
 /**
  * Function removes entry from cart in cookies and updates or removes cart if no other products are left
  * @param cartProduct
  */
-export function removeFromCart(cartProduct: CartProduct) {
+export function removeFromCart(cartProduct: CartProduct): void {
     let cart = getCookie('cart');
     let cartItems: CartProduct[] = cart ? JSON.parse(cart) : [];
     cartItems = cartItems.filter((item: CartProduct) => item.productId !== cartProduct.productId);
@@ -429,6 +551,65 @@ export function removeFromCart(cartProduct: CartProduct) {
     } else {
         setCookie('cart', null, new Date(0))
     }
+}
+
+export async function removeFromWaitingList(productId: string): void {
+    const user: User = getUserInfo();
+    const requestOptions = {
+        method: 'DELETE',
+        headers: getDefaultHeaders()
+    };
+    const requestData = {
+        customerId: user.id,
+        productId: productId
+    };
+
+    const queryParams = new URLSearchParams(requestData).toString();
+
+    return await fetch(`${endpoints.waitingList}?${queryParams}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === 'OK') {
+                if (response['data']) {
+                    notifySuccess('Product was removed from waiting list...')
+                }
+            } else {
+                notifyError(response['exception']['exception'])
+            }
+        })
+        .catch(error => {
+            console.error('Error: ', error);
+            notifyError(error)
+        });
+    //
+    // let waitingList: string = getCookie('waitingList');
+    // let newExpirationDate: Date = moment().add(30, 'day').toDate();
+    // let waitingListProducts: WaitingListProduct[] = waitingList ? JSON.parse(waitingList) : [];
+    // let matchInList: boolean = false;
+    //
+    // waitingListProducts = waitingListProducts.filter((item: CartProduct): boolean => {
+    //     if (item.productId === productId) {
+    //         matchInList = true;
+    //     }
+    //
+    //     return item.productId !== productId
+    // });
+    //
+    // if (matchInList) {
+    //     if (waitingListProducts.length > 0) {
+    //         setCookie('waitingList', JSON.stringify(waitingListProducts), newExpirationDate);
+    //     } else {
+    //         setCookie('waitingList', null, new Date(0))
+    //     }
+    //
+    //     notifySuccess('Product was removed from waiting list successfully')
+    // }
 }
 
 /**
@@ -461,7 +642,6 @@ export function getNovaPostCities(searchString: string) {
             const letter = String(searchString).length > 0 ? String(searchString).at(0) : '0';
 
             const applyFilters = (data, searchString) => {
-
                 let min = 0;
                 let max = data.length;
 
@@ -481,9 +661,15 @@ export function getNovaPostCities(searchString: string) {
                 return data.slice(min, max).filter(city => String(city.Description).startsWith(searchString));
             };
 
-            return applyFilters(cities, searchString);
+            const result =  applyFilters(cities, searchString);
+
+            if (!result || result.length < 1) {
+                notifyError('List of cities for Nova Post delivery is empty or have no matches to your prompt')
+            }
+
+            return result;
         } catch (error) {
-            throw new Error('Error fetching data');
+            notifyError(error)
         }
     }
 }
@@ -527,20 +713,26 @@ export async function getNovaPostWarehouses(city: string) {
             })
             .catch(error => {
                 console.error('Error: ', error);
+                notifyError(error)
             });
 
         if (response === undefined || response === null || response.status !== 'OK') {
-            console.log('Product retrieving response is undefined or null')
             return [];
         }
 
-        return response.data.map((novaPostDepartment: any) => ({
+        const data =  response.data.map((novaPostDepartment: any) => ({
             Description: novaPostDepartment.Description,
             ShortAddress: novaPostDepartment.ShortAddress,
             Number: novaPostDepartment.Number,
             CategoryOfWarehouse: novaPostDepartment.CategoryOfWarehouse,
             TypeOfWarehouse: novaPostDepartment.TypeOfWarehouse
         }));
+
+        if (!data || data.length < 1) {
+            notifyError('Nova Post departments were not found for this city')
+        }
+
+        return data;
     }
 }
 
@@ -567,6 +759,7 @@ export async function processPayment(paymentToken: any, amount: number, currency
         })
         .catch(error => {
             console.error('Error: ', error);
+            notifyError(error)
         });
 
     if (response === undefined || response === null || response.status !== 'OK') {
@@ -580,8 +773,6 @@ export function createOrder(createOrderModel: CreateOrder) {
         headers: getDefaultHeaders(),
         body: JSON.stringify(createOrderModel)
     };
-
-    console.log(JSON.stringify(createOrderModel))
 
     fetch(`${endpoints.createOrder}`, requestOptions)
         .then(response => {
@@ -598,18 +789,18 @@ export function createOrder(createOrderModel: CreateOrder) {
             }
         })
         .catch(error => {
-            console.log('Order registering response error')
             console.error('Error: ', error);
+            notifyError(error)
         });
 }
 
-export async function getUserInfo() {
+export async function fetchUserInfo(): User {
     const requestOptions = {
         method: 'GET',
         headers: getDefaultHeaders()
     };
 
-    await fetch(`${endpoints.getUserInfoEndpoint}`, requestOptions)
+    return await fetch(`${endpoints.getUserInfoEndpoint}`, requestOptions)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -618,21 +809,298 @@ export async function getUserInfo() {
             return response.json();
         })
         .then(data => {
-            if (data) {
-                setCookie('userInfo', JSON.stringify(data['data']));
+            if (data && data.status === 'OK') {
+                if (data['data']) {
+                    setCookie('userInfo', JSON.stringify(data['data']));
+
+                    return User.build(data['data']);
+                }
+            } else {
+                return null;
             }
         })
         .catch(error => {
             console.error('Error:', error);
+            notifyError(error)
         });
+}
+
+export function getUserInfo(): User {
+    const userInfoCookieData: string = getCookie('userInfo');
+    if (userInfoCookieData !== undefined && userInfoCookieData !== null) {
+        return User.build(userInfoCookieData);
+    }
+
+    return null;
+}
+
+export async function searchForProducts(searchBy: string, page: number): ProductLink[] {
+    const requestOptions = {
+        method: 'GET',
+        headers: getDefaultHeaders()
+    };
+
+    const params = {
+        searchBy: searchBy,
+        page: page
+    };
+
+    const queryParams = new URLSearchParams(params).toString();
+
+    return await fetch(`${endpoints.getProductLinksEndpoint}?${queryParams}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'OK') {
+                if (data['data'].length > 0) {
+                    return data['data'].map(link => {
+                        const productLink: ProductLink = new ProductLink();
+                        productLink.productName = link.productName;
+                        productLink.categoryName = link.categoryName;
+                        productLink.productId = link.productId;
+
+                        return productLink;
+                    });
+                }
+            }
+        })
+        .then(data => {
+            if (!data || data.length < 1) {
+                notifyError('No products were found by your prompt')
+            }
+
+            return data;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            notifyError(error)
+        });
+}
+
+export async function checkTelegramUsernameExists(telegramUsername: string): boolean {
+    const requestOptions = {
+        method: 'GET',
+        headers: getDefaultHeaders()
+    };
+
+    const params = {
+        username: telegramUsername.replace('@', '')
+    };
+
+    const queryParams = new URLSearchParams(params).toString();
+
+    return await fetch(`${endpoints.checkTelegramExists}?${queryParams}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'OK') {
+                if (!data['data']) {
+                    notifyError('Telegram username was not found as known')
+                }
+
+                return data['data'];
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            notifyError(error)
+        });
+}
+
+export async function getOrdersCompleteData(orderFilter: OrderFilter): CustomerOrder[] {
+    const requestOptions = {
+        method: 'POST',
+        headers: getDefaultHeaders(),
+        body: JSON.stringify(orderFilter.formAsRequestBody())
+    };
+
+    const params = orderFilter.formAsRequestParameters();
+
+    const requestFilteredData = Object.fromEntries(
+        Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
+    );
+
+    const queryParams = new URLSearchParams(requestFilteredData).toString();
+
+    return await fetch(`${endpoints.getOrdersCompleteDate}?${queryParams}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'OK') {
+                if (data['data'].length > 0) {
+                    return data['data'].map(completeOrder => {
+                        return CustomerOrder.build(completeOrder);
+                    })
+                }
+            }
+
+            return [];
+        })
+        .then(data => {
+            if (!data || data.length < 1) {
+                notifyError('No orders were found')
+            }
+
+            return data;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            notifyError(error)
+        });
+}
+
+export async function getOrderHistory(orderFilter: OrderFilter): OrderHistory[] {
+    const requestOptions = {
+        method: 'POST',
+        headers: getDefaultHeaders(),
+        body: JSON.stringify(orderFilter.formAsRequestBody())
+    };
+
+    const params = orderFilter.formAsRequestParameters();
+
+    const requestFilteredData = Object.fromEntries(
+        Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
+    );
+
+    const queryParams = new URLSearchParams(requestFilteredData).toString();
+
+    return await fetch(`${endpoints.getOrderHistory}?${queryParams}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.status === 'OK') {
+                if (data['data'] && Object.keys(data['data']).length > 0) {
+                    let response;
+
+                    Object.entries(data['data']).forEach(([number: string, orderHistory]) => {
+                        response = OrderHistory.build(number, orderHistory);
+                    });
+
+                    return response;
+                }
+            }
+
+            return [];
+        })
+        .then(history => {
+            if (!history || history.length < 1) {
+                notifyError('Order history was not found for this order');
+            }
+
+            return history;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            notifyError(error)
+        });
+}
+
+export async function requestAdditionalApprovalCode(identifier: string): boolean {
+    const requestOptions = {
+        method: 'POST',
+        headers: getDefaultHeaders()
+    };
+
+    const queryParams: string = new URLSearchParams({identifier: identifier}).toString();
+
+    notifySuccess('Trying to request extra code')
+    return await fetch(`${endpoints.requestAdditionalApprovalUserMessage}?${queryParams}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.status === 'OK') {
+                notifySuccess('Additional verification code was requested, wait please...')
+
+                return true;
+            } else {
+                notifyError(data['exception']['exception']);
+
+                return false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            notifyError(error)
+        });
+}
+
+export async function initiateCredentialsAvailabilityChecking(username: string, email: string, telegramUsername: string, setUsernameException, setEmailException, setTelegramUsernameException) {
+    const requestData = {
+        username: username,
+        email: email === '' ? null : email,
+        telegramUsername: telegramUsername === '' ? null : telegramUsername.replace('@', '')
+    };
+
+    const requestOptions = {
+        method: 'POST',
+        headers: getDefaultHeaders() ,
+        body: JSON.stringify(requestData),
+    };
+
+    let result = true
+
+    await fetch(`${endpoints.checkCredentialsAvailabilityEndpoint}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.data.email === false && email !== '') {
+                setEmailException('User with this email already exists')
+                result = false
+            }
+            if (json.data.username === false) {
+                setUsernameException('User with this username already exists')
+                result = false
+            }
+            if (json.data.telegramUsername === false && telegramUsername !== '') {
+                setTelegramUsernameException('User with this telegram already exists')
+                result = false
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            notifyError(error)
+        });
+
+    return result;
 }
 
 export default endpoints;
 
 root.render(
-  <React.StrictMode>
-    <App/>
-  </React.StrictMode>
+  <React.Fragment>
+      <ToastContainer style={{width: '390px'}}/>
+      <Application />
+  </React.Fragment>
 );
 
 reportWebVitals();

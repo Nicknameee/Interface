@@ -1,0 +1,12 @@
+export enum OrderStatus {
+    INITIATED,
+    ASSIGNED_TO_OPERATOR,
+    WAITING_FOR_PAYMENT,
+    PAID,
+    SHIPPED,
+    IN_DELIVERY_PROCESS,
+    DELIVERED,
+    RETURNED,
+    RECEIVED,
+    DECLINED
+}

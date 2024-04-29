@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {addToCart, getCart, removeFromCart} from "../../../index";
 import {Button, ButtonGroup, Col, Container, FormGroup, Nav} from "react-bootstrap";
-import {CartProduct} from "../../../schemas/CartProduct.ts";
+import {CartProduct} from "../../../schemas/data/CartProduct.ts";
 import defaultImage from '../../../resources/imageNotFoundResource.png'
 import {faTrash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import emptyCart from '../../../resources/emptyCart.png'
-import {redirectToPurchase} from "../../../utilities/redirect";
+import {redirectToPurchase, redirectToUI} from "../../../utilities/redirect";
 
 const ShoppingCart = React.forwardRef(({showCartValue}, ref) => {
     const [cart, setCart] = useState([]);
@@ -117,7 +117,7 @@ const ShoppingCart = React.forwardRef(({showCartValue}, ref) => {
                 :
                 <div className="w-100 d-flex justify-content-center flex-wrap py-3">
                     <img src={emptyCart} style={{maxWidth: '11vw', height: 'auto', marginBottom: '1em'}} alt="Empty"/>
-                    <p className="w-100 font-monospace px-3" style={{fontStyle: 'italic', fontSize: '19px' }}>Cart is empty, but it's never too late to fill it up</p>
+                    <p className="w-100 font-monospace px-3" style={{fontStyle: 'italic', fontSize: '19px' }}>Cart is empty, but it's never too late to <span title={'Go to products'} style={{cursor: 'pointer', textDecoration: 'underline'}} onClick={() => redirectToUI()}>fill it up</span></p>
                 </div>
             }
         </Col>

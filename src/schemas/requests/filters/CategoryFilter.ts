@@ -1,7 +1,7 @@
 export class CategoryFilter {
     page: number | 1;
     size: number | 100;
-    sortBy: string | 'parentCategoryId';
+    sortBy: string | 'name';
     direction: string | 'ASC';
     enabled: boolean;
     parentCategoryId: number | null;
@@ -9,7 +9,7 @@ export class CategoryFilter {
     constructor(
         page: number | 1,
         size: number | 100,
-        sortBy: string | 'parentCategoryId',
+        sortBy: string | 'name',
         direction: string | 'ASC',
         enabled: boolean | null,
         parentCategoryId: number | null
@@ -23,7 +23,7 @@ export class CategoryFilter {
     }
 
     static build(filteringBy: { page: any; size: any; sortBy: any; direction: any; enabled: any; parentCategoryId: any; }) {
-        return new CategoryFilter(filteringBy.page || 1, filteringBy.size || 100, filteringBy.sortBy || 'parentCategoryId',
+        return new CategoryFilter(filteringBy.page || 1, filteringBy.size || 100, filteringBy.sortBy || 'name',
             filteringBy.direction || 'ASC',
             filteringBy.enabled || null,
             filteringBy.parentCategoryId || null);

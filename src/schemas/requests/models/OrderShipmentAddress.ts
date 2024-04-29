@@ -1,4 +1,4 @@
-import {ADDRESS_PARTS} from '../constants/constants'
+import {ADDRESS_PARTS} from '../../../constants/constants'
 
 export class OrderShipmentAddress {
     address: any;

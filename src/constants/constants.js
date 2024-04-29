@@ -12,6 +12,15 @@ export const ADDRESS_PARTS=
         'POST_DEPARTMENT_ID_RECIPIENT',
         'STREET_RECIPIENT',
         'BUILDING_RECIPIENT'];
-export const PAYMENT_TYPE = ['COD', 'PREPAYMENT']
-
-export const DELIVERY_SERVICE_TYPE = ['NOVA_POST', 'NONE']
+export const ORDER_STATUSES = ['INITIATED',
+        'ASSIGNED_TO_OPERATOR',
+        'WAITING_FOR_PAYMENT',
+        'PAID',
+        'SHIPPED',
+        'IN_DELIVERY_PROCESS',
+        'DELIVERED',
+        'RETURNED',
+        'RECEIVED',
+        'DECLINED'];
+export const PAYMENT_TYPE = ['COD', 'PREPAYMENT'];
+export const DELIVERY_SERVICE_TYPE = ['NOVA_POST', 'NONE'];

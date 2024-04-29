@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {getCookie} from '../index.js'
 import Operator from '../components/user/Operator'
-import Customer from "./user/Customer";
+import CustomerDashboard from "./user/customer/CustomerDashboard";
 
 const UI = () => {
     const[userInfo, setUserInfo] = useState({});
@@ -18,7 +18,7 @@ const UI = () => {
         if (userInfo !== undefined && userInfo != null) {
             switch (userInfo.role) {
                 case 'ROLE_MANAGER':
-                    return <Customer/>;
+                    return <CustomerDashboard/>;
                 case 'ROLE_SUPPORT':
                     return null;
                 case 'ROLE_VENDOR':
@@ -26,12 +26,12 @@ const UI = () => {
                 case 'ROLE_OPERATOR':
                     return <Operator/>
                 case 'ROLE_CUSTOMER':
-                    return <Customer/>
+                    return <CustomerDashboard/>
                 default:
-                    return <Customer/>
+                    return <CustomerDashboard/>
             }
         } else {
-            return <Customer/>
+            return <CustomerDashboard/>
         }
     };
 

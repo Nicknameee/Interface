@@ -1,12 +1,11 @@
-import {CustomerProduct} from "./CustomerProduct";
+import {Product} from "../responses/models/Product.ts";
 
-export class CartProduct {
+export class WaitingListProduct {
     id: number;
     name: string;
     productId: string;
     cost: number;
     currency: string;
-    itemsBooked: number;
     categoryId: string;
     introductionPictureUrl: string;
 
@@ -16,7 +15,6 @@ export class CartProduct {
         productId: string,
         cost: number,
         currency: string,
-        itemsBooked: number,
         categoryId: string,
         introductionPictureUrl: string
     ) {
@@ -25,12 +23,11 @@ export class CartProduct {
         this.productId = productId;
         this.cost = cost;
         this.currency = currency;
-        this.itemsBooked = itemsBooked;
         this.categoryId = categoryId;
         this.introductionPictureUrl = introductionPictureUrl;
     }
 
-    static getOfProduct(product: CustomerProduct) {
+    static getOfProduct(product: Product): WaitingListProduct {
         let pictureUrl = product.introductionPictureUrl;
 
         if (!pictureUrl) {
@@ -39,6 +36,6 @@ export class CartProduct {
             }
         }
 
-        return new CartProduct(product.id, product.name, product.productId, product.cost, product.currency, 1, product.categoryId, pictureUrl);
+        return new WaitingListProduct(product.id, product.name, product.productId, product.cost, product.currency, product.categoryId, pictureUrl);
     }
 }
