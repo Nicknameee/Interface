@@ -7,11 +7,13 @@ const ManagerPersonalCabinet = () => {
             <Header
                 showSidebar={false}
                 showCart={false}
-                displaySearchBar={true}
+                setShowCart={() => {}}
+                setShowSidebar={() => {}}
+                displaySearchBar={false}
                 displayLoginButton={true}
-                displaySidebarButton={true}
+                displaySidebarButton={false}
                 displaySignUpButton={true}
-                displayCartButton={true} />
+                displayCartButton={false} />
             <Footer />
         </div>
     )

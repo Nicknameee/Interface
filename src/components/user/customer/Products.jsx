@@ -60,13 +60,14 @@ const Products = ({products, productPage, setProductPage, categoriesPresent}) =>
                     <h4 className="w-100 text-center">No products were found....</h4>
                 }
                 {
-                    categoriesPresent &&
-                    <div className="w-100 d-flex justify-content-center">
-                        <Button className="mx-3" style={{width: '100px'}} onClick={() => {
+                    (categoriesPresent || products.length >= 1) &&
+                    <div className="w-100 d-flex justify-content-center align-items-center">
+                        <Button className="mx-3" style={{width: '100px'}} disabled={productPage <= 1} onClick={() => {
                             if (productPage > 1) {
                                 setProductPage(productPage - 1)
                             }
                         }}>Prev</Button>
+                        <h3 className="font-monospace">{productPage}</h3>
                         <Button className="mx-3" style={{width: '100px'}} onClick={() => {
                             if (products.length > 0) {
                                 setProductPage(productPage + 1)

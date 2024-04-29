@@ -15,3 +15,5 @@ export const getOrdersCompleteDate = process.env.REACT_APP_ORDER_SERVICE_ADDRESS
 export const getOrderHistory = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/orders/history'; //POST
 export const checkTelegramExists = process.env.REACT_APP_MESSAGE_SERVICE_ADDRESS + '/api/v1/message/telegram/exists/allowed'; //GET
 export const waitingList = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/products/waiting/list';
+export const downloadOrders = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/orders/export'; //POST
+export const downloadOrderHistory = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/orders/export/history'; //POST

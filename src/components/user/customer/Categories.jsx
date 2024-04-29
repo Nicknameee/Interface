@@ -8,12 +8,12 @@ import {Button} from "react-bootstrap";
 
 const Categories = ({categories, isSubCategoryOpened, categoriesPage, setCategoriesPage, productPresent}) => {
     const location = useLocation();
-    const imagesRef = useRef(null);
+    const box = useRef(null);
 
     const handleScroll = (direction) => {
-        if (imagesRef.current) {
+        if (box.current) {
             const scrollAmount = 300;
-            const container = imagesRef.current;
+            const container = box.current;
             let scrollPos = container.scrollLeft;
             if (direction === 'left') {
                 scrollPos -= scrollAmount;
@@ -73,7 +73,7 @@ const Categories = ({categories, isSubCategoryOpened, categoriesPage, setCategor
             } else {
                 return (
                     <div className="position-relative w-100 d-flex justify-content-center">
-                        <div style={{ width: '95%', display: 'flex', overflowX: 'auto', WebkitOverflowScrolling: 'touch', alignItems: 'center', justifyContent: 'space-between', marginTop: '3em' }} ref={imagesRef}>
+                        <div style={{ width: '95%', display: 'flex', overflowX: 'auto', WebkitOverflowScrolling: 'touch', alignItems: 'center', justifyContent: 'space-between', marginTop: '3em' }} ref={box}>
                             {renderCategories(categories)}
                         </div>
                         <div className="button-container w-100 d-flex justify-content-between" style={{ position: 'absolute', top: '50%', left: '0', right: '0', transform: 'translateY(-50%)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -102,11 +102,12 @@ const Categories = ({categories, isSubCategoryOpened, categoriesPage, setCategor
                 }
                 {
                     <div className="w-100 d-flex justify-content-center">
-                        <Button className="mx-3" style={{width: '100px'}} onClick={() => {
+                        <Button className="mx-3" style={{width: '100px'}} disabled={categoriesPage <= 1} onClick={() => {
                             if (categoriesPage > 1) {
                                 setCategoriesPage(categoriesPage - 1)
                             }
                         }}>Prev</Button>
+                        <h3 className="font-monospace">{categoriesPage}</h3>
                         <Button className="mx-3" style={{width: '100px'}} onClick={() => {
                             if (categories.length > 0) {
                                 setCategoriesPage(categoriesPage + 1)

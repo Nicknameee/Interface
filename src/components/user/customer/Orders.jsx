@@ -3,12 +3,13 @@ import {Button, Card, CardBody, CardHeader, Collapse, ListGroup, ListGroupItem} 
 import React, {useEffect, useState} from "react";
 import {redirectToUI} from "../../../utilities/redirect";
 import {ShipmentAddress} from "../../../schemas/responses/models/ShipmentAddress.ts";
-import {getOrderHistory, isLoggedIn} from "../../../index";
+import {exportOrderHistory, exportOrders, getOrderHistory, getUserInfo, isLoggedIn} from "../../../index";
 import {OrderHistory} from "../../../schemas/responses/models/OrderHistory.ts";
 import {OrderFilter} from "../../../schemas/requests/filters/OrderFilter.ts";
 import OrderedProducts from "./OrderedProducts";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDown, faAngleUp} from "@fortawesome/free-solid-svg-icons";
+import {User} from "../../../schemas/responses/models/User.ts";
 
 const Orders = ({orders}) => {
     const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -17,6 +18,7 @@ const Orders = ({orders}) => {
     const [selectedTransactionId, setSelectedTransactionId] = useState(null);
     const [orderHistoryView: OrderHistory[], setOrderHistoryView] = useState([]);
     const [historyClicked: boolean, setHistoryClicked] = useState(false);
+    const [user: User, setUser] = useState(null);
 
     const toggleOrder = (orderId) => {
         setOrderHistoryView([])
@@ -65,15 +67,15 @@ const Orders = ({orders}) => {
     }
 
     useEffect(() => {
-        if (!isLoggedIn()) {
-            alert('You are not authorized to view this page!')
-            redirectToUI()
+        if (isLoggedIn()) {
+            setUser(getUserInfo());
         }
     }, []);
 
     return (
         <div className="container">
-            <h2>Orders</h2>
+            <h3>Orders</h3>
+            <Button className="my-3 btn btn-secondary" onClick={() => exportOrders(OrderFilter.build({customerId: user.id}))}>Export orders</Button>
             <div className="row">
                 {
                     orders.length > 0 ?
@@ -149,6 +151,10 @@ const Orders = ({orders}) => {
                                             <h5>Ordered Products:</h5>
                                             <OrderedProducts orderedProducts={customerOrder.order.orderedProducts} toggleProduct={toggleProduct} selectedProductId={selectedProductId} />
                                             <Button className="my-3" onClick={() => toggleHistory(customerOrder.order.number)}>{orderHistoryView.length <= 0 ? 'Order History' : 'Close'}</Button>
+                                            {
+                                                orderHistoryView.length > 0 &&
+                                                <Button className="my-3 mx-3 btn btn-secondary" onClick={() => exportOrderHistory(OrderFilter.build({customerId: user.id, number: customerOrder.order.number}))}>Export Order History</Button>
+                                            }
                                             {
                                                 orderHistoryView.length > 0 && orderHistoryView.map((view: OrderHistory) => (
                                                     <div className="flex-wrap w-100 d-flex my-1 border-bottom border-black">

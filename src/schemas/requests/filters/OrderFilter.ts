@@ -53,4 +53,12 @@ export class OrderFilter {
             vendorIds: this.vendorIds
         };
     }
+
+    static build(data: {customerId: number, number: string}) {
+        const orderFilter: OrderFilter = new OrderFilter();
+        orderFilter.customerId = data.customerId;
+        orderFilter.orderNumber = data.number;
+
+        return orderFilter;
+    }
 }

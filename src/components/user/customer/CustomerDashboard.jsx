@@ -1,4 +1,4 @@
-import {Button, Col, Container, Row} from "react-bootstrap";
+import {Col, Container, Row} from "react-bootstrap";
 import {getCategories, getProducts, getQueryParam} from "../../../index";
 import React, {useEffect, useState} from "react";
 import Categories from './Categories';
@@ -47,8 +47,7 @@ const CustomerDashboard = () => {
             }
         };
 
-        fetchData()
-            .then(() => console.log('Data fetched successfully'));
+        fetchData();
     }, [location, categoriesPage]);
 
     useEffect(() => {
@@ -70,8 +69,7 @@ const CustomerDashboard = () => {
             }
         };
 
-        fetchData()
-            .then(() => console.log('Data fetched successfully'));
+        fetchData();
     }, [productPage]);
 
 

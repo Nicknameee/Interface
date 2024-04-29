@@ -68,7 +68,6 @@ const CustomerPersonalCabinet = () => {
     }
     return (
         <div className="page" style={{background: '#cea4a4'}}>
-            <ToastContainer />
             <Header
                 setShowSidebar={setShowSidebar}
                 showSidebar={showSidebar}

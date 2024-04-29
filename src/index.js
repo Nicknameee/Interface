@@ -184,6 +184,18 @@ export function isLoggedIn(): string {
     return getCookie('token');
 }
 
+export function isCustomerLoggedIn(): boolean {
+    const user: User = getUserInfo();
+
+    return isLoggedIn() && user && user.role === 'ROLE_CUSTOMER';
+}
+
+export function isManagerLoggedIn(): boolean {
+    const user: User = getUserInfo();
+
+    return isLoggedIn() && user && user.role === 'ROLE_MANAGER';
+}
+
 /**
  *
  * @param categoryFilter
@@ -1094,6 +1106,87 @@ export async function initiateCredentialsAvailabilityChecking(username: string, 
     return result;
 }
 
+export async function exportOrders(orderFilter: OrderFilter) {
+    const requestData = {
+        filename: 'Orders'
+    };
+
+    const requestOptions = {
+        method: 'POST',
+        headers: getDefaultHeaders(),
+        body: JSON.stringify(orderFilter.formAsRequestBody())
+    };
+
+
+    const queryParams: string = new URLSearchParams(requestData).toString();
+
+    await fetch(`${endpoints.downloadOrders}?${queryParams}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            return response.blob();
+        })
+        .then(blob => {
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.href = blobUrl;
+            link.setAttribute('download', 'Orders.xlsx'); // Set the download attribute to a filename
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        })
+        .catch(error => {
+            console.error('There was an error downloading the file:', error);
+        });
+}
+
+export async function exportOrderHistory(orderFilter: OrderFilter) {
+    const requestData = {
+        filename: 'History'
+    };
+
+    const requestOptions = {
+        method: 'POST',
+        headers: getDefaultHeaders(),
+        body: JSON.stringify(orderFilter.formAsRequestBody())
+    };
+
+
+    const queryParams: string = new URLSearchParams(requestData).toString();
+
+    await fetch(`${endpoints.downloadOrderHistory}?${queryParams}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            return response.blob();
+        })
+        .then(blob => {
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.href = blobUrl;
+            link.setAttribute('download', 'Orders.xlsx'); // Set the download attribute to a filename
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        })
+        .catch(error => {
+            console.error('There was an error downloading the file:', error);
+        });
+}
 export default endpoints;
 
 root.render(

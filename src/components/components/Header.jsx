@@ -14,7 +14,7 @@ import React, {useEffect, useState} from "react";
 import {ProductLink} from "../../schemas/responses/models/ProductLink.ts";
 import OutsideClickHandler from "../handlers/OutsideClickHandler";
 
-const Header = ({headerData, setShowSidebar, showSidebar, setShowCart, showCart,
+const Header = ({setShowSidebar, showSidebar, setShowCart, showCart,
                     displaySearchBar, displayLoginButton, displaySignUpButton, displayCartButton, displaySidebarButton}) => {
     const [searchBarValue: string, setSearchValue] = useState('');
     const [productLinks: ProductLink[], setProductLinks] = useState([]);
