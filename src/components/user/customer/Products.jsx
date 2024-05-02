@@ -8,7 +8,7 @@ import {addToWaitingList} from "../../../index";
 import {WaitingListProduct} from "../../../schemas/data/WaitingListProduct.ts";
 import {Button} from "react-bootstrap";
 
-const Products = ({products, productPage, setProductPage, categoriesPresent}) => {
+const Products = ({products, productPage, setProductPage, categoriesPresent, managerMode}) => {
     const list = (products: Product[]) => {
         if (products.length > 0) {
             return (
@@ -39,7 +39,10 @@ const Products = ({products, productPage, setProductPage, categoriesPresent}) =>
                                     :
                                     <div>
                                         <button className="btn btn-success" style={{marginRight: '10px'}} onClick={() => redirectToProductPage(product.productId)} title={'Check Up Product Page'}>Check It Up</button>
-                                        <button className="btn btn-primary" onClick={() => addToWaitingList(WaitingListProduct.getOfProduct(product))} title={'Add Product To Waiting List'}><FontAwesomeIcon icon={faFeather}/></button>
+                                        {
+                                            (managerMode === undefined || managerMode === null || managerMode === false) &&
+                                            <button className="btn btn-primary" onClick={() => addToWaitingList(WaitingListProduct.getOfProduct(product))} title={'Add Product To Waiting List'}><FontAwesomeIcon icon={faFeather}/></button>
+                                        }
                                     </div>
                                 }
                             </div>

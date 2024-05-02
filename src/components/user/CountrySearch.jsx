@@ -77,7 +77,7 @@ const CountrySearch = ({setCountry, country}) => {
             {isLoading && <p>Loading countries...</p>}
             {error && <p className="error">Error: {error}</p>}
             <OutsideClickHandler outsideClickCallbacks={[{callback: () => setIsFocused(false), containers: [document.getElementById('searchTerm'), document.getElementById('list')]}]}>
-                <input className="w-50  search-input" type="text" id="searchTerm"
+                <input className="w-50 search-input" type="text" id="searchTerm"
                        placeholder="Search countries..."
                        value={searchTerm}
                        onClick={() => setSearchResults(countries)}

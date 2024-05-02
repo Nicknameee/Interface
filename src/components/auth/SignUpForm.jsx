@@ -130,7 +130,7 @@ const SignUpForm = () => {
     };
 
     const initiateCredentialsAvailabilityCheckingHook = async () => {
-        await initiateCredentialsAvailabilityChecking(username, email, telegramUsername, setUsernameException, setEmailException, setTelegramUsernameException)
+        return await initiateCredentialsAvailabilityChecking(username, email, telegramUsername, setUsernameException, setEmailException, setTelegramUsernameException)
     };
 
     const handleSignUp = async () => {

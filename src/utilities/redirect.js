@@ -58,3 +58,30 @@ export function redirectToPreviousLoginUrl() {
 
     localStorage.removeItem('previousLoginUrl');
 }
+export function redirectToViewingUsers() {
+    window.location.href = '/manager/personal?option=viewUser';
+}
+export function redirectToAddingUser() {
+    window.location.href = '/manager/personal?option=addUser';
+}
+export function redirectToViewingOrders() {
+    window.location.href = '/manager/personal?option=viewOrder';
+}
+export function redirectToViewProducts() {
+    window.location.href = '/manager/personal?option=viewProduct';
+}
+export function redirectToAddingProduct() {
+    window.location.href = '/manager/personal?option=addProduct';
+}
+export function redirectToViewCategory() {
+    window.location.href = '/manager/personal?option=viewCategory';
+}
+export function redirectToAddingCategory() {
+    window.location.href = '/manager/personal?option=addCategory';
+}
+export function redirectToViewPayments() {
+    window.location.href = '/manager/personal?option=viewPayment';
+}
+export function redirectToViewStatistic() {
+    window.location.href = '/manager/personal?option=viewStatistic';
+}

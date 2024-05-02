@@ -29,6 +29,8 @@ import {OrderHistory} from "./schemas/responses/models/OrderHistory.ts";
 import {WaitingListProduct} from "./schemas/data/WaitingListProduct.ts";
 import {notifyError, notifySuccess} from "./utilities/notify";
 import {ToastContainer} from "react-toastify";
+import {UserFilter} from "./schemas/requests/filters/UserFilter.ts";
+import {UserManagementModel} from "./schemas/responses/models/UserManagementModel.ts";
 
 const root: Root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -1185,6 +1187,118 @@ export async function exportOrderHistory(orderFilter: OrderFilter) {
         })
         .catch(error => {
             console.error('There was an error downloading the file:', error);
+        });
+}
+
+export async function getUsersForManagementPanel(userFilter: UserFilter): UserManagementModel[] {
+    const requestOptions = {
+        method: 'POST',
+        headers: getDefaultHeaders(),
+        body: JSON.stringify(userFilter.filter())
+    };
+
+    const queryParams: string = new URLSearchParams(userFilter.query()).toString();
+
+    notifySuccess('Filtering users, wait...')
+    return await fetch(`${endpoints.getUsersForManagement}?${queryParams}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.status === 'OK') {
+                if (data['data'] && data['data'].length > 0) {
+                    const users: UserManagementModel[] = [];
+
+                    for (const model of data['data']) {
+                        users.push(UserManagementModel.build(model))
+                    }
+
+                    return users;
+                }
+            } else {
+                notifyError(data['exception']['exception']);
+
+                return [];
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            notifyError(error)
+        });
+}
+
+export async function updateUser(updateUserData: {status: string, id: number}) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: getDefaultHeaders(),
+        body: JSON.stringify(updateUserData)
+    };
+
+
+    await fetch(`${endpoints.updateUser}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.status === 'OK') {
+                notifySuccess('User was updated')
+                setTimeout(() => window.location.reload(), 1000)
+            } else {
+                notifyError(data['exception']['exception']);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            notifyError(error)
+        });
+}
+
+export async function addUser(data: {username: string, email: string, password: string, telegramUsername: string, role: string, status: string}): boolean{
+    const requestData = {
+        username: data.username,
+        email: data.email === '' ? null : data.email,
+        password: data.password,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        telegramUsername: data.telegramUsername === '' ? null : data.telegramUsername.replace('@', ''),
+        role: data.role,
+        status: data.status
+    };
+
+    const requestOptions = {
+        method: 'POST',
+        headers: getDefaultHeaders() ,
+        body: JSON.stringify(requestData),
+    };
+
+    return await fetch(`${endpoints.signUpEndpoint}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.status === 'OK') {
+                notifySuccess('User added successfully')
+
+                return true;
+            } else {
+                notifyError(data['exception']['exception'])
+
+                return false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
 }
 export default endpoints;

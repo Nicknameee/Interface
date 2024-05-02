@@ -17,3 +17,5 @@ export const checkTelegramExists = process.env.REACT_APP_MESSAGE_SERVICE_ADDRESS
 export const waitingList = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/products/waiting/list';
 export const downloadOrders = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/orders/export'; //POST
 export const downloadOrderHistory = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/orders/export/history'; //POST
+export const getUsersForManagement = process.env.REACT_APP_USER_SERVICE_ADDRESS + '/api/v1/users/management'; //POST
+export const updateUser = process.env.REACT_APP_USER_SERVICE_ADDRESS + '/api/v1/users/update'; //PUT

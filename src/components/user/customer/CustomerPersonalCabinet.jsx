@@ -11,7 +11,6 @@ import ShoppingCart from "./ShoppingCart";
 import Orders from "./Orders";
 import {useLocation} from "react-router-dom";
 import WaitingList from "./WaitingList";
-import {ToastContainer} from "react-toastify";
 
 const CustomerPersonalCabinet = () => {
     const [customer: User, setCustomer] = useState(null);

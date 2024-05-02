@@ -11,7 +11,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDown, faAngleUp} from "@fortawesome/free-solid-svg-icons";
 import {User} from "../../../schemas/responses/models/User.ts";
 
-const Orders = ({orders}) => {
+const Orders = ({orders, managerMode}) => {
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [selectedProductId, setSelectedProductId] = useState(null);
     const [selectedAddressId, setSelectedAddressId] = useState(null);
@@ -75,8 +75,12 @@ const Orders = ({orders}) => {
     return (
         <div className="container">
             <h3>Orders</h3>
-            <Button className="my-3 btn btn-secondary" onClick={() => exportOrders(OrderFilter.build({customerId: user.id}))}>Export orders</Button>
-            <div className="row">
+            {
+                orders.length > 0
+                    &&
+                <Button className="my-3 btn btn-secondary" onClick={() => exportOrders(OrderFilter.build({customerId: user.id}))}>Export orders</Button>
+            }
+            <div className="row" style={{marginBottom: '10vh'}}>
                 {
                     orders.length > 0 ?
                         orders.map((customerOrder: CustomerOrder) => (
@@ -102,6 +106,12 @@ const Orders = ({orders}) => {
                                                 {
                                                     customerOrder.order.deliveryServiceType !== 'NONE' &&
                                                     <ListGroupItem key={crypto.randomUUID()}>Delivery Cost: {customerOrder.order.deliveryCost}</ListGroupItem>
+                                                }
+                                                {
+                                                    managerMode &&
+                                                        <div>
+                                                            <ListGroupItem key={crypto.randomUUID()}>Customer ID: {String(customerOrder.order.customerId).toUpperCase()}</ListGroupItem>
+                                                        </div>
                                                 }
                                             </ListGroup>
                                             {

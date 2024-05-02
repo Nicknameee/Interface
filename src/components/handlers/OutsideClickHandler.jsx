@@ -4,7 +4,7 @@ const OutsideClickHandler = ({ outsideClickCallbacks, children }) => {
     useEffect(() => {
         const handleClick = (event) => {
             outsideClickCallbacks.forEach(({ containers, callback }) => {
-                const clickedInsideContainers = containers.some(container => container.contains(event.target));
+                const clickedInsideContainers = containers.filter(c => c !== undefined && c !== null).some(container => container.contains(event.target));
                 if (!clickedInsideContainers) {
                     callback();
                 }
