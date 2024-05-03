@@ -18,7 +18,7 @@ body {
 }
 .required-field {
     position: absolute;
-    z-index: 100;
+    z-index: 1;
     top: 30%;
     left: 10px; /* Adjust as needed */
     transform: translateY(-50%);

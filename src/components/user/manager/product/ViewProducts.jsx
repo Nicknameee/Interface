@@ -1,8 +1,8 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getProducts} from "../../../../index";
 import {Product} from "../../../../schemas/responses/models/Product.ts";
 import {ProductFilter} from "../../../../schemas/requests/filters/ProductFilter.ts";
-import {Card, CardBody, CardHeader, Collapse, ListGroup, ListGroupItem} from "react-bootstrap";
+import {Button, Card, CardBody, CardHeader, Collapse, ListGroup, ListGroupItem} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDown, faAngleUp} from "@fortawesome/free-solid-svg-icons";
 import {redirectToProductPage} from "../../../../utilities/redirect";
@@ -53,11 +53,40 @@ const ViewProducts = () => {
                                     <ListGroupItem key={crypto.randomUUID()}>Blocked: {String(product.blocked)}</ListGroupItem>
                                     <ListGroupItem key={crypto.randomUUID()}>Category ID: {product.categoryId}</ListGroupItem>
                                     <ListGroupItem key={crypto.randomUUID()}>Margin Rate: {product.marginRate}</ListGroupItem>
+                                    <ListGroupItem key={crypto.randomUUID()}>Intro Picture URL: {product.introductionPictureUrl ? <a href={product.introductionPictureUrl} target="_blank">Link</a> : 'DEFAULT'}</ListGroupItem>
+                                    {
+                                        product.pictureUrls && product.pictureUrls.length > 0 &&
+                                        product.pictureUrls.map(uri => (
+                                            <ListGroupItem key={crypto.randomUUID()}>Picture URL: {uri ? <a href={uri} target="_blank">Link</a> : 'DEFAULT'}</ListGroupItem>
+                                        ))
+                                    }
                                 </ListGroup>
+                                <Button onClick={() => {
+                                    window.location.href = "/product/edit?productId=" + product.productId
+                                }}>Edit</Button>
                             </CardBody>
                         </Collapse>
                     </Card>
                 ))
+            }
+            {
+                products.length < 1 &&
+                <h4 className="w-100 text-center">No products were found....</h4>
+            }
+            {
+                <div className="w-100 d-flex justify-content-center align-items-center">
+                    <Button className="mx-3" style={{width: '100px'}} disabled={productPage <= 1} onClick={() => {
+                        if (productPage > 1) {
+                            setProductPage(productPage - 1)
+                        }
+                    }}>Prev</Button>
+                    <h3 className="font-monospace">{productPage}</h3>
+                    <Button className="mx-3" style={{width: '100px'}} onClick={() => {
+                        if (products.length > 0) {
+                            setProductPage(productPage + 1)
+                        }
+                    }}>Next</Button>
+                </div>
             }
         </div>
     )

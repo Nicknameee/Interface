@@ -29,7 +29,7 @@ const ManagerPersonalCabinet = () => {
 
     const render = () => {
         switch (action) {
-            case 'viewUsers': {
+            case 'viewUser': {
                 return (
                     <ViewUsers />
                 )
@@ -48,6 +48,9 @@ const ManagerPersonalCabinet = () => {
                 return (
                     <ViewProducts />
                 )
+            }
+            case 'addProduct': {
+
             }
             default: {
                 return (

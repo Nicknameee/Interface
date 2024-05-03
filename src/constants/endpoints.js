@@ -19,3 +19,6 @@ export const downloadOrders = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/ap
 export const downloadOrderHistory = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/orders/export/history'; //POST
 export const getUsersForManagement = process.env.REACT_APP_USER_SERVICE_ADDRESS + '/api/v1/users/management'; //POST
 export const updateUser = process.env.REACT_APP_USER_SERVICE_ADDRESS + '/api/v1/users/update'; //PUT
+export const getProduct = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/products/product'; //GET
+export const saveProduct = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/products/save'; //POST
+export const updateProduct = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + '/api/v1/products/update'; //PUT

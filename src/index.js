@@ -1301,6 +1301,119 @@ export async function addUser(data: {username: string, email: string, password: 
             console.error('Error:', error);
         });
 }
+
+export async function getProduct(productId: string) {
+    const requestOptions = {
+        method: 'GET',
+        headers: getDefaultHeaders()
+    };
+
+    const queryParams: string = new URLSearchParams({productId: productId}).toString();
+
+    return await fetch(`${endpoints.getProduct}?${queryParams}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.status === 'OK') {
+                const productData = data['data'];
+
+                return {
+                    id: productData.id,
+                    name: productData.name,
+                    brand: productData.brand,
+                    parameters: productData.parameters,
+                    description: productData.description,
+                    vendorId: productData.vendorId,
+                    productId: productData.productId,
+                    cost: productData.cost,
+                    currency: productData.currency,
+                    itemsLeft: productData.itemsLeft,
+                    blocked: productData.blocked,
+                    categoryId: productData.categoryId,
+                    introductionPictureUrl: productData.introductionPictureUrl,
+                    pictureUrls: productData.pictureUrls,
+                    marginRate: productData.marginRate
+                };
+            } else {
+                notifyError(data['exception']['exception'])
+
+                return null;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+export async function addProduct(data: any): boolean {
+    const requestOptions = {
+        method: 'post',
+        headers: getDefaultHeaders(),
+        body: JSON.stringify(data)
+    };
+
+
+    return await fetch(`${endpoints.saveProduct}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.status === 'OK') {
+                notifySuccess('Product saved successfully')
+
+                return true;
+            } else {
+                notifyError(data['exception']['exception'])
+
+                return false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+export async function updateProduct(data: any): boolean {
+    const requestOptions = {
+        method: 'PUT',
+        headers: getDefaultHeaders(),
+        body: JSON.stringify(data)
+    };
+
+
+    return await fetch(`${endpoints.updateProduct}`, requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.status === 'OK') {
+                notifySuccess('Product updated successfully')
+
+                return true;
+            } else {
+                notifyError(data['exception']['exception'])
+
+                return false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
 export default endpoints;
 
 root.render(

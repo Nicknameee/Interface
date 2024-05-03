@@ -16,7 +16,7 @@ export function redirectToPersonal() {
                 window.location.href = '/customer/personal';
                 break;
             case 'ROLE_MANAGER':
-                window.location.href = '/manager/personal';
+                window.location.href = '/manager/personal?option=viewOrder';
                 break;
             default:
                 window.location.href = '/personal'
