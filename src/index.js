@@ -779,6 +779,10 @@ export async function processPayment(paymentToken: any, amount: number, currency
     if (response === undefined || response === null || response.status !== 'OK') {
         console.log('Transaction initiation response is undefined or null')
     }
+
+    if (response.status === 'OK') {
+        return response['data']['id'];
+    }
 }
 
 export function createOrder(createOrderModel: CreateOrder) {

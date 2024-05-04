@@ -32,6 +32,7 @@ const CheckoutOrder = () => {
     const [deliveryData: DeliveryData] = useState(new DeliveryData());
     const [deliveryType: string, setDeliveryType] = useState('NONE');
     const [transactionStatusMessage, setTransactionStatusMessage] = useState(null);
+    const [transactionId, setTransactionId] = useState(null)
 
     const handleWheel = (e) => {
         document.getElementById('cart').scrollTop += e.deltaY;
@@ -133,6 +134,7 @@ const CheckoutOrder = () => {
         createOrderModel.orderedProducts = cart.map((cartProduct: CartProduct): OrderedProduct => {
           return new OrderedProduct(cartProduct.productId, cartProduct.itemsBooked)
         });
+        createOrderModel.transactionId = transactionId;
 
         createOrderModel.deliveryServiceType = deliveryType;
 
@@ -199,7 +201,7 @@ const CheckoutOrder = () => {
         if (paid) {
             initiateOrderCreation();
         }
-    }, [paid]);
+    }, [transactionId]);
 
     return (
         <div className="page" style={{background: '#cea4a4'}}>
@@ -304,7 +306,9 @@ const CheckoutOrder = () => {
                                     callbackIntents: ["PAYMENT_AUTHORIZATION"],
                                 }}
                                 onPaymentAuthorized={async paymentData => {
-                                    await processPayment(paymentData.paymentMethodData.tokenizationData.token, getTotalCost(), currency, user.id)
+                                    const transactionId = await processPayment(paymentData.paymentMethodData.tokenizationData.token, getTotalCost(), currency, user.id)
+
+                                    setTransactionId(transactionId)
 
                                     return {transactionState: 'SUCCESS'};
                                 }}

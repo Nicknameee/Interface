@@ -8,4 +8,5 @@ export class CreateOrder {
     deliveryServiceType: string;
     orderedProducts: OrderedProduct[];
     orderShipmentAddress: OrderShipmentAddress;
+    transactionId: string;
 }
