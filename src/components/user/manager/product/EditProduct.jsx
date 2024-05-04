@@ -23,8 +23,6 @@ const EditProduct = () => {
 
     const [parameters, setParameters] = useState([]);
 
-    let tempKeyName = null;
-
     const handleProductNameChange = (value) => {
         setProductName(value)
         if (value === '') {

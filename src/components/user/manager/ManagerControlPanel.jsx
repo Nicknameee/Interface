@@ -44,9 +44,9 @@ const ManagerControlPanel = ({showSidebar}) => {
                 <Nav.Link className="navLink" style={{ fontSize: '30px', color: '#e2e6f1', width: '100%', textAlign: 'center' }} onClick={() => redirectToViewProducts()}>
                     View Products
                 </Nav.Link>
-                <Nav.Link className="navLink" style={{ fontSize: '30px', color: '#e2e6f1', width: '100%', textAlign: 'center' }} onClick={() => redirectToAddingProduct()}>
-                    Add Product
-                </Nav.Link>
+                {/*<Nav.Link className="navLink" style={{ fontSize: '30px', color: '#e2e6f1', width: '100%', textAlign: 'center' }} onClick={() => redirectToAddingProduct()}>*/}
+                {/*    Add Product*/}
+                {/*</Nav.Link>*/}
                 <Nav.Link className="navLink" style={{ fontSize: '30px', color: '#e2e6f1', width: '100%', textAlign: 'center' }} onClick={() => redirectToViewCategory()}>
                     View Categories
                 </Nav.Link>

@@ -11,6 +11,7 @@ import {isCustomerLoggedIn, isLoggedIn, isManagerLoggedIn} from "./index";
 import Unauthorized from "./components/components/Unauthorized";
 import ManagerPersonalCabinet from "./components/user/manager/ManagerPersonalCabinet";
 import EditProductWrapper from "./components/user/manager/product/EditProductWrapper";
+import AddProduct from "./components/user/manager/product/AddProduct";
 
 function Application() {
     return (
@@ -25,6 +26,7 @@ function Application() {
                 <Route exact path="/customer/personal" element={isCustomerLoggedIn() ? <CustomerPersonalCabinet /> : <Unauthorized />} />
                 <Route exact path="/manager/personal" element={isManagerLoggedIn() ? <ManagerPersonalCabinet /> : <Unauthorized />} />
                 <Route exact path="/product/edit" element={isManagerLoggedIn() ? <EditProductWrapper /> : <Unauthorized />} />
+                <Route exact path="/product/new" element={isManagerLoggedIn() ? <AddProduct /> : <Unauthorized />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </Router>

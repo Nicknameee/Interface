@@ -14,7 +14,7 @@ import ViewProducts from "./product/ViewProducts";
 
 const ManagerPersonalCabinet = () => {
     const location = useLocation();
-    const [action, setAction] = useState('viewUsers');
+    const [action, setAction] = useState('viewUser');
     const [showPanel: boolean, setShowPanel] = useState(false);
 
     useEffect(() => {

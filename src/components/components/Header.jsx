@@ -19,6 +19,7 @@ const Header = ({setShowSidebar, showSidebar, setShowCart, showCart,
     const [searchBarValue: string, setSearchValue] = useState('');
     const [productLinks: ProductLink[], setProductLinks] = useState([]);
     const [productLinkPage: number, setProductLinkPage] = useState(0);
+
     const searchForProduct = async (page: number) => {
         if (page < 0) {
             page = 0
