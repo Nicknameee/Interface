@@ -464,6 +464,17 @@ export async function getProductStatistics(productId: number): Promise<any> {
   return (await res.json()).data;
 }
 
+export async function getProfitStatistics(): Promise<any> {
+  const res = await fetch(process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/statistic/profit", {
+    method: "GET",
+    headers: getDefaultHeaders(),
+  });
+
+  if (!res.ok) throw new Error("Something went wrong");
+
+  return (await res.json()).data;
+}
+
 /**
  *
  * @param paramName - query param name

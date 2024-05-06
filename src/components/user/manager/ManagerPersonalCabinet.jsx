@@ -15,6 +15,7 @@ import ViewCategories from "./categories/ViewCategories.tsx";
 import AddCategory from "./categories/AddCategory.tsx";
 import ViewTransactions from "./transactions/ViewTransactions.tsx";
 import AddTransaction from "./transactions/AddTransaction.tsx";
+import ViewProfitStatistics from "./statistics/ViewProfitStatistics.tsx";
 
 const ManagerPersonalCabinet = () => {
   const location = useLocation();
@@ -57,6 +58,8 @@ const ManagerPersonalCabinet = () => {
       case "addPayment": {
         return <AddTransaction />;
       }
+      case "viewStatistic":
+        return <ViewProfitStatistics />;
       default: {
         return <NotFound />;
       }
