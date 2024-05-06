@@ -16,6 +16,7 @@ import AddCategory from "./categories/AddCategory.tsx";
 import ViewTransactions from "./transactions/ViewTransactions.tsx";
 import AddTransaction from "./transactions/AddTransaction.tsx";
 import ViewProfitStatistics from "./statistics/ViewProfitStatistics.tsx";
+import ViewTopLeads from "./user/ViewTopLeads.tsx";
 
 const ManagerPersonalCabinet = () => {
   const location = useLocation();
@@ -60,6 +61,8 @@ const ManagerPersonalCabinet = () => {
       }
       case "viewStatistic":
         return <ViewProfitStatistics />;
+      case "viewTopLeads":
+        return <ViewTopLeads />;
       default: {
         return <NotFound />;
       }

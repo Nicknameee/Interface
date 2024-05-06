@@ -103,6 +103,13 @@ const ManagerControlPanel = ({ showSidebar }) => {
         >
           View Statistic
         </Nav.Link>
+        <Nav.Link
+          className="navLink"
+          style={{ fontSize: "30px", color: "#e2e6f1", width: "100%", textAlign: "center" }}
+          onClick={() => (window.location.href = "/manager/personal?option=viewTopLeads")}
+        >
+          Top Leads
+        </Nav.Link>
       </Nav>
     </Col>
   );
