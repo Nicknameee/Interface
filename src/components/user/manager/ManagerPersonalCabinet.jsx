@@ -1,9 +1,9 @@
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import { Container, Row } from "react-bootstrap";
-import { useLocation } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { getQueryParam } from "../../../index";
+import {Container, Row} from "react-bootstrap";
+import {useLocation} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {getQueryParam} from "../../../index";
 import ManagerControlPanel from "./ManagerControlPanel";
 import OutsideClickHandler from "../../handlers/OutsideClickHandler";
 import ViewUsers from "./user/ViewUsers";

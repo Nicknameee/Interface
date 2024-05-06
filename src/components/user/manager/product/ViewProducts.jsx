@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { getProducts, getProductStatistics } from "../../../../index";
-import { Product } from "../../../../schemas/responses/models/Product.ts";
-import { ProductFilter } from "../../../../schemas/requests/filters/ProductFilter.ts";
-import { Button, Card, CardBody, CardHeader, Collapse, ListGroup, ListGroupItem } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDown, faAngleUp } from "@fortawesome/free-solid-svg-icons";
-import { redirectToProductPage } from "../../../../utilities/redirect";
-import { notifyError } from "../../../../utilities/notify.js";
-import { BarChart } from "@mui/x-charts";
-import { Modal, Box, Typography } from "@mui/material";
+import React, {useEffect, useState} from "react";
+import {getProducts, getProductStatistics, getQueryParam} from "../../../../index";
+import {Product} from "../../../../schemas/responses/models/Product.ts";
+import {ProductFilter} from "../../../../schemas/requests/filters/ProductFilter.ts";
+import {Button, Card, CardBody, CardHeader, Collapse, ListGroup, ListGroupItem} from "react-bootstrap";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faAngleDown, faAngleUp} from "@fortawesome/free-solid-svg-icons";
+import {redirectToProductPage} from "../../../../utilities/redirect";
+import {notifyError} from "../../../../utilities/notify.js";
+import {BarChart} from "@mui/x-charts";
+import {Box, Modal, Typography} from "@mui/material";
+import {useLocation} from "react-router-dom";
 
 const ViewProducts = () => {
   const [products: Product[], setProducts] = useState([]);
@@ -16,6 +17,7 @@ const ViewProducts = () => {
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [statistics, setStatistics] = useState([]);
+  const location = useLocation();
 
   const toggleProduct = (productId) => {
     setSelectedProductId(selectedProductId === productId ? null : productId);
@@ -23,7 +25,7 @@ const ViewProducts = () => {
 
   useEffect(() => {
     const initProducts = async () => {
-      const productsData = await getProducts(ProductFilter.build({ page: productPage }));
+      const productsData = await getProducts(ProductFilter.build({ page: productPage, categoryId: getQueryParam('categoryId', location)}));
 
       setProducts(productsData);
     };

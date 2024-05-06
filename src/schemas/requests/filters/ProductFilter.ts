@@ -40,7 +40,9 @@ export class ProductFilter {
         this.priceTo = priceTo;
         this.isPresent = isPresent;
         this.isBlocked = isBlocked;
-        this.categoryId = categoryId;
+        if (categoryId) {
+            this.categoryId = categoryId;
+        }
     }
 
     static build(filteringBy: { page: any; size: any; sortBy: any; direction: any; name: any; brand: any; vendorId: any; productIds: any; priceFrom: any; priceTo: any; isPresent: any; isBlocked: any; categoryId: any;}) {

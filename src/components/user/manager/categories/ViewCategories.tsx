@@ -24,7 +24,12 @@ const ViewCategories = () => {
           <Card.Body>
             <Card.Title>{category.name}</Card.Title>
           </Card.Body>
-          <Button onClick={() => navigate(`/product/new?categoryId=${category.categoryId}`)}>
+          <Button onClick={() => window.location.href = `/manager/personal?option=viewProduct&categoryId=${category.categoryId}`}>
+            View categories products
+          </Button>
+          <Button
+              style={{ marginTop: 4 }}
+              onClick={() => navigate(`/product/new?categoryId=${category.categoryId}`)}>
             Add product to category
           </Button>
           <Button
