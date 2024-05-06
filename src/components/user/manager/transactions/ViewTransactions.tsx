@@ -16,7 +16,7 @@ const ViewTransactions = () => {
   const [toDate, setToDate] = useState<string>();
 
   useEffect(() => {
-    getTransactions(page, 5).then((transactions) => {
+    getTransactions(page, 5, fromDate, toDate).then((transactions) => {
       setTransactions(transactions);
     });
   }, [page]);

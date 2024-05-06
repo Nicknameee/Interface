@@ -7,7 +7,7 @@ import Footer from "../../../components/Footer";
 import {getProduct, getQueryParam, updateProduct} from "../../../../index";
 import {Product} from "../../../../schemas/responses/models/Product.ts";
 import {useLocation} from "react-router-dom";
-import {notifySuccess} from "../../../../utilities/notify";
+import {notifyError, notifySuccess} from "../../../../utilities/notify";
 import ManagerControlPanel from "../ManagerControlPanel";
 import OutsideClickHandler from "../../../handlers/OutsideClickHandler";
 
@@ -163,6 +163,10 @@ const EditProduct = () => {
         init().then()
     }, []);
 
+    const [uwu, setUwu] = useState('');
+    const handleNewParamName = (uwu) => {
+        setUwu(uwu)
+    }
     const handleChangeOfKey = (oldKey, newKey) => {
         setParameters(prevParameters => {
             const updatedParameters = { ...prevParameters };
@@ -181,10 +185,19 @@ const EditProduct = () => {
     };
 
     const handleAddParam = () => {
-        setParameters(prevParameters => ({
-            ...prevParameters,
-            [crypto.randomUUID()]: 'Value'
-        }));
+        if (uwu === '') {
+            notifyError('Can not add param with empty name')
+        } else {
+            if (Object.keys(parameters).includes(uwu)) {
+                notifyError('Duplicate key, can not allow same param name')
+            } else {
+                setParameters(prevParameters => ({
+                    ...prevParameters,
+                    [uwu]: 'Value'
+                }));
+                setUwu('');
+            }
+        }
     };
 
     const handleRemoveParam = (key) => {
@@ -361,6 +374,7 @@ const EditProduct = () => {
                                                 <Form.Control
                                                     type="text"
                                                     value={key}
+                                                    readOnly={true}
                                                     onChange={(e) => handleChangeOfKey(key, e.target.value)}
                                                 />
                                                 <Form.Control
@@ -373,6 +387,11 @@ const EditProduct = () => {
                                             <hr />
                                         </div>
                                     ))}
+                                <Form.Control
+                                    type="text"
+                                    name="key"
+                                    value={uwu}
+                                    onChange={(e) => handleNewParamName(e.target.value)} />
                                 <Button variant="primary" onClick={handleAddParam} className="btn btn-primary w-100 h-25">Add Param</Button>
                             </Form>
                         </div>
