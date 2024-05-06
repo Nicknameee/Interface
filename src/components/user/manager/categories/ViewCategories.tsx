@@ -27,6 +27,14 @@ const ViewCategories = () => {
           <Button onClick={() => navigate(`/product/new?categoryId=${category.categoryId}`)}>
             Add product to category
           </Button>
+          <Button
+            style={{ marginTop: 4 }}
+            onClick={() =>
+              (window.location.href = `/manager/personal?option=addCategory&parentCategoryId=${category.categoryId}`)
+            }
+          >
+            Add child category
+          </Button>
         </Card>
       ))}
     </div>

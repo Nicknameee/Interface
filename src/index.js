@@ -199,11 +199,11 @@ export function isManagerLoggedIn(): boolean {
   return isLoggedIn() && user && user.role === "ROLE_MANAGER";
 }
 
-export async function createCategory(name: string): Promise<Category> {
+export async function createCategory(name: string, parentCategoryId?: string): Promise<Category> {
   const res = await fetch(endpoints.createCategoryEndpoint, {
     method: "POST",
     headers: getDefaultHeaders(),
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, parentCategoryId }),
   });
 
   if (!res.ok) throw new Error("Something went wrong");

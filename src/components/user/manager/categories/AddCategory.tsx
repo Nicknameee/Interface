@@ -2,16 +2,19 @@ import { Button, Form } from "react-bootstrap";
 import React, { useState } from "react";
 import { createCategory, setCategoryPicture } from "../../../..";
 import { notifyError, notifySuccess } from "../../../../utilities/notify";
+import { useSearchParams } from "react-router-dom";
 
 const AddCategory = () => {
   const [name, setName] = useState("");
   const [picture, setPicture] = useState<File>();
 
+  const [params] = useSearchParams();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const category = await createCategory(name);
+      const category = await createCategory(name, params.get("parentCategoryId") ?? undefined);
 
       if (picture) {
         await setCategoryPicture(category?.categoryId, picture);
