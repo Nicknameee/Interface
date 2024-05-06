@@ -32,6 +32,8 @@ const ViewProducts = () => {
   }, [productPage]);
 
   useEffect(() => {
+    if (!isModalOpen) return;
+
     getProductStatistics(selectedProductId)
       .then((statistics) => {
         setStatistics(statistics.slice(0, 16));
