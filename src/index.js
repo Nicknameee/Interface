@@ -1496,7 +1496,7 @@ export async function addProduct(data: any): boolean {
       if (data && data.status === "OK") {
         notifySuccess("Product saved successfully");
 
-        return true;
+        return data;
       } else {
         notifyError(data["exception"]["exception"]);
 
@@ -1506,6 +1506,38 @@ export async function addProduct(data: any): boolean {
     .catch((error) => {
       console.error("Error:", error);
     });
+}
+
+export async function setProductPicture(productId: string, picture: File) {
+  const formData = new FormData();
+
+  formData.append("productId", productId);
+  formData.append("picture", picture);
+
+  const headers = getDefaultHeaders();
+  headers.delete("Content-Type");
+
+  fetch(process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/picture", {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+}
+
+export async function setProductPictures(productId: string, pictures: File[]) {
+  const formData = new FormData();
+
+  formData.append("productId", productId);
+  pictures.forEach((picture) => formData.append("picturesToAdd", picture));
+
+  const headers = getDefaultHeaders();
+  headers.delete("Content-Type");
+
+  fetch(process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/pictures", {
+    method: "POST",
+    headers,
+    body: formData,
+  });
 }
 
 export async function updateProduct(data: any): boolean {
@@ -1527,7 +1559,7 @@ export async function updateProduct(data: any): boolean {
       if (data && data.status === "OK") {
         notifySuccess("Product updated successfully");
 
-        return true;
+        return data;
       } else {
         notifyError(data["exception"]["exception"]);
 
