@@ -1,4 +1,5 @@
 export let createOrder = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/orders/save"; //POST
+export let updateOrder = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/orders/update"; //PUT
 export let initiateTransaction = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/transactions/initiate"; //POST
 export const getTransactions = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/transactions"; //GET
 export const createTransaction = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/transactions/manual/payment"; //GET

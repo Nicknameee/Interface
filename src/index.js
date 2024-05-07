@@ -924,6 +924,23 @@ export function createOrder(createOrderModel: CreateOrder) {
     });
 }
 
+export async function updateOrder(orderId: number, nextStatus: string) {
+  const res = await fetch(endpoints.updateOrder, {
+    method: "PUT",
+    headers: getDefaultHeaders(),
+    body: JSON.stringify({
+      orderId,
+      nextStatus,
+    }),
+  });
+
+  const data = await res.json();
+
+  if (data.status !== "OK") throw new Error("Something went wrong");
+
+  return data.data;
+}
+
 export async function fetchUserInfo(): User {
   const requestOptions = {
     method: "GET",

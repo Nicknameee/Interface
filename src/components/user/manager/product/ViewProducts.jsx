@@ -78,7 +78,9 @@ const ViewProducts = () => {
                   <ListGroupItem key={crypto.randomUUID()}>Description: {product.description}</ListGroupItem>
                   <ListGroupItem key={crypto.randomUUID()}>Vendor ID: {product.vendorId}</ListGroupItem>
                   <ListGroupItem key={crypto.randomUUID()}>Product ID: {product.productId}</ListGroupItem>
-                  <ListGroupItem key={crypto.randomUUID()}>Items Left: {product.itemsLeft}</ListGroupItem>
+                  <ListGroupItem style={{ color: product.itemsLeft < 30 && "red" }} key={crypto.randomUUID()}>
+                    Items Left: {product.itemsLeft}
+                  </ListGroupItem>
                   <ListGroupItem key={crypto.randomUUID()}>Blocked: {String(product.blocked)}</ListGroupItem>
                   <ListGroupItem key={crypto.randomUUID()}>Category ID: {product.categoryId}</ListGroupItem>
                   <ListGroupItem key={crypto.randomUUID()}>Margin Rate: {product.marginRate}</ListGroupItem>

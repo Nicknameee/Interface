@@ -222,7 +222,10 @@ const EditProduct = () => {
   };
 
   return (
-    <div className="page" style={{ background: "#cea4a4", height: "100vh", overflow: "scroll", width: "100vw" }}>
+    <div
+      className="page"
+      style={{ background: "#cea4a4", color: "#fff", height: "100vh", overflow: "scroll", width: "100vw" }}
+    >
       <OutsideClickHandler
         outsideClickCallbacks={[
           {

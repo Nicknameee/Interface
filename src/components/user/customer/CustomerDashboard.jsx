@@ -79,7 +79,7 @@ const CustomerDashboard = () => {
   }, [productPage]);
 
   return (
-    <div className="page" style={{ background: "#cea4a4" }}>
+    <div className="page" style={{ background: "#cea4a4", paddingBottom: 50 }}>
       <OutsideClickHandler
         outsideClickCallbacks={[
           {
