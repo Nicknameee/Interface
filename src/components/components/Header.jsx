@@ -76,17 +76,21 @@ const Header = ({
           title={"Home"}
           onClick={redirectToUI}
         />
-        {!isMobile && <h1 style={{ fontSize: 30, marginBottom: 0 }}>CRM Assistant</h1>}
+        {!isMobile && <h1 style={{ fontSize: 30, marginBottom: 0 }}>{language === "EN" ? 'CRM Assistant' : 'CRM Асистент'}</h1>}
       </div>
       {displaySearchBar !== undefined && displaySearchBar !== null && displaySearchBar === true && (
         <Form inline style={{ display: "flex", flexGrow: 1, maxWidth: "600px" }}>
           <FormControl
             type="text"
-            placeholder="Search..."
+            placeholder={language === "EN" ? "Search..." : "Пошук..."}
             value={searchBarValue}
             onChange={(e) => setSearchValue(e.target.value)}
           />
-          <Button onClick={() => searchForProduct(productLinkPage)}>Search</Button>
+          <Button onClick={() => searchForProduct(productLinkPage)}>
+              {
+                  language === "EN" ? 'Search' : 'Знайти'
+              }
+          </Button>
           <OutsideClickHandler
             outsideClickCallbacks={[
               {
@@ -140,7 +144,9 @@ const Header = ({
                       await searchForProduct(productLinkPage + 1);
                     }}
                   >
-                    Extra results...
+                    {
+                      language === "EN" ? 'Extra results...' : 'Наступна сторінка'
+                    }
                   </ListGroupItem>
                 )}
               </ListGroup>
@@ -153,7 +159,7 @@ const Header = ({
           <FontAwesomeIcon
             icon={faInfo}
             className="icon"
-            title={"Show Menu"}
+            title={language === "EN" ? "Show Menu" : "Меню"}
             onClick={() => setShowSidebar(!showSidebar)}
           />
         )}
@@ -161,7 +167,7 @@ const Header = ({
           <FontAwesomeIcon
             icon={faShoppingCart}
             className="icon"
-            title={"Check On Your Shopping Cart"}
+            title={language === "EN" ? "Check On Your Shopping Cart" : "Глянути Кошик"}
             onClick={() => setShowCart(!showCart)}
           />
         ) : null}
@@ -169,17 +175,19 @@ const Header = ({
           <FontAwesomeIcon
             icon={faUser}
             className="icon"
-            title={"Your Personal Account"}
+            title={language === "EN" ? "Your Personal Account" : "Особистий кабінет"}
             onClick={redirectToPersonal}
           />
         )}
-        {isLoggedIn() && <FontAwesomeIcon icon={faSignOutAlt} className="icon" title={"Log Out"} onClick={logout} />}
+        {isLoggedIn() && <FontAwesomeIcon icon={faSignOutAlt} className="icon" title={language === "EN" ? "Log Out" : 'Вийти'} onClick={logout} />}
         {!isLoggedIn() &&
           displayLoginButton !== undefined &&
           displayLoginButton !== null &&
           displayLoginButton === true && (
             <Button size="sm" variant="outline-light" style={{ width: 55 }} onClick={redirectToSignIn}>
-              Login
+                {
+                    language === "EN" ? 'Login' : 'Авторизація'
+                }
             </Button>
           )}
         {!isLoggedIn() &&
@@ -187,7 +195,9 @@ const Header = ({
           displaySignUpButton !== null &&
           displaySignUpButton === true && (
             <Button size="sm" variant="outline-light" style={{ width: 75 }} onClick={redirectToSignUp}>
-              Register
+                {
+                    language === "EN" ? 'Register' : 'Зареєструватися'
+                }
             </Button>
           )}
         <Select

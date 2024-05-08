@@ -117,6 +117,7 @@ export const signIn = async (login, password): boolean => {
 
         return true;
       }
+      notifyError(json['exception']['exception'])
 
       return false;
     })
@@ -1314,7 +1315,7 @@ export async function exportOrderHistory(orderFilter: OrderFilter) {
       const link = document.createElement("a");
 
       link.href = blobUrl;
-      link.setAttribute("download", "Orders.xlsx"); // Set the download attribute to a filename
+      link.setAttribute("download", "OrderHistory.xlsx"); // Set the download attribute to a filename
 
       document.body.appendChild(link);
 
@@ -1441,9 +1442,10 @@ export async function addUser(data: {
         return false;
       }
     })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+      .catch((error) => {
+        console.error("Error:", error);
+        notifyError(error);
+      });
 }
 
 export async function getProduct(productId: string) {
@@ -1489,9 +1491,10 @@ export async function getProduct(productId: string) {
         return null;
       }
     })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+      .catch((error) => {
+        console.error("Error:", error);
+        notifyError(error);
+      });
 }
 
 export async function addProduct(data: any): boolean {
@@ -1520,9 +1523,10 @@ export async function addProduct(data: any): boolean {
         return false;
       }
     })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+      .catch((error) => {
+        console.error("Error:", error);
+        notifyError(error);
+      });
 }
 
 export async function setProductPicture(productId: string, picture: File) {
@@ -1583,11 +1587,41 @@ export async function updateProduct(data: any): boolean {
         return false;
       }
     })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+      .catch((error) => {
+        console.error("Error:", error);
+        notifyError(error);
+      });
 }
 
+export async function updatePassword(data: {login: string, password: string, code: string}): boolean {
+  const requestOptions = {
+    method: "PUT",
+    headers: getDefaultHeaders(),
+    body: JSON.stringify(data),
+  };
+
+  return await fetch(`${endpoints.updatePassword}`, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        if (data && data.status === "OK") {
+          return true;
+        } else {
+          notifyError(data["exception"]["exception"]);
+
+          return false;
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        notifyError(error);
+      });
+}
 export default endpoints;
 
 root.render(

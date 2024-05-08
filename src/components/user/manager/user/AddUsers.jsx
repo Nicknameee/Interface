@@ -12,7 +12,7 @@ const AddUsers = () => {
     const [password: string, setPassword] = useState('');
     const [passwordConfirmation: string, setPasswordConfirmation] = useState('');
     const [telegramUsername: string, setTelegramUsername] = useState('');
-    const [role: string, setRole] = useState('ROLE_OPERATOR');
+    const [role: string, setRole] = useState('');
     const [status: string, setStatus] = useState('ENABLED');
 
     const [usernameException, setUsernameException] = useState('');
@@ -236,13 +236,13 @@ const AddUsers = () => {
                     <div className="input-container">
                         <Form.Label>Role</Form.Label>
                         <div className="input-container">
-                            <FormCheck className="w-100"
-                                       key={crypto.randomUUID()}
-                                       id={'Operator'}
-                                       label={'Operator'}
-                                       value={'Operator'}
-                                       checked={role === 'ROLE_OPERATOR'}
-                                       onChange={() => setRole('ROLE_OPERATOR')}/>
+                            {/*<FormCheck className="w-100"*/}
+                            {/*           key={crypto.randomUUID()}*/}
+                            {/*           id={'Operator'}*/}
+                            {/*           label={'Operator'}*/}
+                            {/*           value={'Operator'}*/}
+                            {/*           checked={role === 'ROLE_OPERATOR'}*/}
+                            {/*           onChange={() => setRole('ROLE_OPERATOR')}/>*/}
                             <FormCheck className="w-100"
                                        key={crypto.randomUUID()}
                                        id={'Manager'}

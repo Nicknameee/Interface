@@ -1,4 +1,4 @@
-export let createOrder = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/orders/save"; //POST
+ export let createOrder = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/orders/save"; //POST
 export let updateOrder = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/orders/update"; //PUT
 export let initiateTransaction = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/transactions/initiate"; //POST
 export const getTransactions = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/transactions"; //GET
@@ -32,3 +32,4 @@ export const updateUser = process.env.REACT_APP_USER_SERVICE_ADDRESS + "/api/v1/
 export const getProduct = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/product"; //GET
 export const saveProduct = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/save"; //POST
 export const updateProduct = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/update"; //PUT
+export const updatePassword = process.env.REACT_APP_USER_SERVICE_ADDRESS + "/api/v1/users/password/allowed"; //PUT

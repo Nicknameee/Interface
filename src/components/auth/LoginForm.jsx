@@ -2,11 +2,17 @@ import { useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { isLoggedIn, signIn } from "../../index.js";
 import * as utility from "../../constants/pattern.js";
-import { redirectToPreviousLoginUrl, redirectToSignUp, redirectToUI } from "../../utilities/redirect";
+import {
+  redirectToPasswordChangeRoute,
+  redirectToPreviousLoginUrl,
+  redirectToSignUp,
+  redirectToUI
+} from "../../utilities/redirect";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import {useLanguage} from "../../contexts/language/language-context";
 
 const LoginForm = () => {
   const [login, setLogin] = useState("");
@@ -14,6 +20,7 @@ const LoginForm = () => {
   const [loginException, setLoginException] = useState("");
   const [passwordException, setPasswordException] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { language, setLanguage } = useLanguage();
 
   const handleLoginChange = (value) => {
     setLogin(value);
@@ -28,7 +35,11 @@ const LoginForm = () => {
       !utility.USERNAME_PATTERN.test(value) &&
       value
     ) {
-      setLoginException("Invalid login, can not be used as email or telegram username or system username");
+      if (language === "EN") {
+        setLoginException("Invalid login, can not be used as email or telegram username or system username");
+      } else {
+        setLoginException("Авторизаційний логін некоректий")
+      }
     } else {
       setLoginException("");
     }
@@ -42,7 +53,11 @@ const LoginForm = () => {
     }
 
     if (!utility.USER_PASSWORD_PATTERN.test(value) && value) {
-      setPasswordException("Password can contain only [a-zA-Z0-9@] and be in length range from 8 to 33");
+      if (language === 'EN') {
+        setPasswordException("Password can contain only [a-zA-Z0-9@] and be in length range from 8 to 33");
+      } else {
+        setPasswordException("Авторизаційний пароль некоректний, може містити лише [a-zA-Z0-9@] і бути довжиною від 8 до 33")
+      }
     } else {
       setPasswordException("");
     }
@@ -58,10 +73,18 @@ const LoginForm = () => {
       });
     } else {
       if (!login) {
-        setLoginException("Invalid login");
+        if (language === "EN") {
+          setLoginException("Invalid login");
+        } else {
+          setLoginException("Логін некоректний")
+        }
       }
       if (!password) {
-        setPasswordException("Invalid password");
+        if (language === "EN") {
+          setPasswordException("Invalid password");
+        } else {
+          setPasswordException("Ваш пароль некоректний")
+        }
       }
     }
   };
@@ -84,12 +107,24 @@ const LoginForm = () => {
           className="custom-form"
         >
           <Form.Group controlId="formLogin" className="m-3">
-            <h1>CRM Assistant System</h1>
-            <h3>Welcome!</h3>
-            <Form.Label style={{ fontSize: "1.3em" }}>Login</Form.Label>
+            <h1>
+              {
+                language === "EN" ? 'CRM Assistant System' : 'CRM Асистент Система'
+              }
+            </h1>
+            <h3>
+              {
+                language === "EN" ? 'Welcome!' : 'Ласкаво просимо!'
+              }
+            </h3>
+            <Form.Label style={{ fontSize: "1.3em" }}>
+              {
+                language === "EN" ? 'Login' : 'Логін'
+              }
+            </Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter your login"
+              placeholder={language === "EN" ? "Enter your login" : "Заповніть логін"}
               value={login}
               onChange={(e) => handleLoginChange(e.target.value)}
               style={{ fontSize: "1.1em" }}
@@ -103,11 +138,15 @@ const LoginForm = () => {
           </Form.Group>
 
           <Form.Group controlId="formPassword" className="m-3">
-            <Form.Label style={{ fontSize: "1.3em" }}>Password</Form.Label>
+            <Form.Label style={{ fontSize: "1.3em" }}>
+              {
+                language === 'EN' ? 'Password' : 'Пароль'
+              }
+            </Form.Label>
             <div className="input-container">
               <Form.Control
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
+                placeholder={language === 'EN' ? "Enter your password" : "Заповніть пароль"}
                 value={password}
                 onChange={(e) => handlePasswordChange(e.target.value)}
                 style={{ fontSize: "1.1em", position: "relative" }}
@@ -125,11 +164,20 @@ const LoginForm = () => {
               {passwordException}
             </p>
           </Form.Group>
+          <Button variant="primary" type="button" className="m-3" onClick={() => redirectToPasswordChangeRoute()}>
+            {
+              language === 'EN' ? 'Forgot password?' : 'Забули пароль?'
+            }
+          </Button>
           <Button variant="primary" type="button" className="m-3" onClick={() => handleSignIn()}>
-            Login
+            {
+              language === 'EN' ? 'Login' : 'Логін'
+            }
           </Button>
           <Button variant="secondary" className="m-3" onClick={() => redirectToSignUp()}>
-            Switch To Sign Up
+            {
+              language === 'EN' ? 'Switch To Sign Up' : 'Сторінка реєстрації'
+            }
           </Button>
         </Form>
       </div>

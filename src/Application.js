@@ -2,17 +2,18 @@ import "./styles/App.css";
 import LoginForm from "./components/auth/LoginForm";
 import UI from "./components/UI";
 import SignUpForm from "./components/auth/SignUpForm";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import NotFound from "./components/components/NotFound";
 import ProductComponent from "./components/user/customer/ProductComponent";
 import CheckoutOrder from "./components/user/customer/CheckoutOrder";
 import CustomerPersonalCabinet from "./components/user/customer/CustomerPersonalCabinet";
-import { isCustomerLoggedIn, isLoggedIn, isManagerLoggedIn } from "./index";
+import {isCustomerLoggedIn, isLoggedIn, isManagerLoggedIn} from "./index";
 import Unauthorized from "./components/components/Unauthorized";
 import ManagerPersonalCabinet from "./components/user/manager/ManagerPersonalCabinet";
 import EditProductWrapper from "./components/user/manager/product/EditProductWrapper";
 import AddProduct from "./components/user/manager/product/AddProduct";
-import { LanguageProvider } from "./contexts/language/language-context";
+import {LanguageProvider} from "./contexts/language/language-context";
+import PasswordChange from "./components/auth/PasswordChange";
 
 function Application() {
   return (
@@ -37,6 +38,7 @@ function Application() {
           />
           <Route exact path="/product/edit" element={isManagerLoggedIn() ? <EditProductWrapper /> : <Unauthorized />} />
           <Route exact path="/product/new" element={isManagerLoggedIn() ? <AddProduct /> : <Unauthorized />} />
+          <Route exact path="/password/change" element={isLoggedIn() ? <UI /> : <PasswordChange />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

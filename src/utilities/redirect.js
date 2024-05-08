@@ -1,6 +1,7 @@
 import { getCookie } from "../index";
 import { User } from "../schemas/responses/models/User.ts";
 
+
 export function redirectToUI() {
   window.location.href = "/home";
 }
@@ -29,6 +30,9 @@ export function redirectToPersonal() {
 export function redirectToSignIn() {
   localStorage.setItem("previousLoginUrl", window.location.href);
   window.location.href = "/sign/in";
+}
+export function redirectToPasswordChangeRoute() {
+  window.location.href = "/password/change"
 }
 export function redirectToSignUp() {
   window.location.href = "/sign/up";
