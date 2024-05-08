@@ -17,6 +17,7 @@ import * as utility from '../../constants/pattern.js'
 import {notifyError, notifySuccess} from "../../utilities/notify";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAsterisk, faEye, faEyeSlash} from "@fortawesome/free-solid-svg-icons";
+import {useLanguage} from "../../contexts/language/language-context";
 
 const SignUpForm = () => {
     const [username, setUsername] = useState('');
@@ -39,6 +40,9 @@ const SignUpForm = () => {
     const [emailSigningUp, setEmailSigningUp] = useState(false);
 
     const [lastTimePoint: number, setLastTimePoint] = useState(new Date(0).getTime());
+
+    const { language, setLanguage } = useLanguage();
+
     let webSocketClient;
 
     const handleUsernameChange = (value) => {
@@ -49,7 +53,11 @@ const SignUpForm = () => {
         }
 
         if ((!(/^[a-zA-Z0-9]{5,33}$/).test(value)) && value) {
-            setUsernameException('Invalid username')
+            if (language === 'EN') {
+                setUsernameException('Invalid username')
+            } else {
+                setUsernameException('Юзернейм невалідний')
+            }
         } else {
             setUsernameException('')
         }
@@ -63,7 +71,11 @@ const SignUpForm = () => {
         }
 
         if (!(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/).test(value) && value) {
-            setEmailException('Invalid email')
+            if (language === 'EN') {
+                setEmailException('Invalid email')
+            } else {
+                setEmailException('Емейл невалідний')
+            }
         } else {
             setEmailException('')
         }
@@ -77,7 +89,11 @@ const SignUpForm = () => {
         }
 
         if (!(/^[a-zA-Z0-9]{8,33}$/).test(value) && value) {
-            setPasswordException('Invalid password')
+            if (language === 'EN') {
+                setPasswordException('Invalid password')
+            } else {
+                setPasswordException('Інвалідний пароль')
+            }
         } else {
             setPasswordException('')
         }
@@ -95,7 +111,11 @@ const SignUpForm = () => {
         }
 
         if (value !== password && value) {
-            setPasswordConfirmationException('Passwords not match')
+            if (language === 'EN') {
+                setPasswordConfirmationException('Passwords not match')
+            } else {
+                setPasswordConfirmationException('Паролі не збігаються')
+            }
         } else {
             setPasswordConfirmationException('')
         }
@@ -109,7 +129,11 @@ const SignUpForm = () => {
         }
 
         if (!utility.TELEGRAM_USERNAME_PATTERN.test(value) && value) {
-            setTelegramUsernameException('Invalid telegram username, must be in format @Username 5 list of username at least')
+            if (language === 'EN') {
+                setTelegramUsernameException('Invalid telegram username, must be in format @Username 5 list of username at least')
+            } else {
+                setTelegramUsernameException('Інвалід телеграм нікнейм, повинен зберігати формат @Юзернейм і не менше 5 символів')
+            }
         } else {
             setTelegramUsernameException('')
         }
@@ -123,7 +147,11 @@ const SignUpForm = () => {
         }
 
         if (!(/^[0-9\-A-Z]{4,}$/).test(value) && value) {
-            setCodeException('Invalid code')
+            if (language === 'EN') {
+                setCodeException('Invalid code')
+            } else {
+                setCodeException('Інвалід код')
+            }
         } else {
             setCodeException('')
         }
@@ -135,7 +163,11 @@ const SignUpForm = () => {
 
     const handleSignUp = async () => {
         if (await initiateCredentialsAvailabilityCheckingHook() && infoValid()) {
-            notifySuccess('Initiating verification process...')
+            if (language === 'EN') {
+                notifySuccess('Initiating verification process...')
+            } else {
+                notifySuccess('Ініціація процесу верифікації...')
+            }
             if (telegramUsername !== '') {
                 if (await checkTelegramUsernameExists(telegramUsername)) {
                     await initiateSigningUp()
