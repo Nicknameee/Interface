@@ -5,10 +5,12 @@ import { Category } from "../../../schemas/responses/models/Category.ts";
 import { getQueryParam } from "../../../index";
 import { useLocation } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import {useLanguage} from "../../../contexts/language/language-context";
 
 const Categories = ({ categories, isSubCategoryOpened, categoriesPage, setCategoriesPage, productPresent }) => {
   const location = useLocation();
   const box = useRef(null);
+  const { language, setLanguage } = useLanguage();
 
   const handleScroll = (direction) => {
     if (box.current) {
@@ -45,11 +47,15 @@ const Categories = ({ categories, isSubCategoryOpened, categoriesPage, setCatego
             <h5 className="card-title">{category.name}</h5>
             {category.enabled ? (
               <button className="btn btn-success" onClick={() => redirectToCategory(category.categoryId)}>
-                Check It Up
+                  {
+                      language === 'EN' ? 'Check It Up' : 'Переглянути'
+                  }
               </button>
             ) : (
               <button className="btn btn-dark" disabled={true}>
-                Not Available
+                  {
+                      language === 'EN' ? 'Not Available' : 'Недоступний'
+                  }
               </button>
             )}
           </div>
@@ -114,7 +120,11 @@ const Categories = ({ categories, isSubCategoryOpened, categoriesPage, setCatego
       <div className="row justify-content-center w-100 py-0">
         {list(categories)}
         {categories.length < 1 && isSubCategoryOpened && productPresent && (
-          <h4 className="w-100 text-center">No categories were found....</h4>
+          <h4 className="w-100 text-center">
+              {
+                  language === 'EN' ? 'No categories were found...' : 'Не знайдено категорій...'
+              }
+          </h4>
         )}
         {
           <div className="w-100 d-flex justify-content-center">

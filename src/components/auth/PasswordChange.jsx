@@ -8,6 +8,7 @@ import Footer from "../components/Footer";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEye, faEyeSlash} from "@fortawesome/free-solid-svg-icons";
 import {notifySuccess} from "../../utilities/notify"
+import {useLanguage} from "../../contexts/language/language-context";
 
 const PasswordChange = () => {
   const [login, setLogin] = useState("");
@@ -18,6 +19,7 @@ const PasswordChange = () => {
   const [code, setCode] = useState('');
   const [codeException, setCodeException] = useState('');
   const [codeRequested, setCodeRequested] = useState(false);
+  const { language, setLanguage } = useLanguage();
 
   const handleLoginChange = (value) => {
     setLogin(value);
@@ -32,7 +34,11 @@ const PasswordChange = () => {
       !utility.USERNAME_PATTERN.test(value) &&
       value
     ) {
-      setLoginException("Invalid login, can not be used as email or telegram username or system username");
+      if (language === 'EN' ) {
+        setLoginException("Invalid login, can not be used as email or telegram username or system username");
+      } else {
+        setLoginException("Невалідний логін, не може бути поштовою адресою, телеграм або системним юзернеймом");
+      }
     } else {
       setLoginException("");
     }
@@ -46,7 +52,11 @@ const PasswordChange = () => {
     }
 
     if (!utility.USER_PASSWORD_PATTERN.test(value) && value) {
-      setPasswordException("Password can contain only [a-zA-Z0-9@] and be in length range from 8 to 33");
+      if ( language === 'EN' ) {
+        setPasswordException("Password can contain only [a-zA-Z0-9@] and be in length range from 8 to 33");
+      } else {
+        setPasswordException("Авторизаційний пароль некоректний, може містити лише [a-zA-Z0-9@] і бути довжиною від 8 до 33")
+      }
     } else {
       setPasswordException("");
     }
@@ -60,7 +70,11 @@ const PasswordChange = () => {
     }
 
     if (!value || value === '') {
-      setCodeException("Invaqlid ocnfirmation code");
+      if ( language === 'EN' ) {
+        setCodeException("Invalid confirmation code");
+      } else {
+        setCodeException('Невалідний код підтвердження');
+      }
     } else {
       setCodeException("");
     }
@@ -74,7 +88,11 @@ const PasswordChange = () => {
     })
         .then(result => {
           if (result) {
-            notifySuccess('Code requested, wait...')
+            if ( language === 'EN' ) {
+              notifySuccess('Code requested, wait...')
+            } else {
+              notifySuccess('Код очікується...')
+            }
             setCodeRequested(true)
           }
         })
@@ -88,7 +106,11 @@ const PasswordChange = () => {
     })
         .then(result => {
           if (result) {
-            notifySuccess('Password updated successfully...')
+            if ( language === 'EN' ) {
+              notifySuccess('Password updated successfully...')
+            } else {
+              notifySuccess('Ваш пароль Успішно оновлено ...')
+            }
             setTimeout(() => redirectToSignIn(), 3000);
           }
         })
@@ -114,13 +136,25 @@ const PasswordChange = () => {
           className="custom-form"
         >
           <Form.Group controlId="formLogin" className="m-3">
-            <h1>CRM Assistant System</h1>
-            <h3>Welcome!</h3>
-            <Form.Label style={{ fontSize: "1.3em" }}>Login</Form.Label>
+            <h1>
+              {
+                language === "EN" ? 'CRM Assistant System' : 'CRM Асистент Система'
+              }
+            </h1>
+            <h3>
+              {
+                language === "EN" ? 'Welcome!' : 'Ласкаво просимо!'
+              }
+            </h3>
+            <Form.Label style={{ fontSize: "1.3em" }}>
+              {
+                language === 'EN' ? 'Update password' : 'Оновити пароль'
+              }
+            </Form.Label>
             <Form.Control
               readOnly={codeRequested}
               type="text"
-              placeholder="Enter your login(email, telegram or username)"
+              placeholder={ language === 'EN' ? "Enter your login(email, telegram or username)" : 'Будь ласка введіть ваш логін(пошта, telegram , юзернейм)'}
               value={login}
               onChange={(e) => handleLoginChange(e.target.value)}
               style={{ fontSize: "1.1em" }}
@@ -135,11 +169,15 @@ const PasswordChange = () => {
           {
             codeRequested &&
               <Form.Group controlId="formPassword" className="m-3">
-                <Form.Label style={{ fontSize: "1.3em" }}>Password</Form.Label>
+                <Form.Label style={{ fontSize: "1.3em" }}>
+                  {
+                    language === 'EN' ? 'Password' : 'Пароль'
+                  }
+                </Form.Label>
                 <div className="input-container">
                   <Form.Control
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder={language === 'EN' ? "Enter your password" : "Заповніть пароль"}
                       value={password}
                       onChange={(e) => handlePasswordChange(e.target.value)}
                       style={{ fontSize: "1.1em", position: "relative" }}
@@ -161,11 +199,15 @@ const PasswordChange = () => {
           {
               codeRequested &&
               <Form.Group controlId="formCode" className="m-3">
-                <Form.Label style={{ fontSize: "1.3em" }}>Code</Form.Label>
+                <Form.Label style={{ fontSize: "1.3em" }}>
+                  {
+                        language === 'EN' ? 'Code' : 'Код'
+                  }
+                </Form.Label>
                 <div className="input-container">
                   <Form.Control
                       type={"text"}
-                      placeholder="Enter your code"
+                      placeholder={language === 'EN' ? "Enter your code here..." : 'Введіть ваш код...'}
                       value={code}
                       onChange={(e) => handleCodeChange(e.target.value)}
                       style={{ fontSize: "1.1em", position: "relative" }}
@@ -183,20 +225,24 @@ const PasswordChange = () => {
           {
             codeRequested &&
             <Button variant="primary" type="button" className="m-3" onClick={() => confirmChange()}>
-              Confirm Change
+              { language === 'EN' ? 'Confirm Change\'' : 'Змінити'}
             </Button>
           }
           {
               !codeRequested &&
               <Button variant="primary" type="button" className="m-3" onClick={() => requestCode()}>
-                Request Code
+                { language === 'EN' ? 'Request Code' : 'Отримати код'}
               </Button>
           }
           <Button variant="secondary" className="m-3" onClick={() => redirectToSignIn()}>
-            Switch To Sign In
+            {
+              language === 'EN' ? 'Switch To Sign In' : 'Логін'
+            }
           </Button>
           <Button variant="secondary" className="m-3" onClick={() => redirectToSignUp()}>
-            Switch To Sign Up
+            {
+              language === 'EN' ? 'Switch To Sign Up' : 'Сторінка реєстрації'
+            }
           </Button>
         </Form>
       </div>

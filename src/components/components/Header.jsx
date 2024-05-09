@@ -184,7 +184,7 @@ const Header = ({
           displayLoginButton !== undefined &&
           displayLoginButton !== null &&
           displayLoginButton === true && (
-            <Button size="sm" variant="outline-light" style={{ width: 55 }} onClick={redirectToSignIn}>
+            <Button size="sm" variant="outline-light" style={{ width: 95 }} onClick={redirectToSignIn}>
                 {
                     language === "EN" ? 'Login' : 'Авторизація'
                 }
@@ -194,9 +194,9 @@ const Header = ({
           displaySignUpButton !== undefined &&
           displaySignUpButton !== null &&
           displaySignUpButton === true && (
-            <Button size="sm" variant="outline-light" style={{ width: 75 }} onClick={redirectToSignUp}>
+            <Button size="sm" variant="outline-light" style={{ width: 90 }} onClick={redirectToSignUp}>
                 {
-                    language === "EN" ? 'Register' : 'Зареєструватися'
+                    language === "EN" ? 'Register' : 'Реєстрація'
                 }
             </Button>
           )}

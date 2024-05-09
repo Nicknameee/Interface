@@ -2,7 +2,8 @@ import {useEffect, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {
     checkTelegramUsernameExists,
-    getDefaultHeaders, initiateCredentialsAvailabilityChecking,
+    getDefaultHeaders,
+    initiateCredentialsAvailabilityChecking,
     isLoggedIn,
     requestAdditionalApprovalCode,
     signIn
@@ -92,7 +93,7 @@ const SignUpForm = () => {
             if (language === 'EN') {
                 setPasswordException('Invalid password')
             } else {
-                setPasswordException('Інвалідний пароль')
+                setPasswordException('Невалідний пароль')
             }
         } else {
             setPasswordException('')
@@ -132,7 +133,7 @@ const SignUpForm = () => {
             if (language === 'EN') {
                 setTelegramUsernameException('Invalid telegram username, must be in format @Username 5 list of username at least')
             } else {
-                setTelegramUsernameException('Інвалід телеграм нікнейм, повинен зберігати формат @Юзернейм і не менше 5 символів')
+                setTelegramUsernameException('Невалідний телеграм нікнейм, повинен зберігати формат @Юзернейм і не менше 5 символів')
             }
         } else {
             setTelegramUsernameException('')
@@ -150,7 +151,7 @@ const SignUpForm = () => {
             if (language === 'EN') {
                 setCodeException('Invalid code')
             } else {
-                setCodeException('Інвалід код')
+                setCodeException('Невалідний код')
             }
         } else {
             setCodeException('')
@@ -177,19 +178,39 @@ const SignUpForm = () => {
             }
         } else {
             if (!username) {
-                setUsernameException('Invalid username')
+                if (language === 'EN') {
+                    setUsernameException('Invalid username')
+                } else {
+                    setUsernameException('Невалідний юзернейм')
+                }
             }
             if (!email && !showTelegramInput) {
-                setEmailException('Invalid email')
+                if (language === 'EN') {
+                    setEmailException('Invalid email')
+                } else {
+                    setEmailException('Невалідна поштова адреса')
+                }
             }
             if (!password) {
-                setPasswordException('Invalid password')
+                if (language === 'EN') {
+                    setPasswordException('Invalid password')
+                } else {
+                    setPasswordException('Невалідний пароль')
+                }
             }
             if (!passwordConfirmation) {
-                setPasswordConfirmationException('Passwords not match')
+                if (language === 'EN') {
+                    setPasswordConfirmationException('Passwords not match')
+                } else {
+                    setPasswordConfirmationException('Не збігаються паролі')
+                }
             }
             if (!telegramUsername && showTelegramInput) {
-                setTelegramUsernameException('Invalid telegram username')
+                if (language === 'EN' ) {
+                    setTelegramUsernameException('Invalid telegram username')
+                } else {
+                    setTelegramUsernameException('Телеграм юзернейм невалідний')
+                }
             }
         }
     };
@@ -230,7 +251,11 @@ const SignUpForm = () => {
 
     const initiateVerification = async () => {
         if (code === '') {
-            notifyError('Code for verification is not set');
+            if (language === 'EN') {
+                notifyError('Code for verification is not set');
+            } else {
+                notifyError('Код для верифікації не вказано')
+            }
             return;
         }
 
@@ -281,7 +306,11 @@ const SignUpForm = () => {
 
     const toggleTelegramCheckbox = () => {
         if (!showTelegramInput) {
-            notifySuccess('Subscribe to telegram BOT(send message)')
+            if (language === 'EN') {
+                notifySuccess('Subscribe to telegram BOT(send message)')
+            } else {
+                notifySuccess('Напишіть повідомлення телеграм боту для підписки')
+            }
         }
 
         setShowTelegramInput(!showTelegramInput);
@@ -294,7 +323,11 @@ const SignUpForm = () => {
     const requestAdditionalApprovalCodeHook = () => {
         const delay: number = Math.abs(lastTimePoint - new Date().getTime());
         if (delay < 60) {
-            notifyError('Too often invocation, wait another ' + (60 - delay))
+            if (language === 'EN') {
+                notifyError(`Too often invocation, wait another ${(60 - delay)} seconds`)
+            } else {
+                notifyError(`Забагато запитів, зачекайте ${(60 - delay)} секунд`)
+            }
         } else {
             if (telegramUsername !== '') {
                 requestAdditionalApprovalCode(telegramUsername.replace('@', ''))
@@ -335,11 +368,15 @@ const SignUpForm = () => {
              return (
                  <Form style={{ width: '30vw', margin: 'auto' }} className="custom-form">
                      <Form.Group controlId="formUsername" className="m-3">
-                         <Form.Label>Username</Form.Label>
+                         <Form.Label>
+                             {
+                                 language === 'EN' ? 'Username' : 'Введіть ваш юзернейм...'
+                             }
+                         </Form.Label>
                          <div className="input-container">
                              <Form.Control
                                  type="text"
-                                 placeholder="Enter your username"
+                                 placeholder={ language === 'EN' ? "Enter your username" : 'Введіть ваш юзернейм...'}
                                  style={{paddingLeft: '30px'}}
                                  value={username}
                                  onChange={(e) => handleUsernameChange(e.target.value) } />
@@ -350,11 +387,15 @@ const SignUpForm = () => {
 
                      {!showTelegramInput ?
                          <Form.Group controlId="formEmail" className="m-3">
-                             <Form.Label>Email</Form.Label>
+                             <Form.Label>
+                                 {
+                                     language === 'EN' ? 'Email' : 'Ваша поштова адреса'
+                                 }
+                             </Form.Label>
                              <div className="input-container">
                                  <Form.Control
                                      type="text"
-                                     placeholder="Enter your email"
+                                     placeholder={ language === 'EN' ? "Enter your email" : 'Введіть вашу поштову адресу...'}
                                      style={{paddingLeft: '30px'}}
                                      value={email}
                                      onChange={(e) => handleEmailChange(e.target.value)} />
@@ -367,11 +408,15 @@ const SignUpForm = () => {
                      }
 
                      <Form.Group controlId="formPassword" className="m-3">
-                         <Form.Label>Password</Form.Label>
+                         <Form.Label>
+                             {
+                                 language === 'EN' ? 'Password' : 'Ваш пароль'
+                             }
+                         </Form.Label>
                          <div className="input-container">
                              <Form.Control
                                  type={showPassword ? 'text' : 'password'}
-                                 placeholder="Enter your password"
+                                 placeholder={ language === 'EN' ? "Enter your password" : 'Введіть ваш пароль...'}
                                  style={{paddingLeft: '30px'}}
                                  value={password}
                                  onChange={(e) => handlePasswordChange(e.target.value)} />
@@ -382,11 +427,15 @@ const SignUpForm = () => {
                      </Form.Group>
 
                      <Form.Group controlId="formConfirmationPassword" className="m-3">
-                         <Form.Label>Repeat Password</Form.Label>
+                         <Form.Label>
+                             {
+                                 language === 'EN' ? 'Repeat Password' : 'Введіть пароль ще раз'
+                             }
+                         </Form.Label>
                          <div className="input-container">
                              <Form.Control
                                  type={showPassword ? 'text' : 'password'}
-                                 placeholder="Repeat your password"
+                                 placeholder={ language === 'EN' ? "Repeat your password" : 'Ще раз введіть пароль...'}
                                  style={{paddingLeft: '30px'}}
                                  value={passwordConfirmation}
                                  readOnly={passwordException !== ''}
@@ -399,7 +448,7 @@ const SignUpForm = () => {
                      <Form.Group controlId="formTelegram" className="m-3">
                          <Form.Check
                              type="checkbox"
-                             label="Do you want to verify your account by Telegram?"
+                             label={ language === 'EN' ? "Do you want to verify your account by Telegram?" : 'Бажаєте підтвердити вашу реєстрацію за допомогою Телеграм?'}
                              onChange={toggleTelegramCheckbox}
                              className="mb-3"
                          />
@@ -409,7 +458,7 @@ const SignUpForm = () => {
                                  <FontAwesomeIcon icon={faAsterisk} className="required-field" title='This field is required'/>
                                  <Form.Control
                                      type="text"
-                                     placeholder="Enter your Telegram nickname => TELEGRAM"
+                                     placeholder={language === 'EN' ? "Enter your Telegram nickname => TELEGRAM" : 'Телеграм юзернейм'}
                                      style={{paddingLeft: '30px'}}
                                      value={telegramUsername}
                                      onChange={(e) => handleTelegramNicknameChange(e.target.value)}
@@ -419,29 +468,38 @@ const SignUpForm = () => {
                          }
                          {showTelegramInput &&
                              <Button type="button" className="mt-3" onClick={() => window.open(process.env.REACT_APP_TELEGRAM_BOT_ADDRESS, '_blank', 'noopener,noreferrer')}>
-                                 Subscribe To Bot
+                                 {
+                                     language === 'EN' ? 'Subscribe To Bot' : 'Телеграм Бот'
+                                 }
                              </Button>
                          }
                          <p style={{wordBreak: 'break-word', marginTop: '1em', color: 'white', fontSize: '1.1em'}} hidden={telegramUsernameException === ''}>{telegramUsernameException}</p>
                      </Form.Group>
 
                      <Button variant={infoValid() ? 'primary' : 'secondary'} type="button" className="m-3" disabled={!infoValid()} onClick={() => handleSignUp()}>
-                         Sign Up
+                         {
+                             language === 'EN' ? 'Sign Up' : 'Зареєструватися'
+                         }
                      </Button>
                      <Button variant="secondary" type="button" className="m-3" onClick={() => redirectToSignIn()}>
-                         Login
+                         {
+                             language === 'EN' ? 'Switch To Sign In' : 'Логін'
+                         }
                      </Button>
                  </Form>
              );
          } else if (telegramSigningUp && !emailSigningUp) {
              return (
                  <Form style={{ width: '30vw', margin: 'auto' }} className="custom-form">
-
                      <Form.Group controlId="formCode" className="m-3">
-                         <Form.Label>Verification Code</Form.Label>
+                         <Form.Label>
+                             {
+                                 language === 'EN' ? 'Verification Code' : 'Код Підтвердження'
+                             }
+                         </Form.Label>
                          <Form.Control
                              type="text"
-                             placeholder="Enter your code here   ..."
+                             placeholder={language === 'EN' ? "Enter your code here..." : 'Введіть ваш код...'}
                              value={code}
                              onChange={(e) => handleCodeChange(e.target.value) }
                          />
@@ -449,10 +507,14 @@ const SignUpForm = () => {
                      </Form.Group>
 
                      <Button variant={codeException === '' ? 'primary' : 'secondary'} type="button" className="m-3" disabled={codeException !== '' && code !== ''} onClick={() => initiateVerification()}>
-                         Confirm
+                         {
+                             language === 'EN' ? 'Confirm' : 'Підтвердити'
+                         }
                      </Button>
                      <Button type={'button'} onClick={() => requestAdditionalApprovalCodeHook()}>
-                         Request Additional Code
+                         {
+                             language === 'EN' ? 'Request Additional Code' : 'Ініціювати отримання нового коду'
+                         }
                      </Button>
                  </Form>
              );
@@ -461,11 +523,17 @@ const SignUpForm = () => {
                  <Form style={{ width: '30vw', margin: 'auto' }} className="custom-form">
                      <Form.Group>
                          <Form.Label>
-                             Verification email was sent to {email}, check your mails and follow instructions in it
+                             {
+                                 language === 'EN' ? `Verification email was sent to ${email}, check your mails and follow instructions in it`
+                                     :
+                                     `Лист на пошту ${email} надіслано, перевірте вашу пошту і слідуйте інструкціям у листі`
+                             }
                          </Form.Label>
                      </Form.Group>
                      <Button variant="secondary" type="button" className="m-3" onClick={() => redirectToSignIn()}>
-                         Login
+                         {
+                             language === 'EN' ? 'Login' : 'Логін'
+                         }
                      </Button>
                  </Form>
              )

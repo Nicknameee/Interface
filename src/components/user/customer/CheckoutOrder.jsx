@@ -20,6 +20,7 @@ import {TransactionState} from "../../../schemas/responses/models/TransactionSta
 import {Client} from "@stomp/stompjs";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
+import {useLanguage} from "../../../contexts/language/language-context";
 
 const CheckoutOrder = () => {
     const [user: User, setUser] = useState({});
@@ -33,6 +34,7 @@ const CheckoutOrder = () => {
     const [deliveryType: string, setDeliveryType] = useState('NONE');
     const [transactionStatusMessage, setTransactionStatusMessage] = useState(null);
     const [transactionId, setTransactionId] = useState(null)
+    const { language, setLanguage } = useLanguage();
 
     const handleWheel = (e) => {
         document.getElementById('cart').scrollTop += e.deltaY;
@@ -186,10 +188,18 @@ const CheckoutOrder = () => {
                 let transactionState: TransactionState = JSON.parse(message.body).data;
 
                 if (transactionState.authorized && transactionState.settled) {
-                    setTransactionStatusMessage('Transaction settle process is completed, payment is processed');
+                    if (language === 'EN') {
+                        setTransactionStatusMessage('Transaction settle process is completed, payment is processed');
+                    } else {
+                        setTransactionStatusMessage('Обробка транзакції завершена, платіж проведено успішно');
+                    }
                     setPaid(true);
                 } else {
-                    setTransactionStatusMessage('Transaction settle process has not succeeded, payment is not processed');
+                    if (language === 'EN') {
+                        setTransactionStatusMessage('Transaction settle process has not succeeded, payment is not processed');
+                    } else {
+                        setTransactionStatusMessage('Обробка транзакції не пройшла успішно, ваш платіж не зафіксовано');
+                    }
                     console.log('Transaction status ', transactionState.status);
                     setPaid(false);
                 }
@@ -210,7 +220,11 @@ const CheckoutOrder = () => {
                 cart.length === 0 ?
                     <div style={{width: '100vw', height: '84vh', display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap'}}>
                         <img src={nothingHereSeems} className="w-auto mb-5" alt="Nothing Here"/>
-                        <h1 className="w-100 d-flex justify-content-center">No products ordered...</h1>
+                        <h1 className="w-100 d-flex justify-content-center">
+                            {
+                                language === 'EN' ? 'No products ordered...' : 'Ви нічого не замовили...'
+                            }
+                        </h1>
                     </div>
                     :
                     <Container style={{width: '100vw', height: '84vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
@@ -245,10 +259,19 @@ const CheckoutOrder = () => {
                 </Col>
                 <div className="w-50 d-flex flex-wrap flex-column px-5">
                     <div style={{ width: '100%', height: '90%', display: 'flex', justifyContent: 'space-around', flexDirection: 'column'}} id="delivery">
-                        <h1>Delivery</h1>
+                        <h1>
+                            {
+                                language === 'EN' ? 'Delivery' : 'Доставка'
+                            }
+                        </h1>
                         <FormGroup>
-                            {userCountry &&
-                                <p>Your country was determined as: <b>{userCountry}</b>, if it's incorrect, please look for it here</p>
+                            {
+                                userCountry && language === 'EN' &&
+                                <p>Your country was determined as: <b>{userCountry}</b>  , if it's incorrect, please look for it here</p>
+                            }
+                            {
+                                userCountry && language === 'UA' &&
+                                <p>Ваша країна <b>{userCountry}</b> , якщо це невірно, оберіть вашу країну зі списку довідника</p>
                             }
                             <CountrySearch setCountry={updateCountry} country={userCountry} />
                             <DeliveryAddress country={userCountry} deliveryData={deliveryData} setDeliveryTypeExt={setDeliveryType}/>
@@ -322,10 +345,18 @@ const CheckoutOrder = () => {
                             <p className="w-100 text-center font-monospace">{transactionStatusMessage}</p>
                         }
                     </div>
-                    <Button className="my-3 btn btn-success" disabled={!canCheckout()} onClick={initiateOrderCreation}>Checkout</Button>
+                    <Button className="my-3 btn btn-success" disabled={!canCheckout()} onClick={initiateOrderCreation}>
+                        {
+                            language === 'EN' ? 'Checkout' : 'Замовити'
+                        }
+                    </Button>
                     {!isLoggedIn()
                         &&
-                        <Button className="my-3 btn btn-secondary" onClick={redirectToSignIn}>You need to authorize first!</Button>
+                        <Button className="my-3 btn btn-secondary" onClick={redirectToSignIn}>
+                            {
+                                language === 'EN' ? 'You need to authorize first!' : 'Будь ласка авторизуйтеся спочатку'
+                            }
+                        </Button>
                     }
                 </div>
             </Container>
