@@ -1,4 +1,4 @@
-import { Col, Container, Row } from "react-bootstrap";
+import { Col, Container, Row, ListGroup, ListGroupItem, Button, FormCheck } from "react-bootstrap";
 import { getCategories, getProducts, getQueryParam } from "../../../index";
 import React, { useEffect, useState } from "react";
 import Categories from "./Categories";
@@ -23,6 +23,12 @@ const CustomerDashboard = () => {
   const [productPage: number, setProductPage] = useState(1);
   const [isSubCategoryOpened: boolean, setIsSubCategoryOpened] = useState(false);
   const location = useLocation();
+
+  const [name, setName] = useState("");
+  const [priceFrom, setPriceFrom] = useState();
+  const [priceTo, setPriceTo] = useState();
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [isPresent, setIsPresent] = useState(false);
 
   useEffect(() => {
     const categoryId: string = getQueryParam("categoryId", location);
@@ -124,19 +130,6 @@ const CustomerDashboard = () => {
               }}
             >
               <Container fluid style={{ width: "90%" }}>
-                {categories.length <= 0 && products.length <= 0 ? (
-                  <div className="w-100 h-100 d-flex justify-content-center align-items-center flex-wrap">
-                    <img src={nothingHereSeems} className="w-auto mb-5" alt="Nothing Here" />
-                    <h1 className="w-100 d-flex justify-content-center">No subcategories or products available...</h1>
-                    <h3
-                      onClick={() => redirectToUI()}
-                      className="text-decoration-underline"
-                      style={{ cursor: "pointer" }}
-                    >
-                      Go to main
-                    </h3>
-                  </div>
-                ) : null}
                 <Categories
                   categories={categories}
                   isSubCategoryOpened={isSubCategoryOpened}
@@ -145,6 +138,124 @@ const CustomerDashboard = () => {
                   productPresent={products.length > 0}
                 />
                 {products.length > 0 && <hr style={{ width: "100%", height: "5px" }} />}
+                <div
+                  style={{
+                    flexWrap: "wrap",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    background: "#fff",
+                    padding: 20,
+                    marginTop: 20,
+                    gap: 10,
+                    borderRadius: 8,
+                    marginBottom: 20,
+                  }}
+                >
+                  <div>
+                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Name:</div>
+                    <input
+                      type="text"
+                      name="name"
+                      className="form-control"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Price from:</div>
+                    <input
+                      type="number"
+                      name="priceFrom"
+                      className="form-control"
+                      value={priceFrom}
+                      onChange={(e) => setPriceFrom(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Price to:</div>
+                    <input
+                      type="number"
+                      name="priceTo"
+                      className="form-control"
+                      value={priceTo}
+                      onChange={(e) => setPriceTo(e.target.value)}
+                    />
+                  </div>
+                  <div style={{ display: "flex" }}>
+                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Is blocked:</div>
+                    <div className="d-flex">
+                      <FormCheck
+                        className="w-25"
+                        key={crypto.randomUUID()}
+                        checked={isBlocked}
+                        onChange={(e) => setIsBlocked(e.target.checked)}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ display: "flex" }}>
+                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Is present:</div>
+                    <div className="d-flex">
+                      <FormCheck
+                        className="w-25"
+                        key={crypto.randomUUID()}
+                        checked={isPresent}
+                        onChange={(e) => setIsPresent(e.target.checked)}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <Button
+                      color="primary"
+                      onClick={() => {
+                        const initProducts = async () => {
+                          const productsData = await getProducts(
+                            ProductFilter.build({
+                              name,
+                              priceFrom,
+                              priceTo,
+                              isBlocked,
+                              isPresent,
+                              page: productPage,
+                              categoryId: getQueryParam("categoryId", location),
+                            })
+                          );
+
+                          setProducts(productsData);
+                        };
+
+                        initProducts().then(() => {});
+                      }}
+                    >
+                      Filter
+                    </Button>
+                    <Button
+                      color="primary"
+                      onClick={() => {
+                        setIsBlocked(false);
+                        setIsPresent(false);
+                        setName("");
+                        setPriceFrom(undefined);
+                        setPriceTo(undefined);
+
+                        const initProducts = async () => {
+                          const productsData = await getProducts(
+                            ProductFilter.build({
+                              page: productPage,
+                              categoryId: getQueryParam("categoryId", location),
+                            })
+                          );
+
+                          setProducts(productsData);
+                        };
+
+                        initProducts().then(() => {});
+                      }}
+                    >
+                      Drop Filters
+                    </Button>
+                  </div>
+                </div>
                 {products && isSubCategoryOpened && (
                   <Products
                     products={products}

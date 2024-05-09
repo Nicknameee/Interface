@@ -117,7 +117,7 @@ export const signIn = async (login, password): boolean => {
 
         return true;
       }
-      notifyError(json['exception']['exception'])
+      notifyError(json["exception"]["exception"]);
 
       return false;
     })
@@ -449,6 +449,46 @@ export async function getProducts(productFilter: ProductFilter): Product[] {
 
     return products;
   }
+}
+
+export async function exportProducts(productFilter: ProductFilter) {
+  const requestData = {
+    filename: "Products",
+  };
+
+  const requestOptions = {
+    method: "POST",
+    headers: getDefaultHeaders(),
+    body: JSON.stringify(productFilter.formAsRequestBody()),
+  };
+
+  const queryParams: string = new URLSearchParams(requestData).toString();
+
+  await fetch(`${endpoints.downloadProducts}?${queryParams}`, requestOptions)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      return response.blob();
+    })
+    .then((blob) => {
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = blobUrl;
+      link.setAttribute("download", "Products.xlsx"); // Set the download attribute to a filename
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    })
+    .catch((error) => {
+      console.error("There was an error downloading the file:", error);
+    });
 }
 
 export async function getProductStatistics(productId: number): Promise<any> {
@@ -1442,10 +1482,10 @@ export async function addUser(data: {
         return false;
       }
     })
-      .catch((error) => {
-        console.error("Error:", error);
-        notifyError(error);
-      });
+    .catch((error) => {
+      console.error("Error:", error);
+      notifyError(error);
+    });
 }
 
 export async function getProduct(productId: string) {
@@ -1491,10 +1531,10 @@ export async function getProduct(productId: string) {
         return null;
       }
     })
-      .catch((error) => {
-        console.error("Error:", error);
-        notifyError(error);
-      });
+    .catch((error) => {
+      console.error("Error:", error);
+      notifyError(error);
+    });
 }
 
 export async function addProduct(data: any): boolean {
@@ -1523,10 +1563,10 @@ export async function addProduct(data: any): boolean {
         return false;
       }
     })
-      .catch((error) => {
-        console.error("Error:", error);
-        notifyError(error);
-      });
+    .catch((error) => {
+      console.error("Error:", error);
+      notifyError(error);
+    });
 }
 
 export async function setProductPicture(productId: string, picture: File) {
@@ -1587,13 +1627,13 @@ export async function updateProduct(data: any): boolean {
         return false;
       }
     })
-      .catch((error) => {
-        console.error("Error:", error);
-        notifyError(error);
-      });
+    .catch((error) => {
+      console.error("Error:", error);
+      notifyError(error);
+    });
 }
 
-export async function updatePassword(data: {login: string, password: string, code: string}): boolean {
+export async function updatePassword(data: { login: string, password: string, code: string }): boolean {
   const requestOptions = {
     method: "PUT",
     headers: getDefaultHeaders(),
@@ -1601,26 +1641,26 @@ export async function updatePassword(data: {login: string, password: string, cod
   };
 
   return await fetch(`${endpoints.updatePassword}`, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
-        return response.json();
-      })
-      .then((data) => {
-        if (data && data.status === "OK") {
-          return true;
-        } else {
-          notifyError(data["exception"]["exception"]);
+      return response.json();
+    })
+    .then((data) => {
+      if (data && data.status === "OK") {
+        return true;
+      } else {
+        notifyError(data["exception"]["exception"]);
 
-          return false;
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        notifyError(error);
-      });
+        return false;
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      notifyError(error);
+    });
 }
 export default endpoints;
 
