@@ -1,4 +1,4 @@
- export let createOrder = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/orders/save"; //POST
+export let createOrder = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/orders/save"; //POST
 export let updateOrder = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/orders/update"; //PUT
 export let initiateTransaction = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/transactions/initiate"; //POST
 export const getTransactions = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/transactions"; //GET
@@ -16,6 +16,7 @@ export const createCategoryEndpoint = process.env.REACT_APP_ORDER_SERVICE_ADDRES
 export const setCategoryPictureEndpoint = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/categories/picture"; //GET
 export const getCategoriesEndpoint = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/categories/allowed"; //GET
 export const getProductsEndpoint = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/allowed"; //GET
+export const downloadProducts = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/export"; //POST
 export const getNovaPostDepartments =
   process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/util/v1/services/post/nova/warehouses"; //GET
 export const webSocketTelegramTopic = "/topic/telegram/subscription/"; //WS
