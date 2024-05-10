@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
-import React from "react";
-import { getProfitStatistics } from "../../../../index.js";
-import { notifyError } from "../../../../utilities/notify.js";
-import { Typography } from "@mui/material";
-import { BarChart } from "@mui/x-charts";
+import React, {useEffect, useState} from "react";
+import {getProfitStatistics} from "../../../../index.js";
+import {notifyError} from "../../../../utilities/notify.js";
+import {Typography} from "@mui/material";
+import {BarChart} from "@mui/x-charts";
 import moment from "moment";
+import {useLanguage} from "../../../../contexts/language/language-context.jsx";
 
 const ViewProfitStatistic = () => {
   const [statistics, setStatistics] = useState<any>([]);
+
+  const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
     getProfitStatistics()
@@ -25,7 +27,9 @@ const ViewProfitStatistic = () => {
     <div style={{ display: "flex", justifyContent: "center" }}>
       <div style={{ borderRadius: "8px", marginTop: 20, background: "#fff" }}>
         <Typography textAlign="center" marginTop="20px" variant="h4">
-          Profit statistics
+            {
+                language === 'EN' ? 'Profit statistics USD' : 'Статистика виручки USD'
+            }
         </Typography>
         <BarChart
           dataset={statistics}

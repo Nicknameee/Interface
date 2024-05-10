@@ -10,6 +10,7 @@ import { useLocation } from "react-router-dom";
 import { notifyError, notifySuccess } from "../../../../utilities/notify";
 import ManagerControlPanel from "../ManagerControlPanel";
 import OutsideClickHandler from "../../../handlers/OutsideClickHandler";
+import {useLanguage} from "../../../../contexts/language/language-context";
 
 const EditProduct = () => {
   const [productId, setProductId] = useState(null);
@@ -26,6 +27,8 @@ const EditProduct = () => {
   const [picture, setPicture] = useState();
   const [pictures, setPictures] = useState();
 
+  const {language} = useLanguage();
+
   const handleProductNameChange = (value) => {
     setProductName(value);
     if (value === "") {
@@ -34,7 +37,11 @@ const EditProduct = () => {
     }
 
     if (!/^[a-zA-Z0-9]{5,33}$/.test(value) && value) {
-      setProductNameException("Invalid product name");
+      if (language === 'EN') {
+        setProductNameException("Invalid product name");
+      } else {
+        setProductNameException("Невалідна назва продукту");
+      }
     } else {
       setProductNameException("");
     }
@@ -51,7 +58,11 @@ const EditProduct = () => {
     }
 
     if (!/^[a-zA-Z0-9]{5,33}$/.test(value) && value) {
-      setProductBrandException("Invalid product name");
+      if (language === 'EN'     ) {
+        setProductBrandException("Invalid product brand");
+      } else {
+        setProductBrandException("Невалідна бренд продукту");
+      }
     } else {
       setProductBrandException("");
     }
@@ -68,7 +79,11 @@ const EditProduct = () => {
     }
 
     if (value && String(value).length > 300) {
-      setDescriptionException("Invalid description, text must be not longer than 300 symbols");
+      if (language === 'EN') {
+        setDescriptionException("Invalid description, text must be not longer than 300 symbols");
+      } else {
+        setDescriptionException("Невалідний опис так як текст не може бути довше за 300 символів");
+      }
     } else {
       setDescriptionException("");
     }
@@ -85,7 +100,11 @@ const EditProduct = () => {
     }
 
     if (!value || Number(value) < 1) {
-      setCostException("Invalid cost, cant be 0");
+      if (language === 'EN') {
+        setCostException("Invalid cost, cant be less than 1");
+      } else {
+        setCostException("Ціна невалідна, не може бути менше за 1");
+      }
     } else {
       setCostException("");
     }
@@ -104,7 +123,11 @@ const EditProduct = () => {
     }
 
     if (!value || Number(value) < 1 || value === "") {
-      setMarginRateException("Invalid margin rate, can not be less than 1");
+      if (language === 'EN') {
+        setMarginRateException("Invalid margin rate, can not be less than 1");
+      } else {
+        setMarginRateException("Невалідна ставка виручки, не може бути меншою за 1");
+      }
     }
   };
 
@@ -123,7 +146,11 @@ const EditProduct = () => {
     setItemsLeft(value);
 
     if ((value && value < 0) || value === "") {
-      setItemsLeftException("Invalid remaining items number");
+      if (language === 'EN' ) {
+        setItemsLeftException("Invalid remaining items number");
+      } else {
+        setItemsLeftException("Невалідна кількість залишку товару");
+      }
     } else {
       setItemsLeftException("");
     }
@@ -151,7 +178,11 @@ const EditProduct = () => {
         await setProductPictures(result.data.productId, Array.from(pictures));
       }
 
-      notifySuccess("Product updated");
+      if (language === 'EN') {
+        notifySuccess("Product updated");
+      } else {
+        notifySuccess("Ви оновили продукт");
+      }
 
       window.location.reload();
     }
@@ -202,10 +233,18 @@ const EditProduct = () => {
 
   const handleAddParam = () => {
     if (uwu === "") {
-      notifyError("Can not add param with empty name");
+      if (language === 'EN') {
+        notifyError("Can not add param with empty name");
+      } else {
+        notifyError("Заборонено додавати параметр з пустим іменем");
+      }
     } else {
       if (Object.keys(parameters).includes(uwu)) {
-        notifyError("Duplicate key, can not allow same param name");
+        if (language === 'EN') {
+          notifyError("Duplicate key, can not allow same param name");
+        } else {
+          notifyError("Заборонено додати параметр, це ім я вже зайняте");
+        }
       } else {
         setParameters((prevParameters) => ({
           ...prevParameters,
@@ -250,7 +289,11 @@ const EditProduct = () => {
           <div className="d-flex">
             <Form className="custom-form py-3 my-1 w-25" style={{ marginBottom: "13vh", height: "fit-content" }}>
               <Form.Group controlId="formUsername" className="m-3">
-                <Form.Label>Name</Form.Label>
+                <Form.Label>
+                  {
+                    language === 'EN' ? 'Name' : 'Ім\'я'
+                  }
+                </Form.Label>
                 <div className="input-container">
                   <Form.Control
                     type="text"
@@ -269,7 +312,11 @@ const EditProduct = () => {
                 </p>
               </Form.Group>
               <Form.Group controlId="formEmail" className="m-3">
-                <Form.Label>Brand</Form.Label>
+                <Form.Label>
+                  {
+                    language === 'EN' ? 'Brand' : 'Бренд'
+                  }
+                </Form.Label>
                 <div className="input-container">
                   <Form.Control
                     type="text"
@@ -293,7 +340,11 @@ const EditProduct = () => {
               </Form.Group>
 
               <Form.Group controlId="formPassword" className="m-3">
-                <Form.Label>Description</Form.Label>
+                <Form.Label>
+                  {
+                    language === 'EN' ? 'Description' : 'Опис'
+                  }
+                 </Form.Label>
                 <div className="input-container">
                   <textarea
                     placeholder="Enter product brand"
@@ -318,7 +369,11 @@ const EditProduct = () => {
               </Form.Group>
 
               <Form.Group controlId="formConfirmationPassword" className="m-3">
-                <Form.Label>Cost</Form.Label>
+                <Form.Label>
+                  {
+                    language === 'EN' ? 'Cost' : 'Ціна'
+                  }
+                </Form.Label>
                 <div className="input-container">
                   <Form.Control
                     type="number"
@@ -341,7 +396,11 @@ const EditProduct = () => {
 
               <Form.Group controlId="formTelegram" className="m-3">
                 <div className="input-container">
-                  <Form.Label>Currency</Form.Label>
+                  <Form.Label>
+                    {
+                      language === 'EN' ? 'Currency' : 'Тип валюти'
+                    }
+                  </Form.Label>
                   <div className="input-container">
                     <span>Status:</span>
                     <div className="d-flex">
@@ -370,7 +429,11 @@ const EditProduct = () => {
 
               <Form.Group controlId="formTelegram" className="m-3">
                 <div className="input-container">
-                  <Form.Label>Blocked</Form.Label>
+                  <Form.Label>
+                    {
+                      language === 'EN' ? 'Blocked' : 'Заблоковано'
+                    }
+                  </Form.Label>
                   <div className="d-flex">
                     <FormCheck
                       className="w-25"
@@ -396,7 +459,11 @@ const EditProduct = () => {
 
               <Form.Group controlId="formTelegram" className="m-3">
                 <div className="input-container">
-                  <Form.Label>Margin Rate</Form.Label>
+                  <Form.Label>
+                    {
+                      language === 'EN' ? 'Margin Rate' : 'Відношення виручки'
+                    }
+                  </Form.Label>
                   <div className="input-container">
                     <Form.Control
                       type="number"
@@ -418,7 +485,11 @@ const EditProduct = () => {
 
               <Form.Group controlId="formTelegram" className="m-3">
                 <div className="input-container">
-                  <Form.Label>Items Left</Form.Label>
+                  <Form.Label>
+                    {
+                      language === 'EN' ? 'Items Left' : 'Залишилося товару'
+                    }
+                  </Form.Label>
                   <div className="input-container">
                     <Form.Control
                       type="number"
@@ -439,12 +510,20 @@ const EditProduct = () => {
               </Form.Group>
 
               <Form.Group className="m-3" controlId="formBasicEmail">
-                <Form.Label style={{ fontSize: 16 }}>Main picture</Form.Label>
+                <Form.Label style={{ fontSize: 16 }}>
+                  {
+                    language === 'EN' ? 'Main picture' : 'Фото'
+                  }
+                </Form.Label>
                 <Form.Control onChange={(e) => setPicture(e.target.files[0])} size="lg" type="file" />
               </Form.Group>
 
               <Form.Group className="m-3" controlId="formBasicEmail">
-                <Form.Label style={{ fontSize: 16 }}>Pictures</Form.Label>
+                <Form.Label style={{ fontSize: 16 }}>
+                  {
+                    language === 'EN' ? 'Pictures' : 'Додаткові фото'
+                  }
+                </Form.Label>
                 <Form.Control onChange={(e) => setPictures(e.target.files)} multiple size="lg" type="file" />
               </Form.Group>
 
@@ -455,7 +534,9 @@ const EditProduct = () => {
                 disabled={!infoValid()}
                 onClick={() => editProductHook()}
               >
-                Edit Product
+                {
+                  language === 'EN' ? 'Edit Product' : 'Редагувати продукцію'
+                }
               </Button>
             </Form>
             <Form
@@ -480,14 +561,18 @@ const EditProduct = () => {
                       />
                     </Form.Group>
                     <Button variant="danger" onClick={() => handleRemoveParam(key)}>
-                      Remove
+                      {
+                        language === 'EN' ? 'Remove' : 'Прибрати'
+                      }
                     </Button>
                     <hr />
                   </div>
                 ))}
               <Form.Control type="text" name="key" value={uwu} onChange={(e) => handleNewParamName(e.target.value)} />
               <Button variant="primary" onClick={handleAddParam} className="btn btn-primary w-100 h-25">
-                Add Param
+                {
+                  language === 'EN' ? 'Add Param' : 'Новий параметр'
+                }
               </Button>
             </Form>
           </div>

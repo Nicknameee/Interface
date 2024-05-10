@@ -1,14 +1,18 @@
-import { Button, Form } from "react-bootstrap";
-import React, { useState } from "react";
-import { createCategory, setCategoryPicture } from "../../../..";
-import { notifyError, notifySuccess } from "../../../../utilities/notify";
-import { useSearchParams } from "react-router-dom";
+import {Button, Form} from "react-bootstrap";
+import React, {useState} from "react";
+import {createCategory, setCategoryPicture} from "../../../..";
+import {notifyError, notifySuccess} from "../../../../utilities/notify";
+import {useSearchParams} from "react-router-dom";
+import { useLanguage } from "../../../../contexts/language/language-context";
 
 const AddCategory = () => {
   const [name, setName] = useState("");
   const [picture, setPicture] = useState<File>();
 
   const [params] = useSearchParams();
+
+
+  const {language} = useLanguage();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +35,9 @@ const AddCategory = () => {
       <Form onSubmit={handleSubmit} style={{ background: "white", borderRadius: 8, padding: 20, width: 600 }}>
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label required style={{ fontSize: 16 }}>
-            Category name
+            {
+              language === 'EN' ? 'Category name' : 'Ім\'я категорії'
+            }
           </Form.Label>
           <Form.Control
             value={name}
@@ -39,15 +45,21 @@ const AddCategory = () => {
             required
             size="lg"
             type="text"
-            placeholder="Enter category name"
+            placeholder={ language === 'EN' ? "Enter category name" : 'Введіть ім\'я категорії'}
           />
         </Form.Group>
         <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label style={{ fontSize: 16 }}>Category picture</Form.Label>
+          <Form.Label style={{ fontSize: 16 }}>
+            {
+              language === 'EN' ? 'Category picture' : 'Фото'
+            }
+          </Form.Label>
           <Form.Control onChange={(e: any) => setPicture(e.target.files[0])} size="lg" type="file" />
         </Form.Group>
         <Button size="lg" type="submit">
-          Create Category
+          {
+            language === 'EN' ? 'Create Category' : 'Зареєструвати категорію'
+          }
         </Button>
       </Form>
     </div>

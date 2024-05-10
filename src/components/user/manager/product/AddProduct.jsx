@@ -9,6 +9,7 @@ import ManagerControlPanel from "../ManagerControlPanel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAsterisk } from "@fortawesome/free-solid-svg-icons";
 import Footer from "../../../components/Footer";
+import {useLanguage} from "../../../../contexts/language/language-context";
 
 const AddProduct = () => {
   const [categoryId, setCategoryId] = useState("");
@@ -24,6 +25,9 @@ const AddProduct = () => {
   const [pictures, setPictures] = useState();
 
   const [parameters, setParameters] = useState([]);
+
+  const {language} = useLanguage();
+
   let parametersException = [];
 
   const handleProductNameChange = (value) => {
@@ -34,7 +38,11 @@ const AddProduct = () => {
     }
 
     if (!/^[a-zA-Z0-9\s]{3,33}$/.test(value) && value) {
-      setProductNameException("Invalid product name");
+      if (language === 'EN') {
+        setProductNameException("Invalid product name");
+      } else {
+        setProductNameException("Невалідна назва продукту");
+      }
     } else {
       setProductNameException("");
     }
@@ -51,7 +59,11 @@ const AddProduct = () => {
     }
 
     if (!/^[a-zA-Z0-9\s]{5,33}$/.test(value) && value) {
-      setProductBrandException("Invalid product name");
+      if (language === 'EN'     ) {
+        setProductBrandException("Invalid product brand");
+      } else {
+        setProductBrandException("Невалідна бренд продукту");
+      }
     } else {
       setProductBrandException("");
     }
@@ -68,7 +80,11 @@ const AddProduct = () => {
     }
 
     if (value && String(value).length > 300) {
-      setDescriptionException("Invalid description, text must be not longer than 300 symbols");
+      if (language === 'EN') {
+        setDescriptionException("Invalid description, text must be not longer than 300 symbols");
+      } else {
+        setDescriptionException("Невалідний опис так як текст не може бути довше за 300 символів");
+      }
     } else {
       setDescriptionException("");
     }
@@ -85,7 +101,11 @@ const AddProduct = () => {
     }
 
     if (!value || Number(value) < 1) {
-      setCostException("Invalid cost, cant be 0");
+      if (language === 'EN') {
+        setCostException("Invalid cost, cant be less than 1");
+      } else {
+        setCostException("Ціна невалідна, не може бути менше за 1");
+      }
     } else {
       setCostException("");
     }
@@ -95,17 +115,21 @@ const AddProduct = () => {
 
   const [blocked: boolean, setBlocked] = useState(false);
 
-  const [marginRate: number, setMarginRate] = useState(0);
+  const [marginRate: number, setMarginRate] = useState(1.1);
   const [marginRateException: string, setMarginRateException] = useState("");
 
   const handleMarginRateChange = (value) => {
-    if (value && Number(value) > 1) {
+    if (value && Number(value) >= 1) {
       setMarginRate(value);
       setMarginRateException("");
     }
 
-    if (!value || Number(value) <= 1 || value === "") {
-      setMarginRateException("Invalid margin rate, can not be less than or equal to 1");
+    if (!value || Number(value) < 1) {
+      if (language === 'EN') {
+        setMarginRateException("Invalid margin rate, can not be less than 1");
+      } else {
+        setMarginRateException("Невалідна ставка виручки, не може бути меншою за 1");
+      }
       setMarginRate(1);
     }
   };
@@ -117,10 +141,18 @@ const AddProduct = () => {
 
   const handleAddParam = () => {
     if (uwu === "") {
-      notifyError("Can not add param with empty name");
+      if (language === 'EN') {
+        notifyError("Can not add param with empty name");
+      } else {
+        notifyError("Заборонено додавати параметр з пустим іменем");
+      }
     } else {
       if (Object.keys(parameters).includes(uwu)) {
-        notifyError("Duplicate key, can not allow same param name");
+        if (language === 'EN') {
+          notifyError("Duplicate key, can not allow same param name");
+        } else {
+          notifyError("Заборонено додати параметр, це ім я вже зайняте");
+        }
       } else {
         setParameters((prevParameters) => ({
           ...prevParameters,
@@ -185,7 +217,11 @@ const AddProduct = () => {
     setItemsLeft(value);
 
     if ((value && value < 0) || value === "") {
-      setItemsLeftException("Invalid remaining items number");
+      if (language === 'EN') {
+        setItemsLeftException("Invalid remaining items number");
+      } else {
+        setItemsLeftException('Невалідна кількість')
+      }
     } else {
       setItemsLeftException("");
     }
@@ -246,13 +282,6 @@ const AddProduct = () => {
     }));
   };
 
-  // const handleAddParam = () => {
-  //     setParameters(prevParameters => ({
-  //         ...prevParameters,
-  //         ['Param ' + Object.entries(parameters).length]: 'Value'
-  //     }));
-  // };
-
   const handleRemoveParam = (key) => {
     const { [key]: _, ...rest } = parameters;
     setParameters(rest);
@@ -287,7 +316,11 @@ const AddProduct = () => {
           <div className="d-flex">
             <Form className="custom-form py-3 my-1 w-25" style={{ marginBottom: "13vh", height: "fit-content" }}>
               <Form.Group controlId="formUsername" className="m-3">
-                <Form.Label>Name</Form.Label>
+                <Form.Label>
+                  {
+                    language === 'EN' ? 'Name' : 'Ім\'я'
+                  }
+                </Form.Label>
                 <div className="input-container">
                   <Form.Control
                     type="text"
@@ -306,7 +339,11 @@ const AddProduct = () => {
                 </p>
               </Form.Group>
               <Form.Group controlId="formEmail" className="m-3">
-                <Form.Label>Brand</Form.Label>
+                <Form.Label>
+                  {
+                    language === 'EN' ? 'Brand' : 'Бренд'
+                  }
+                </Form.Label>
                 <div className="input-container">
                   <Form.Control
                     type="text"
@@ -330,7 +367,11 @@ const AddProduct = () => {
               </Form.Group>
 
               <Form.Group controlId="formPassword" className="m-3">
-                <Form.Label>Description</Form.Label>
+                <Form.Label>
+                  {
+                    language === 'EN' ? 'Description' : 'Опис'
+                  }
+                </Form.Label>
                 <div className="input-container">
                   <textarea
                     placeholder="Enter product description"
@@ -355,7 +396,11 @@ const AddProduct = () => {
               </Form.Group>
 
               <Form.Group controlId="formConfirmationPassword" className="m-3">
-                <Form.Label>Cost</Form.Label>
+                <Form.Label>
+                  {
+                    language === 'EN' ? 'Cost' : 'Ціна'
+                  }
+                </Form.Label>
                 <div className="input-container">
                   <Form.Control
                     type="number"
@@ -378,9 +423,12 @@ const AddProduct = () => {
 
               <Form.Group controlId="formTelegram" className="m-3">
                 <div className="input-container">
-                  <Form.Label>Currency</Form.Label>
+                  <Form.Label>
+                    {
+                      language === 'EN' ? 'Currency' : 'Оберіть валюту'
+                    }
+                  </Form.Label>
                   <div className="input-container">
-                    <span>Status:</span>
                     <div className="d-flex">
                       <FormCheck
                         className="w-25"
@@ -407,7 +455,11 @@ const AddProduct = () => {
 
               <Form.Group controlId="formTelegram" className="m-3">
                 <div className="input-container">
-                  <Form.Label>Blocked</Form.Label>
+                  <Form.Label>
+                    {
+                      language === 'EN' ? 'Blocked' : 'Заблоковано'
+                    }
+                  </Form.Label>
                   <div className="d-flex">
                     <FormCheck
                       className="w-25"
@@ -433,7 +485,11 @@ const AddProduct = () => {
 
               <Form.Group controlId="formTelegram" className="m-3">
                 <div className="input-container">
-                  <Form.Label>Margin Rate</Form.Label>
+                  <Form.Label>
+                    {
+                      language === 'EN' ? 'Margin Rate' : 'Відношення виручки'
+                    }
+                  </Form.Label>
                   <div className="input-container">
                     <Form.Control
                       type="number"
@@ -455,7 +511,11 @@ const AddProduct = () => {
 
               <Form.Group controlId="formTelegram" className="m-3">
                 <div className="input-container">
-                  <Form.Label>Items Left</Form.Label>
+                  <Form.Label>
+                    {
+                      language === 'EN' ? 'Items Left' : 'Залишилося товару'
+                    }
+                  </Form.Label>
                   <div className="input-container">
                     <Form.Control
                       type="number"
@@ -476,12 +536,20 @@ const AddProduct = () => {
               </Form.Group>
 
               <Form.Group className="m-3" controlId="formBasicEmail">
-                <Form.Label style={{ fontSize: 16 }}>Main picture</Form.Label>
+                <Form.Label style={{ fontSize: 16 }}>
+                  {
+                    language === 'EN' ? 'Main picture' : 'Фото'
+                  }
+                </Form.Label>
                 <Form.Control onChange={(e) => setPicture(e.target.files[0])} size="lg" type="file" />
               </Form.Group>
 
               <Form.Group className="m-3" controlId="formBasicEmail">
-                <Form.Label style={{ fontSize: 16 }}>Pictures</Form.Label>
+                <Form.Label style={{ fontSize: 16 }}>
+                  {
+                    language === 'EN' ? 'Pictures' : 'Додаткові фото'
+                  }
+                </Form.Label>
                 <Form.Control onChange={(e) => setPictures(e.target.files)} multiple size="lg" type="file" />
               </Form.Group>
 
@@ -492,7 +560,9 @@ const AddProduct = () => {
                 disabled={!infoValid()}
                 onClick={() => addProductHook()}
               >
-                Add Product
+                {
+                  language === 'EN' ? 'Add Product' : 'Додати продукт'
+                }
               </Button>
             </Form>
             <Form
@@ -524,7 +594,9 @@ const AddProduct = () => {
                 ))}
               <Form.Control type="text" name="key" value={uwu} onChange={(e) => handleNewParamName(e.target.value)} />
               <Button variant="primary" onClick={handleAddParam} className="btn btn-primary w-100 h-25">
-                Add Param
+                {
+                  language === 'EN' ? 'Add Param' : 'Новий параметр'
+                }
               </Button>
               {parametersException.map((ex) => (
                 <p

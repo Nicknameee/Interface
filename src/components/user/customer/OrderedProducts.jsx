@@ -3,8 +3,11 @@ import {redirectToProductPage} from "../../../utilities/redirect";
 import {CustomerOrderedProduct} from "../../../schemas/responses/models/CustomerOrderedProduct.ts";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAngleDown, faAngleUp} from "@fortawesome/free-solid-svg-icons";
+import {useLanguage} from "../../../contexts/language/language-context";
 
 const OrderedProducts = ({orderedProducts, toggleProduct, selectedProductId}) => {
+    const { language, setLanguage } = useLanguage();
+
     return (
         <div>
         {
@@ -20,10 +23,29 @@ const OrderedProducts = ({orderedProducts, toggleProduct, selectedProductId}) =>
                         <CardBody>
                             <ListGroup>
                                 <ListGroupItem key={crypto.randomUUID()}>
-                                    Product Name: <strong title={'Go to product page'} onClick={() => redirectToProductPage(orderedProduct.product.productId)} style={{cursor: 'pointer', textDecoration: 'underline'}}> {orderedProduct.product.name}</strong></ListGroupItem>
-                                <ListGroupItem key={crypto.randomUUID()}>Product Brand: {orderedProduct.product.brand}</ListGroupItem>
-                                <ListGroupItem key={crypto.randomUUID()}>Items Sold: {orderedProduct.productAmount}</ListGroupItem>
-                                <ListGroupItem key={crypto.randomUUID()}>Total Cost: {orderedProduct.productAmount} * {orderedProduct.product.cost} = > {orderedProduct.productAmount * orderedProduct.product.cost} {orderedProduct.product.currency}</ListGroupItem>
+                                    {
+                                        language === 'EN' ? 'Product Name: ' : 'Назва продукції: '
+                                    }
+                                    <strong title={'Go to product page'} onClick={() => redirectToProductPage(orderedProduct.product.productId)} style={{cursor: 'pointer', textDecoration: 'underline'}}> {orderedProduct.product.name}</strong>
+                                </ListGroupItem>
+                                <ListGroupItem key={crypto.randomUUID()}>
+                                    {
+                                        language === 'EN' ? 'Product Brand: ' : 'Бренд: '
+                                    }
+                                    {orderedProduct.product.brand}
+                                </ListGroupItem>
+                                <ListGroupItem key={crypto.randomUUID()}>
+                                    {
+                                        language === 'EN' ? 'Items Sold: ' : 'Кількість куплених товарів: '
+                                    }
+                                    {orderedProduct.productAmount}
+                                </ListGroupItem>
+                                <ListGroupItem key={crypto.randomUUID()}>
+                                    {
+                                        language === 'EN' ? 'Total Cost: ' : 'Загальна вартість: '
+                                    }
+                                    {orderedProduct.productAmount} * {orderedProduct.product.cost} = > {orderedProduct.productAmount * orderedProduct.product.cost} {orderedProduct.product.currency}
+                                </ListGroupItem>
                             </ListGroup>
                         </CardBody>
                     </Collapse>

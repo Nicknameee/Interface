@@ -18,6 +18,7 @@ import { redirectToUI } from "../../../../utilities/redirect";
 import React, { useEffect, useState } from "react";
 import { UserFilter } from "../../../../schemas/requests/filters/UserFilter.ts";
 import { useLocation } from "react-router-dom";
+import {useLanguage} from "../../../../contexts/language/language-context";
 
 const ViewUsers = () => {
   const [users: UserManagementModel[], setUsers] = useState([]);
@@ -32,6 +33,7 @@ const ViewUsers = () => {
     page: usersPage,
   });
   const location = useLocation();
+  const {language} = useLanguage();
 
   const toggleUser = (id) => {
     setSelectedUserId(id === selectedUserId ? null : id);
@@ -118,7 +120,11 @@ const ViewUsers = () => {
       <Col md={3} className="position-sticky">
         <ListGroup>
           <ListGroupItem className="d-flex justify-content-between align-items-center">
-            <span>Username:</span>
+            <span>
+              {
+                 'Username: '
+              }
+            </span>
             <input
               type="text"
               name="usernamePrompt"
@@ -166,7 +172,11 @@ const ViewUsers = () => {
             />
           </ListGroupItem>
           <ListGroupItem className="d-flex justify-content-between align-items-center flex-wrap">
-            <span>Status:</span>
+            <span>
+              {
+                language === 'EN' ? 'Status:' : 'Статус:'
+              }
+            </span>
             <FormCheck
               className="w-100"
               key={crypto.randomUUID()}
@@ -187,7 +197,11 @@ const ViewUsers = () => {
             />
           </ListGroupItem>
           <ListGroupItem className="d-flex justify-content-between align-items-center flex-wrap">
-            <span>Role:</span>
+            <span>
+              {
+                language === 'EN' ? 'Role:' : 'Роль:'
+              }
+            </span>
             <FormCheck
               className="w-100"
               key={crypto.randomUUID()}
@@ -196,15 +210,6 @@ const ViewUsers = () => {
               value={"Customer"}
               checked={filters.roles.includes("ROLE_CUSTOMER")}
               onChange={() => updateFilterRoles("ROLE_CUSTOMER")}
-            />
-            <FormCheck
-              className="w-100"
-              key={crypto.randomUUID()}
-              id={"Operator"}
-              label={"Operator"}
-              value={"Operator"}
-              checked={filters.roles.includes("ROLE_OPERATOR")}
-              onChange={() => updateFilterRoles("ROLE_OPERATOR")}
             />
             <FormCheck
               className="w-100"
@@ -218,10 +223,15 @@ const ViewUsers = () => {
           </ListGroupItem>
           <ListGroupItem className="d-flex justify-content-between">
             <Button color="primary" onClick={getUsers}>
-              Filter
+              {
+                language === 'EN' ? 'Filter' : 'Відфільтрувати'
+              }
             </Button>
             <Button color="primary" onClick={dropFilters}>
-              Drop Filters
+              {
+                language === 'EN' ? 'Drop Filters' : 'Скинути фільтрацію'
+              }
+
             </Button>
           </ListGroupItem>
         </ListGroup>
@@ -233,7 +243,10 @@ const ViewUsers = () => {
               <CardHeader onClick={() => toggleUser(user.id)} style={{ cursor: "pointer" }}>
                 <div className="d-flex justify-content-between align-items-center">
                   <span>
-                    Username: {user.username} | Status: {user.status} | Online:{" "}
+                    {
+                      language === 'EN' ? 'Username: ' : 'Юзернейм: '
+                    }
+                    {user.username} | Status: {user.status} | Online:{" "}
                     {String(user.loginTime > user.logoutTime).toUpperCase()}
                   </span>
                   <FontAwesomeIcon icon={selectedUserId === user.id ? faAngleUp : faAngleDown} />
@@ -242,15 +255,45 @@ const ViewUsers = () => {
               <Collapse in={selectedUserId === user.id}>
                 <CardBody>
                   <ListGroup>
-                    <ListGroupItem>Username: {user.username}</ListGroupItem>
+                    <ListGroupItem>
+                      {
+                        language === 'EN' ? 'Username: ' : 'Юзернейм: '
+                      }
+                      {user.username}</ListGroupItem>
                     <ListGroupItem>Email: {user.email || "UNKNOWN"}</ListGroupItem>
                     <ListGroupItem>Telegram: {user.telegramUsername || "UNKNOWN"}</ListGroupItem>
-                    <ListGroupItem>Last Log In Time: {user.loginTime}</ListGroupItem>
-                    <ListGroupItem>Last Log Out Time: {user.logoutTime}</ListGroupItem>
-                    <ListGroupItem>Registered At: {user.creationTime}</ListGroupItem>
-                    <ListGroupItem>User Role: {user.role}</ListGroupItem>
-                    <ListGroupItem>User Status: {user.status}</ListGroupItem>
-                    <ListGroupItem>User Timezone: {user.timezone}</ListGroupItem>
+                    <ListGroupItem>
+                      {
+                        language === 'EN' ? 'Last Log In Time: ' : 'Останній вхід: '
+                      }
+                      {user.loginTime}</ListGroupItem>
+                    <ListGroupItem>
+                      {
+                        language === 'EN' ? 'Last Log Out Time: ' : 'Останній вихід з системи: '
+                      }
+                      {user.logoutTime}</ListGroupItem>
+                    <ListGroupItem>
+                      {
+                        language === 'EN' ? 'Registered At: ' : 'Зареєстровано о: '
+                      }
+                      {user.creationTime}</ListGroupItem>
+                    <ListGroupItem>
+                      {
+                        language === 'EN' ? 'User Role: ' : 'Роль користувача: '
+                      }
+                      {user.role}</ListGroupItem>
+                    <ListGroupItem>
+                      {
+                        language === 'EN' ? 'User Status: ' : 'Статус користувача: '
+                      }
+                      {user.status}
+                    </ListGroupItem>
+                    <ListGroupItem>
+                      {
+                        language === 'EN' ? 'User Timezone: ' : 'Таймзона: '
+                      }
+                      {user.timezone}
+                    </ListGroupItem>
                   </ListGroup>
                   <Button
                     onClick={() =>
@@ -268,7 +311,9 @@ const ViewUsers = () => {
           <div>
             <h1 className="font-monospace my-3">No users...</h1>
             <h3 onClick={() => redirectToUI()} className="text-decoration-underline" style={{ cursor: "pointer" }}>
-              Go to main
+              {
+                language === 'EN' ? 'Go to main' : 'Відкрити головну сторінку'
+              }
             </h3>
           </div>
         )}

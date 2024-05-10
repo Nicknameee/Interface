@@ -1,23 +1,17 @@
-import { CustomerOrder } from "../../../schemas/responses/models/CustomerOrder.ts";
-import { Button, Card, Form, CardBody, CardHeader, Collapse, ListGroup, ListGroupItem } from "react-bootstrap";
-import React, { useEffect, useState } from "react";
-import { redirectToUI } from "../../../utilities/redirect";
-import { ShipmentAddress } from "../../../schemas/responses/models/ShipmentAddress.ts";
-import {
-  exportOrderHistory,
-  updateOrder,
-  exportOrders,
-  getOrderHistory,
-  getUserInfo,
-  isLoggedIn,
-} from "../../../index";
-import { OrderHistory } from "../../../schemas/responses/models/OrderHistory.ts";
-import { OrderFilter } from "../../../schemas/requests/filters/OrderFilter.ts";
+import {CustomerOrder} from "../../../schemas/responses/models/CustomerOrder.ts";
+import {Button, Card, CardBody, CardHeader, Collapse, Form, ListGroup, ListGroupItem} from "react-bootstrap";
+import React, {useEffect, useState} from "react";
+import {redirectToUI} from "../../../utilities/redirect";
+import {ShipmentAddress} from "../../../schemas/responses/models/ShipmentAddress.ts";
+import {exportOrderHistory, exportOrders, getOrderHistory, getUserInfo, isLoggedIn, updateOrder,} from "../../../index";
+import {OrderHistory} from "../../../schemas/responses/models/OrderHistory.ts";
+import {OrderFilter} from "../../../schemas/requests/filters/OrderFilter.ts";
 import OrderedProducts from "./OrderedProducts";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDown, faAngleUp } from "@fortawesome/free-solid-svg-icons";
-import { Modal, Box, Typography } from "@mui/material";
-import { notifyError, notifySuccess } from "../../../utilities/notify.js";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faAngleDown, faAngleUp} from "@fortawesome/free-solid-svg-icons";
+import {Box, Modal, Typography} from "@mui/material";
+import {notifyError, notifySuccess} from "../../../utilities/notify.js";
+import {useLanguage} from "../../../contexts/language/language-context";
 
 const Orders = ({ orders, setOrders, managerMode }) => {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
@@ -30,6 +24,8 @@ const Orders = ({ orders, setOrders, managerMode }) => {
 
   const [isChangeOrderStatusModalOpen, setIsChangeOrderStatusModalOpen] = useState(false);
   const [selectedOrderStatus, setSelectedOrderStatus] = useState();
+
+  const { language, setLanguage } = useLanguage();
 
   const toggleOrder = (orderId) => {
     setOrderHistoryView([]);
@@ -104,28 +100,76 @@ const Orders = ({ orders, setOrders, managerMode }) => {
         >
           <div style={{ padding: "30px 40px 30px" }}>
             <Typography textAlign="center" variant="h4">
-              Change order status
+              {
+                language === 'EN' ? 'Change order status' : 'Змінити статус замовлення'
+              }
             </Typography>
             <Form.Group className="mb-3 mt-3" controlId="ssomeid">
-              <Form.Label style={{ fontSize: 20 }}>Order status</Form.Label>
+              <Form.Label style={{ fontSize: 20 }}>
+                {
+                  language === 'EN' ? 'Order status' : 'Статус замовлення'
+                }
+              </Form.Label>
               <Form.Select
                 value={selectedOrderStatus}
                 onChange={(e) => setSelectedOrderStatus(e.target.value)}
                 size="lg"
               >
                 <option disabled selected value>
-                  Select order status
+                  {
+                    language === 'EN' ? 'Select order status' : 'Оберіть статус замовлення'
+                  }
                 </option>
-                <option value="INITIATED">Initiated</option>
-                <option value="ASSIGNED_TO_OPERATOR">Assigned to operator</option>
-                <option value="WAITING_FOR_PAYMENT">Waiting for payment</option>
-                <option value="PAID">Paid</option>
-                <option value="SHIPPED">Shopped</option>
-                <option value="IN_DELIVERY_PROCESS">In delivery process</option>
-                <option value="DELIVERED">Delivered</option>
-                <option value="RETURNED">Returned</option>
-                <option value="RECEIVED">Received</option>
-                <option value="DECLINED">Declined</option>
+                <option value="INITIATED">
+                  {
+                    language === 'EN' ? 'Initiated' : 'Ініціовано'
+                  }
+                </option>
+                <option value="ASSIGNED_TO_OPERATOR">
+                  {
+                    language === 'EN' ? 'Assigned to operator' : 'Закріплено за оператором'
+                  }
+                </option>
+                <option value="WAITING_FOR_PAYMENT">
+                  {
+                    language === 'EN' ? 'Waiting for payment' : 'Очікування оплати'
+                  }
+                </option>
+                <option value="PAID">
+                  {
+                      language === 'EN' ? 'Paid' : 'Оплачено'
+                  }
+                </option>
+                <option value="SHIPPED">
+                  {
+                      language === 'EN' ? 'Shipped' : 'Доставлено'
+                  }
+                </option>
+                <option value="IN_DELIVERY_PROCESS">
+                  {
+                    language === 'EN' ? 'In delivery process' : 'У дорозі до пункту отримання'
+                  }
+                </option>
+                <option value="DELIVERED">
+                  {
+                      language === 'EN' ? 'Delivered' : 'Доставлено'
+                  }
+                </option>
+                <option value="RETURNED">
+                  {
+                    language === 'EN' ? 'Returned' : 'Повернуто відправнику'
+                  }
+                </option>
+                <option value="RECEIVED">
+                  {
+                      language === 'EN' ?' Received' : 'Отримано'
+                  }
+                </option>
+                <option value="DECLINED">
+                  {
+                      language === 'EN' ? 'Declined' : 'Відмова'
+                  }
+                </option>
               </Form.Select>
             </Form.Group>
             <div style={{ marginTop: 30, display: "flex", gap: 10, justifyContent: "flex-end" }}>
@@ -138,17 +182,29 @@ const Orders = ({ orders, setOrders, managerMode }) => {
                     orders.find(({ order }) => order.id === selectedOrderId).order = updatedOrder;
 
                     setIsChangeOrderStatusModalOpen(false);
-                    notifySuccess("Order status updated successfully");
+                    if (language === 'EN') {
+                      notifySuccess("Order status updated successfully");
+                    } else {
+                      notifySuccess("Статус замовлення було успішно оновлено");
+                    }
                   } catch {
-                    notifyError("Something went wrong");
+                    if (language === 'EN') {
+                      notifyError("Something went wrong");
+                    } else {
+                      notifyError("Щось пішло не так");
+                    }
                   }
                 }}
                 size="lg"
               >
-                Save
+                {
+                  language === 'EN' ? 'Save' : 'Зберегти'
+                }
               </Button>
               <Button onClick={() => setIsChangeOrderStatusModalOpen(false)} size="lg" variant="secondary">
-                Cancel
+                {
+                  language === 'EN' ? 'Cancel' : 'Відхилити'
+                }
               </Button>
             </div>
           </div>
@@ -158,9 +214,11 @@ const Orders = ({ orders, setOrders, managerMode }) => {
       {orders.length > 0 && (
         <Button
           className="my-3 btn btn-secondary"
-          onClick={() => exportOrders(OrderFilter.build({ customerId: user.id }))}
+          onClick={() => exportOrders(OrderFilter.build({ customerId: user.role === 'ROLE_MANAGER' ? null : user.id }))}
         >
-          Export orders
+          {
+            language === 'EN' ? 'Export orders' : 'Експортувати'
+          }
         </Button>
       )}
       <div className="row" style={{ marginBottom: "10vh" }}>
@@ -171,7 +229,10 @@ const Orders = ({ orders, setOrders, managerMode }) => {
                 <CardHeader onClick={() => toggleOrder(customerOrder.order.id)} style={{ cursor: "pointer" }}>
                   <div className="d-flex justify-content-between align-items-center">
                     <span>
-                      Order Number: {customerOrder.order.number} | Status: {customerOrder.order.status} | Date:{" "}
+                      {
+                        language === 'EN' ? 'Order Number: ' : 'Замовлення №: '
+                      }
+                      {customerOrder.order.number} | Status: {customerOrder.order.status} | Date:{" "}
                       {formatDate(customerOrder.order.creationDate)}
                     </span>
                     <FontAwesomeIcon icon={selectedOrderId === customerOrder.order.id ? faAngleUp : faAngleDown} />
@@ -181,46 +242,78 @@ const Orders = ({ orders, setOrders, managerMode }) => {
                   <CardBody>
                     <ListGroup>
                       <ListGroupItem key={crypto.randomUUID()}>
-                        Ordered Product Cost: {customerOrder.order.orderedProductCost}
+                        {
+                          language === 'EN' ? 'Ordered Product Cost: ' : 'Вартість замовлених продуктів: '
+                        }
+                        {customerOrder.order.orderedProductCost}
                       </ListGroupItem>
                       <ListGroupItem
                         style={{ display: "flex", gap: "20px", alignItems: "center" }}
                         key={crypto.randomUUID()}
                       >
-                        Status: {customerOrder.order.status}{" "}
+                        {
+                          language === 'EN' ? 'Status: ' : 'Статус: '
+                        }
+                        {customerOrder.order.status}{" "}
                         {managerMode && (
                           <Button onClick={() => setIsChangeOrderStatusModalOpen(true)} size="sm">
-                            Change order status
+                            {
+                              language === 'EN' ? 'Change order status' : 'Оновити статус'
+                            }
                           </Button>
                         )}
                       </ListGroupItem>
                       <ListGroupItem key={crypto.randomUUID()}>
-                        Payment Type: {customerOrder.order.paymentType}
+                        {
+                          language === 'EN' ? 'Payment Type: ' : 'Шлях оплати: '
+                        }
+                        {customerOrder.order.paymentType}
                       </ListGroupItem>
                       <ListGroupItem key={crypto.randomUUID()}>
-                        Creation Date: {formatDate(customerOrder.order.creationDate)}
+                        {
+                          language === 'EN' ? 'Creation Date: ' : 'Створено о: '
+                        }
+                        {formatDate(customerOrder.order.creationDate)}
                       </ListGroupItem>
                       <ListGroupItem key={crypto.randomUUID()}>
-                        Processing Operator ID: {customerOrder.order.processingOperatorId || "UNKNOWN"}
+                        {
+                          language === 'EN' ? 'Processing Operator ID: ' : 'Оператор: '
+                        }
+                        {customerOrder.order.processingOperatorId || "UNKNOWN"}
                       </ListGroupItem>
                       <ListGroupItem key={crypto.randomUUID()}>
-                        Paid: {String(customerOrder.order.paid).toUpperCase()}
+                        {
+                          language === 'EN' ? 'Paid: ' : 'Оплачене замовлення: '
+                        }
+                        {String(customerOrder.order.paid).toUpperCase()}
                       </ListGroupItem>
                       <ListGroupItem key={crypto.randomUUID()}>
-                        Last Update Date: {formatDate(customerOrder.order.lastUpdateDate)}
+                        {
+                          language === 'EN' ? 'Last Update Date: ' : 'Час останньої зміни: '
+                        }
+                        {formatDate(customerOrder.order.lastUpdateDate)}
                       </ListGroupItem>
                       <ListGroupItem key={crypto.randomUUID()}>
-                        Delivery Service: {customerOrder.order.deliveryServiceType}
+                        {
+                          language === 'EN' ? 'Delivery Service: ' : 'Замовлення буде доставлено сервісом: '
+                        }
+                        {customerOrder.order.deliveryServiceType}
                       </ListGroupItem>
                       {customerOrder.order.deliveryServiceType !== "NONE" && (
                         <ListGroupItem key={crypto.randomUUID()}>
-                          Delivery Cost: {customerOrder.order.deliveryCost}
+                          {
+                            language === 'EN' ? 'Delivery Cost: ' : 'Ціна доставки: '
+                          }
+                          {customerOrder.order.deliveryCost}
                         </ListGroupItem>
                       )}
                       {managerMode && (
                         <div>
                           <ListGroupItem key={crypto.randomUUID()}>
-                            Customer ID: {String(customerOrder.order.customerId).toUpperCase()}
+                            {
+                              language === 'EN' ? 'Customer ID: ' : 'ID клієнта: '
+                            }
+                            {String(customerOrder.order.customerId).toUpperCase()}
                           </ListGroupItem>
                         </div>
                       )}
@@ -233,7 +326,11 @@ const Orders = ({ orders, setOrders, managerMode }) => {
                             style={{ cursor: "pointer" }}
                           >
                             <div className="d-flex justify-content-between align-items-center">
-                              <span>Delivery Address</span>
+                              <span>
+                                {
+                                  language === 'EN' ? 'Delivery Address' : 'Адреса доставки: '
+                                }
+                              </span>
                               <FontAwesomeIcon
                                 icon={
                                   selectedAddressId === customerOrder.order.shipmentAddress.id ? faAngleUp : faAngleDown
@@ -263,7 +360,11 @@ const Orders = ({ orders, setOrders, managerMode }) => {
                           style={{ cursor: "pointer" }}
                         >
                           <div className="d-flex justify-content-between align-items-center">
-                            <span>Transaction</span>
+                            <span>
+                              {
+                                language === 'EN' ? 'Transaction' : 'Банківська транзакція'
+                              }
+                            </span>
                             <FontAwesomeIcon
                               icon={
                                 selectedTransactionId === customerOrder.order.transactionId ? faAngleUp : faAngleDown
@@ -275,17 +376,29 @@ const Orders = ({ orders, setOrders, managerMode }) => {
                           <CardBody>
                             <ListGroup>
                               <ListGroupItem key={crypto.randomUUID()}>
-                                Transaction Fee: {customerOrder.transaction.amount}{" "}
+                                {
+                                  language === 'EN' ? 'Transaction Fee: ' : 'Сума оплати: '
+                                }
+                                {customerOrder.transaction.amount}{" "}
                                 {customerOrder.transaction.sourceCurrency}
                               </ListGroupItem>
                               <ListGroupItem key={crypto.randomUUID()}>
-                                Status: {customerOrder.transaction.status}
+                                {
+                                  language === 'EN' ? 'Status: ' : 'Статус: '
+                                }
+                                {customerOrder.transaction.status}
                               </ListGroupItem>
                               <ListGroupItem key={crypto.randomUUID()}>
-                                Is Authorized: {String(customerOrder.transaction.authorized).toUpperCase()}
+                                {
+                                  language === 'EN' ? 'Is Authorized: ' : 'Авторизована: '
+                                }
+                                {String(customerOrder.transaction.authorized).toUpperCase()}
                               </ListGroupItem>
                               <ListGroupItem key={crypto.randomUUID()}>
-                                Is Settled: {String(customerOrder.transaction.settled).toUpperCase()}
+                                {
+                                  language === 'EN' ? 'Is Settled: ' : 'Оброблена: '
+                                }
+                                {String(customerOrder.transaction.settled).toUpperCase()}
                               </ListGroupItem>
                             </ListGroup>
                           </CardBody>
@@ -293,7 +406,11 @@ const Orders = ({ orders, setOrders, managerMode }) => {
                       </Card>
                     )}
                     <hr />
-                    <h5>Ordered Products:</h5>
+                    <h5>
+                      {
+                        language === 'EN' ? 'Ordered Products: ' : 'Замовлені продукти: '
+                      }
+                    </h5>
                     <OrderedProducts
                       orderedProducts={customerOrder.order.orderedProducts}
                       toggleProduct={toggleProduct}
@@ -311,48 +428,81 @@ const Orders = ({ orders, setOrders, managerMode }) => {
                           )
                         }
                       >
-                        Export Order History
+                        {
+                          language === 'EN' ? 'Export Order History' : 'Експортувати історію замовлення'
+                        }
                       </Button>
                     )}
                     {orderHistoryView.length > 0 &&
                       orderHistoryView.map((view: OrderHistory) => (
                         <div className="flex-wrap w-100 d-flex my-1 border-bottom border-black">
                           <h5 className="w-100">
-                            Update # {view.iteration} at {formatDate(view.updateTime)}
+                            {
+                              language === 'EN' ? 'Update #' : 'Оновлення #'
+                            }
+                            {view.iteration} at {formatDate(view.updateTime)}
                           </h5>
                           <ListGroup className="w-50 font-monospace">
                             <ListGroupItem key={crypto.randomUUID()}>
-                              Ordered Product Cost: {view.oldOrder.orderedProductCost}{" "}
+                              {
+                                language === 'EN' ? 'Ordered Product Cost: ' : 'Вартість замовлення : '
+                              }
+                              {view.oldOrder.orderedProductCost}{" "}
                               {view.isParamChanged("orderedProductCost") ? "->" : ""}
                             </ListGroupItem>
                             <ListGroupItem key={crypto.randomUUID()}>
-                              Status: {view.oldOrder.status} {view.isParamChanged("status") ? "->" : ""}
+                              {
+                                language === 'EN' ? 'Status: ' : 'Статус: '
+                              }
+                              {view.oldOrder.status} {view.isParamChanged("status") ? "->" : ""}
                             </ListGroupItem>
                             <ListGroupItem key={crypto.randomUUID()}>
-                              Payment Type: {view.oldOrder.paymentType} {view.isParamChanged("paymentType") ? "->" : ""}
+                              {
+                                language === 'EN' ? 'Payment Type: ' : 'Шлях оплати: '
+                              }
+                              {view.oldOrder.paymentType} {view.isParamChanged("paymentType") ? "->" : ""}
                             </ListGroupItem>
                             <ListGroupItem key={crypto.randomUUID()}>
-                              Creation Date: {formatDate(view.oldOrder.creationDate)}{" "}
+                              {
+                                language === 'EN' ? 'Creation Date: ' : 'Створено о: '
+                              }
+                              {formatDate(view.oldOrder.creationDate)}{" "}
                               {view.isParamChanged("creationDate") ? "->" : ""}
                             </ListGroupItem>
                             <ListGroupItem key={crypto.randomUUID()}>
-                              Processing Operator ID: {view.oldOrder.processingOperatorId || "UNKNOWN"}
+                              {
+                                language === 'EN' ? 'Processing Operator ID: ' : 'Оператор замовлення: '
+                              }
+                              {view.oldOrder.processingOperatorId || "UNKNOWN"}
                               {view.isParamChanged("processingOperatorId") ? "->" : ""}
                             </ListGroupItem>
                             <ListGroupItem key={crypto.randomUUID()}>
-                              Paid: {String(view.oldOrder.paid).toUpperCase()} {view.isParamChanged("paid") ? "->" : ""}
+                              {
+                                language === 'EN' ? 'Paid: ' : 'Оплачено: '
+                              }
+                              {String(view.oldOrder.paid).toUpperCase()} {view.isParamChanged("paid") ? "->" : ""}
                             </ListGroupItem>
                             <ListGroupItem key={crypto.randomUUID()}>
-                              Last Update Date: {formatDate(view.oldOrder.lastUpdateDate)}{" "}
+                              {
+                                language === 'EN' ? 'Last Update Date: ' : 'Оновлено о: '
+                              }
+                              {formatDate(view.oldOrder.lastUpdateDate)}{" "}
                               {view.isParamChanged("lastUpdateDate") ? "->" : ""}
                             </ListGroupItem>
                             <ListGroupItem key={crypto.randomUUID()}>
-                              Delivery Service: {view.oldOrder.deliveryServiceType}{" "}
+                              {
+                                language === 'EN' ? "Delivery Service: " : "Компанія доставки: "
+
+                              }
+                              {view.oldOrder.deliveryServiceType}{" "}
                               {view.isParamChanged("deliveryServiceType") ? "->" : ""}
                             </ListGroupItem>
                             {view.oldOrder.deliveryServiceType !== "NONE" && (
                               <ListGroupItem key={crypto.randomUUID()}>
-                                Delivery Cost: {view.oldOrder.deliveryCost}
+                                {
+                                  language === 'EN' ? 'Delivery Cost: ' : 'Вартість доставки: '
+                                }
+                                {view.oldOrder.deliveryCost}
                               </ListGroupItem>
                             )}
                           </ListGroup>
@@ -361,60 +511,91 @@ const Orders = ({ orders, setOrders, managerMode }) => {
                               key={crypto.randomUUID()}
                               className={view.isParamChanged("orderedProductCost") ? "text-decoration-underline" : ""}
                             >
-                              Ordered Product Cost: {view.updatedOrder.orderedProductCost}
+                              {
+                                language === 'EN' ? 'Ordered Product Cost: ' : 'Вартість замовлення: '
+                              }
+                              {view.updatedOrder.orderedProductCost}
                             </ListGroupItem>
                             <ListGroupItem
                               key={crypto.randomUUID()}
                               className={view.isParamChanged("status") ? "text-decoration-underline" : ""}
                             >
-                              Status: {view.updatedOrder.status}
+                              {
+                                language === 'EN' ? 'Status: ' : 'Статус: '
+                              }
+                              {view.updatedOrder.status}
                             </ListGroupItem>
                             <ListGroupItem
                               key={crypto.randomUUID()}
                               className={view.isParamChanged("paymentType") ? "text-decoration-underline" : ""}
                             >
-                              Payment Type: {view.updatedOrder.paymentType}
+                              {
+                                language === 'EN' ? 'Payment Type: ' : 'Шлях оплати: '
+                              }
+                              {view.updatedOrder.paymentType}
                             </ListGroupItem>
                             <ListGroupItem
                               key={crypto.randomUUID()}
                               className={view.isParamChanged("creationDate") ? "text-decoration-underline" : ""}
                             >
-                              Creation Date: {formatDate(view.updatedOrder.creationDate)}
+                              {
+                                language === 'EN' ? 'Creation Date: ' : 'Створено о: '
+                              }
+                              {formatDate(view.updatedOrder.creationDate)}
                             </ListGroupItem>
                             <ListGroupItem
                               key={crypto.randomUUID()}
                               className={view.isParamChanged("processingOperatorId") ? "text-decoration-underline" : ""}
                             >
-                              Processing Operator ID: {view.updatedOrder.processingOperatorId || "UNKNOWN"}
+                              {
+                                language === 'EN' ? 'Processing Operator ID: ' : 'Оператор замовлення: '
+                              }
+                              {view.updatedOrder.processingOperatorId || "UNKNOWN"}
                             </ListGroupItem>
                             <ListGroupItem
                               key={crypto.randomUUID()}
                               className={view.isParamChanged("paid") ? "text-decoration-underline" : ""}
                             >
-                              Paid: {String(view.updatedOrder.paid).toUpperCase()}
+                              {
+                                language === 'EN' ? 'Paid: ' : 'Оплачено: '
+                              }
+                              {String(view.updatedOrder.paid).toUpperCase()}
                             </ListGroupItem>
                             <ListGroupItem
                               key={crypto.randomUUID()}
                               className={view.isParamChanged("lastUpdateDate") ? "text-decoration-underline" : ""}
                             >
-                              Last Update Date: {formatDate(view.updatedOrder.lastUpdateDate)}
+                              {
+                                language === 'EN' ? 'Last Update Date: ' : 'Оновлено о: '
+                              }
+                              {formatDate(view.updatedOrder.lastUpdateDate)}
                             </ListGroupItem>
                             <ListGroupItem
                               key={crypto.randomUUID()}
                               className={view.isParamChanged("deliveryServiceType") ? "text-decoration-underline" : ""}
                             >
-                              Delivery Service: {view.updatedOrder.deliveryServiceType}
+                              {
+                                language === 'EN' ? "Delivery Service: " : "Компанія доставки: "
+                              }
+                              {view.updatedOrder.deliveryServiceType}
                             </ListGroupItem>
                             {view.updatedOrder.deliveryServiceType !== "NONE" && (
                               <ListGroupItem key={crypto.randomUUID()}>
-                                Delivery Cost: {view.updatedOrder.deliveryCost}
+                                {
+                                  language === 'EN' ? 'Delivery Cost: ' : 'Вартість доставки: '
+                                }
+                                {view.updatedOrder.deliveryCost}
                               </ListGroupItem>
                             )}
                           </ListGroup>
                         </div>
                       ))}
                     {historyClicked && orderHistoryView.length < 1 && (
-                      <h5 className="font-monospace my-3">No history records were found</h5>
+                      <h5 className="font-monospace my-3">
+                        {
+                          language === 'EN' ? 'No history records were found' : 'Історія замовлення відсутня'
+                        }
+                      </h5>
                     )}
                   </CardBody>
                 </Collapse>
@@ -423,9 +604,15 @@ const Orders = ({ orders, setOrders, managerMode }) => {
           ))
         ) : (
           <div>
-            <h1 className="font-monospace my-3">You seem to not have any orders...</h1>
+            <h1 className="font-monospace my-3">
+              {
+                language === 'EN' ? 'You seem to not have any orders...' : 'У вас відсутні замовлення...'
+              }
+            </h1>
             <h3 onClick={() => redirectToUI()} className="text-decoration-underline" style={{ cursor: "pointer" }}>
-              Go to main
+              {
+                language === 'EN' ? 'Go to main' : 'На головну сторінку'
+              }
             </h3>
           </div>
         )}

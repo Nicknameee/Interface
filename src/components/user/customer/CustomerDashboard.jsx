@@ -1,18 +1,17 @@
-import { Col, Container, Row, ListGroup, ListGroupItem, Button, FormCheck } from "react-bootstrap";
-import { getCategories, getProducts, getQueryParam } from "../../../index";
-import React, { useEffect, useState } from "react";
+import {Button, Col, Container, FormCheck, Row} from "react-bootstrap";
+import {getCategories, getProducts, getQueryParam} from "../../../index";
+import React, {useEffect, useState} from "react";
 import Categories from "./Categories";
 import Products from "./Products";
-import { useLocation } from "react-router-dom";
-import { CategoryFilter } from "../../../schemas/requests/filters/CategoryFilter.ts";
-import { ProductFilter } from "../../../schemas/requests/filters/ProductFilter.ts";
-import nothingHereSeems from "../../../resources/oh.png";
+import {useLocation} from "react-router-dom";
+import {CategoryFilter} from "../../../schemas/requests/filters/CategoryFilter.ts";
+import {ProductFilter} from "../../../schemas/requests/filters/ProductFilter.ts";
 import OutsideClickHandler from "../../handlers/OutsideClickHandler";
 import ControlPanel from "./ControlPanel";
 import ShoppingCart from "./ShoppingCart";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
-import { redirectToUI } from "../../../utilities/redirect";
+import {useLanguage} from "../../../contexts/language/language-context";
 
 const CustomerDashboard = () => {
   const [categories, setCategories] = useState([]);
@@ -29,6 +28,7 @@ const CustomerDashboard = () => {
   const [priceTo, setPriceTo] = useState();
   const [isBlocked, setIsBlocked] = useState(false);
   const [isPresent, setIsPresent] = useState(false);
+  const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
     const categoryId: string = getQueryParam("categoryId", location);
@@ -138,6 +138,8 @@ const CustomerDashboard = () => {
                   productPresent={products.length > 0}
                 />
                 {products.length > 0 && <hr style={{ width: "100%", height: "5px" }} />}
+                {
+                  isSubCategoryOpened &&
                 <div
                   style={{
                     flexWrap: "wrap",
@@ -150,40 +152,57 @@ const CustomerDashboard = () => {
                     gap: 10,
                     borderRadius: 8,
                     marginBottom: 20,
+                    backgroundColor: 'pink'
                   }}
                 >
                   <div>
-                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Name:</div>
+                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
+                      {
+                        language === 'EN' ? 'Name:' : 'Ім я'
+                      }
+                    </div>
                     <input
                       type="text"
                       name="name"
-                      className="form-control"
+                      className="form-control border-3 border-black"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                     />
                   </div>
                   <div>
-                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Price from:</div>
+                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
+                      {
+                        language === 'EN' ? 'Price from:' : 'Ціна мін:'
+                      }
+                    </div>
                     <input
                       type="number"
                       name="priceFrom"
-                      className="form-control"
+                      className="form-control border-3 border-black"
                       value={priceFrom}
                       onChange={(e) => setPriceFrom(e.target.value)}
                     />
                   </div>
                   <div>
-                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Price to:</div>
+                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
+                      {
+                        language === 'EN' ? 'Price to:' : 'Ціна макс:'
+                      }
+                    </div>
                     <input
                       type="number"
                       name="priceTo"
-                      className="form-control"
+                      className="form-control border-3 border-black"
                       value={priceTo}
                       onChange={(e) => setPriceTo(e.target.value)}
                     />
                   </div>
                   <div style={{ display: "flex" }}>
-                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Is blocked:</div>
+                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
+                      {
+                        language === 'EN' ? 'Is blocked:' : 'Заблоковані(недоступні):'
+                      }
+                    </div>
                     <div className="d-flex">
                       <FormCheck
                         className="w-25"
@@ -194,7 +213,11 @@ const CustomerDashboard = () => {
                     </div>
                   </div>
                   <div style={{ display: "flex" }}>
-                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Is present:</div>
+                    <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
+                      {
+                        language === 'EN' ? 'Is present:' : 'Є у наявності:'
+                      }
+                    </div>
                     <div className="d-flex">
                       <FormCheck
                         className="w-25"
@@ -256,6 +279,7 @@ const CustomerDashboard = () => {
                     </Button>
                   </div>
                 </div>
+                }
                 {products && isSubCategoryOpened && (
                   <Products
                     products={products}

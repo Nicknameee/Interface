@@ -10,6 +10,7 @@ import { notifyError } from "../../../../utilities/notify.js";
 import { BarChart } from "@mui/x-charts";
 import { Box, Modal, Typography } from "@mui/material";
 import { useLocation } from "react-router-dom";
+import {useLanguage} from "../../../../contexts/language/language-context";
 
 const ViewProducts = () => {
   const [products: Product[], setProducts] = useState([]);
@@ -26,7 +27,9 @@ const ViewProducts = () => {
   const [isBlocked, setIsBlocked] = useState(false);
   const [isPresent, setIsPresent] = useState(false);
 
-  const toggleProduct = (productId) => {
+  const { language, setLanguage } = useLanguage();
+
+    const toggleProduct = (productId) => {
     setSelectedProductId(selectedProductId === productId ? null : productId);
   };
 
@@ -66,9 +69,13 @@ const ViewProducts = () => {
       }}
       className="py-3"
     >
-      <ListGroup style={{ width: "28%" }}>
-        <ListGroupItem className="d-flex justify-content-between align-items-center">
-          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Name:</div>
+      <ListGroup style={{ width: "28%"}}>
+        <ListGroupItem className="d-flex justify-content-between align-items-center" style={{ backgroundColor: 'pink' }}>
+          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
+              {
+                  language === 'EN' ? 'Name:' : 'Назва:'
+              }
+          </div>
           <input
             type="text"
             name="name"
@@ -77,7 +84,7 @@ const ViewProducts = () => {
             onChange={(e) => setName(e.target.value)}
           />
         </ListGroupItem>
-        <ListGroupItem className="d-flex justify-content-between align-items-center">
+        <ListGroupItem className="d-flex justify-content-between align-items-center" style={{ backgroundColor: 'pink' }}>
           <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Id:</div>
           <input
             type="text"
@@ -87,8 +94,12 @@ const ViewProducts = () => {
             onChange={(e) => setProductId(e.target.value)}
           />
         </ListGroupItem>
-        <ListGroupItem className="d-flex justify-content-between align-items-center">
-          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Price from:</div>
+        <ListGroupItem className="d-flex justify-content-between align-items-center" style={{ backgroundColor: 'pink' }}>
+          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
+              {
+                  language === 'EN' ? 'Price from:' : 'Ціна від:'
+              }
+           </div>
           <input
             type="number"
             name="priceFrom"
@@ -97,8 +108,12 @@ const ViewProducts = () => {
             onChange={(e) => setPriceFrom(e.target.value)}
           />
         </ListGroupItem>
-        <ListGroupItem className="d-flex justify-content-between align-items-center">
-          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Price to:</div>
+        <ListGroupItem className="d-flex justify-content-between align-items-center" style={{ backgroundColor: 'pink' }}>
+          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
+              {
+                  language === 'EN' ? 'Price to:' : 'Ціна макс:'
+              }
+          </div>
           <input
             type="number"
             name="priceTo"
@@ -107,8 +122,12 @@ const ViewProducts = () => {
             onChange={(e) => setPriceTo(e.target.value)}
           />
         </ListGroupItem>
-        <ListGroupItem className="d-flex align-items-center">
-          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Is blocked:</div>
+        <ListGroupItem className="d-flex align-items-center" style={{ backgroundColor: 'pink' }}>
+          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
+              {
+                  language === 'EN' ? 'Is blocked:' : 'Заблоковано'
+              }
+          </div>
           <div className="d-flex">
             <FormCheck
               className="w-25"
@@ -118,8 +137,12 @@ const ViewProducts = () => {
             />
           </div>
         </ListGroupItem>
-        <ListGroupItem className="d-flex align-items-center">
-          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Is present:</div>
+        <ListGroupItem className="d-flex align-items-center" style={{ backgroundColor: 'pink' }}>
+          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
+              {
+                  language === 'EN' ? 'Is present:' : 'Чи доступний:'
+              }
+          </div>
           <div className="d-flex">
             <FormCheck
               className="w-25"
@@ -153,7 +176,9 @@ const ViewProducts = () => {
               initProducts().then(() => {});
             }}
           >
-            Filter
+              {
+                  language === 'EN' ? 'Filter' : 'Фільтрувати'
+              }
           </Button>
           <Button
             color="primary"
@@ -176,7 +201,9 @@ const ViewProducts = () => {
               initProducts().then(() => {});
             }}
           >
-            Drop Filters
+              {
+                  language === 'EN' ? 'Drop Filters' : 'Скинути фільтри'
+              }
           </Button>
         </ListGroupItem>
       </ListGroup>
@@ -199,7 +226,9 @@ const ViewProducts = () => {
               )
             }
           >
-            Export products
+              {
+                  language === 'EN' ? 'Export products' : 'Експортувати продукти'
+              }
           </Button>
         )}
         {products !== null &&
@@ -216,7 +245,10 @@ const ViewProducts = () => {
                 <CardBody>
                   <ListGroup>
                     <ListGroupItem key={crypto.randomUUID()}>
-                      Product Name:{" "}
+                        {
+                            language === 'EN' ? 'Product Name:' : 'Ім\'я продукту:'
+                        }
+                        {" "}
                       <strong
                         title={"Go to product page"}
                         onClick={() => redirectToProductPage(product.productId)}
@@ -226,19 +258,48 @@ const ViewProducts = () => {
                         {product.name}
                       </strong>
                     </ListGroupItem>
-                    <ListGroupItem key={crypto.randomUUID()}>Product Brand: {product.brand}</ListGroupItem>
                     <ListGroupItem key={crypto.randomUUID()}>
-                      Cost: {product.cost} {product.currency}
+                        {
+                            language === 'EN' ? 'Product Brand: ' : 'Бренд продукту: '
+                        }
+                        {product.brand}</ListGroupItem>
+                    <ListGroupItem key={crypto.randomUUID()}>
+                        {
+                            language === 'EN' ? 'Cost: ' : 'Ціна: '
+                        }
+                        {product.cost} {product.currency}
                     </ListGroupItem>
-                    <ListGroupItem key={crypto.randomUUID()}>Description: {product.description}</ListGroupItem>
-                    <ListGroupItem key={crypto.randomUUID()}>Vendor ID: {product.vendorId}</ListGroupItem>
-                    <ListGroupItem key={crypto.randomUUID()}>Product ID: {product.productId}</ListGroupItem>
+                    <ListGroupItem key={crypto.randomUUID()}>
+                        {
+                            language === 'EN' ? 'Description: ' : 'Опис: '
+                        }
+                        {product.description}</ListGroupItem>
+                    <ListGroupItem key={crypto.randomUUID()}>
+                        {
+                            language === 'EN' ? 'Product ID: ' : 'Ідентифікатор продукту: '
+                        }
+                        {product.productId}</ListGroupItem>
                     <ListGroupItem style={{ color: product.itemsLeft < 30 && "red" }} key={crypto.randomUUID()}>
-                      Items Left: {product.itemsLeft}
+                        {
+                            language === 'EN' ? 'Items Left: ' : 'Залишок продукту: '
+                        }
+                        {product.itemsLeft}
                     </ListGroupItem>
-                    <ListGroupItem key={crypto.randomUUID()}>Blocked: {String(product.blocked)}</ListGroupItem>
-                    <ListGroupItem key={crypto.randomUUID()}>Category ID: {product.categoryId}</ListGroupItem>
-                    <ListGroupItem key={crypto.randomUUID()}>Margin Rate: {product.marginRate}</ListGroupItem>
+                    <ListGroupItem key={crypto.randomUUID()}>
+                        {
+                            language === 'EN' ? 'Blocked: ' : 'Заблоковано: '
+                        }
+                        {String(product.blocked)}</ListGroupItem>
+                    <ListGroupItem key={crypto.randomUUID()}>
+                        {
+                            language === 'EN' ? 'Category ID: ' : 'Ідентифікатор категорії: '
+                        }
+                        {product.categoryId}</ListGroupItem>
+                    <ListGroupItem key={crypto.randomUUID()}>
+                        {
+                            language === 'EN' ? 'Margin Rate:' : 'Відношення виручки'
+                        }
+                        {product.marginRate}</ListGroupItem>
                     <ListGroupItem key={crypto.randomUUID()}>
                       Intro Picture URL:{" "}
                       {product.introductionPictureUrl ? (
@@ -270,10 +331,14 @@ const ViewProducts = () => {
                         window.location.href = "/product/edit?productId=" + product.productId;
                       }}
                     >
-                      Edit
+                        {
+                            language === 'EN' ? 'Edit' : 'Відредагувати'
+                        }
                     </Button>
                     <Button style={{ marginLeft: 20 }} onClick={() => setIsModalOpen(true)}>
-                      View statistics
+                        {
+                            language === 'EN' ? 'View statistics' : 'Статистика'
+                        }
                     </Button>
                     <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
                       <Box
@@ -290,7 +355,9 @@ const ViewProducts = () => {
                         bgcolor="#fff"
                       >
                         <Typography textAlign="center" marginTop="20px" variant="h4">
-                          Product sales statistics
+                            {
+                                language === 'EN' ? 'Product sales statistics' : 'Статистика продуктового продажу'
+                            }
                         </Typography>
                         <BarChart
                           dataset={statistics}
@@ -307,7 +374,11 @@ const ViewProducts = () => {
               </Collapse>
             </Card>
           ))}
-        {products.length < 1 && <h4 className="w-100 text-center">No products were found....</h4>}
+        {products.length < 1 && <h4 className="w-100 text-center">
+            {
+                language === 'EN' ? 'No products were found....' : 'Не знайдено жодного продукта....'
+            }
+        </h4>}
         {
           <div className="w-100 d-flex justify-content-center align-items-center">
             <Button

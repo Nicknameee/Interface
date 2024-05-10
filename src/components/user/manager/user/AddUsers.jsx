@@ -3,8 +3,8 @@ import * as utility from "../../../../constants/pattern";
 import {Button, Col, Form, FormCheck} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAsterisk} from "@fortawesome/free-solid-svg-icons";
-import {redirectToSignIn} from "../../../../utilities/redirect";
 import {addUser, initiateCredentialsAvailabilityChecking} from "../../../../index";
+import {useLanguage} from "../../../../contexts/language/language-context";
 
 const AddUsers = () => {
     const [username: string, setUsername] = useState('');
@@ -23,6 +23,8 @@ const AddUsers = () => {
     const [roleException, setRoleException] = useState('');
     const [statusException, setStatusException] = useState('');
 
+    const {language} = useLanguage();
+
     const handleUsernameChange = (value) => {
         setUsername(value)
         if (value === '') {
@@ -31,7 +33,11 @@ const AddUsers = () => {
         }
 
         if ((!(/^[a-zA-Z0-9]{5,33}$/).test(value)) && value) {
-            setUsernameException('Invalid username')
+            if (language === 'EN') {
+                setUsernameException('Invalid username')
+            } else {
+                setUsernameException('Невалідний нікнейм')
+            }
         } else {
             setUsernameException('')
         }
@@ -45,7 +51,11 @@ const AddUsers = () => {
         }
 
         if (!(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/).test(value) && value) {
-            setEmailException('Invalid email')
+            if (language === 'EN') {
+                setEmailException('Invalid email')
+            } else {
+                setEmailException('Невалідна поштова адреса')
+            }
         } else {
             setEmailException('')
         }
@@ -59,7 +69,11 @@ const AddUsers = () => {
         }
 
         if (!(/^[a-zA-Z0-9]{8,33}$/).test(value) && value) {
-            setPasswordException('Invalid password')
+            if (language === 'EN') {
+                setPasswordException('Invalid password')
+            } else {
+                setPasswordException('Невалідний пароль')
+            }
         } else {
             setPasswordException('')
         }
@@ -77,7 +91,11 @@ const AddUsers = () => {
         }
 
         if (value !== password && value) {
-            setPasswordConfirmationException('Passwords not match')
+            if (language === 'EN') {
+                setPasswordConfirmationException('Passwords not match')
+            } else {
+                setPasswordConfirmationException('Вказані паролі не збігаються')
+            }
         } else {
             setPasswordConfirmationException('')
         }
@@ -91,7 +109,11 @@ const AddUsers = () => {
         }
 
         if (!utility.TELEGRAM_USERNAME_PATTERN.test(value) && value) {
-            setRoleException('Invalid telegram username, must be in format @Username 5 list of username at least')
+            if (language === 'EN') {
+                setRoleException('Invalid telegram username, must be in format @Username 5 list of username at least')
+            } else {
+                setRoleException('Невалідний телеграм ідентифікатор, повинен бути у форматі @Username і не менше 5 символів довжиною')
+            }
         } else {
             setRoleException('')
         }
@@ -138,7 +160,11 @@ const AddUsers = () => {
         <Col>
             <Form className="custom-form py-3 my-1">
                 <Form.Group controlId="formUsername" className="m-3">
-                    <Form.Label>Username</Form.Label>
+                    <Form.Label>
+                        {
+                            language === 'EN' ? 'Username' : 'Юзернейм'
+                        }
+                    </Form.Label>
                     <div className="input-container">
                         <Form.Control
                             type="text"
@@ -165,7 +191,11 @@ const AddUsers = () => {
                 </Form.Group>
 
                 <Form.Group controlId="formPassword" className="m-3">
-                    <Form.Label>Password</Form.Label>
+                    <Form.Label>
+                        {
+                            language === 'EN' ? 'Password' : 'Користувацький пароль'
+                        }
+                    </Form.Label>
                     <div className="input-container">
                         <Form.Control
                             type={'text'}
@@ -179,7 +209,11 @@ const AddUsers = () => {
                 </Form.Group>
 
                 <Form.Group controlId="formConfirmationPassword" className="m-3">
-                    <Form.Label>Repeat Password</Form.Label>
+                    <Form.Label>
+                        {
+                            language === 'EN' ? 'Repeat Password' : 'Підтвердіть пароль'
+                        }
+                    </Form.Label>
                     <div className="input-container">
                         <Form.Control
                             type={'text'}
@@ -211,7 +245,11 @@ const AddUsers = () => {
 
                 <Form.Group controlId="formTelegram" className="m-3">
                     <div className="input-container">
-                        <Form.Label>Status</Form.Label>
+                        <Form.Label>
+                            {
+                                language === 'EN' ? 'Status' : 'Статус'
+                            }
+                        </Form.Label>
                         <div className="input-container">
                             <FormCheck className="w-100"
                                        key={crypto.randomUUID()}
@@ -234,15 +272,12 @@ const AddUsers = () => {
 
                 <Form.Group controlId="formTelegram" className="m-3">
                     <div className="input-container">
-                        <Form.Label>Role</Form.Label>
+                        <Form.Label>
+                            {
+                                language === 'EN' ? 'Role' : 'Роль'
+                            }
+                        </Form.Label>
                         <div className="input-container">
-                            {/*<FormCheck className="w-100"*/}
-                            {/*           key={crypto.randomUUID()}*/}
-                            {/*           id={'Operator'}*/}
-                            {/*           label={'Operator'}*/}
-                            {/*           value={'Operator'}*/}
-                            {/*           checked={role === 'ROLE_OPERATOR'}*/}
-                            {/*           onChange={() => setRole('ROLE_OPERATOR')}/>*/}
                             <FormCheck className="w-100"
                                        key={crypto.randomUUID()}
                                        id={'Manager'}
@@ -256,7 +291,9 @@ const AddUsers = () => {
                 </Form.Group>
 
                 <Button variant={infoValid() ? 'primary' : 'secondary'} type="button" className="m-3" disabled={!infoValid()} onClick={() => addUserHook()}>
-                    Add User
+                    {
+                        language === 'EN' ? 'Add User' : 'Створити користувача'
+                    }
                 </Button>
             </Form>
         </Col>

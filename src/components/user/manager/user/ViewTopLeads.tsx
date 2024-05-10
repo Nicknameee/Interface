@@ -5,10 +5,12 @@ import { getTopLeads } from "../../../../index";
 import { redirectToUI } from "../../../../utilities/redirect";
 import React, { useEffect, useState } from "react";
 import { notifyError } from "../../../../utilities/notify.js";
+import { useLanguage } from "../../../../contexts/language/language-context";
 
 const ViewTopLeads = () => {
   const [topLeads, setTopLeads] = useState<any[]>([]);
   const [selectedLeadId, setSelectedLeadId] = useState<any>();
+  const {language} = useLanguage();
 
   useEffect(() => {
     getTopLeads()
@@ -29,7 +31,18 @@ const ViewTopLeads = () => {
             >
               <div className="d-flex justify-content-between align-items-center">
                 <span>
-                  Customer ID: {lead.customerId} | Total Profit: {lead.totalProfit} | Currency: {lead.currency}{" "}
+                  {
+                    language === 'EN' ? ' Customer ID: ' : ' Ідентифікатор користуачач: '
+                  }
+                  {lead.customerId} |
+                  {
+                    language === 'EN' ? ' Total Profit: ' : ' Загальна виручка: '
+                  }
+                  {lead.totalProfit} |
+                  {
+                    language === 'EN' ? ' Currency: ' : ' Валюта виручки: '
+                  }
+                  {lead.currency}{" "}
                 </span>
                 <FontAwesomeIcon icon={selectedLeadId === lead.customerId ? faAngleUp : faAngleDown} />
               </div>
@@ -37,7 +50,11 @@ const ViewTopLeads = () => {
             <Collapse in={selectedLeadId === lead.customerId}>
               <CardBody>
                 <ListGroup>
-                  <ListGroupItem>Customer ID: {lead.customerId}</ListGroupItem>
+                  <ListGroupItem>
+                    {
+                      language === 'EN' ? 'Customer ID: ' : 'Ідентифікатор користувача: '
+                    }
+                    {lead.customerId}</ListGroupItem>
                   {lead.contact.find((item) => item.includes("https")) && (
                     <ListGroupItem>
                       Telegram:{" "}
@@ -54,8 +71,16 @@ const ViewTopLeads = () => {
                       </a>
                     </ListGroupItem>
                   )}
-                  <ListGroupItem>Total Profit: {lead.totalProfitByCustomer.toFixed(2)}</ListGroupItem>
-                  <ListGroupItem>Currency: {lead.currency}</ListGroupItem>
+                  <ListGroupItem>
+                    {
+                      language === 'EN' ? 'Total Profit: ' : 'Загальна виручка: '
+                    }
+                    {lead.totalProfitByCustomer.toFixed(2)}</ListGroupItem>
+                  <ListGroupItem>
+                    {
+                      language === 'EN' ? 'Currency: ' : 'Валюта виручки: '
+                    }
+                    {lead.currency}</ListGroupItem>
                 </ListGroup>
               </CardBody>
             </Collapse>
@@ -63,9 +88,15 @@ const ViewTopLeads = () => {
         ))
       ) : (
         <div>
-          <h1 className="font-monospace my-3">No top leads...</h1>
+          <h1 className="font-monospace my-3">
+            {
+              language === 'EN' ? 'No top leads...' : 'Відсутні прибуткові користувачі'
+            }
+          </h1>
           <h3 onClick={() => redirectToUI()} className="text-decoration-underline" style={{ cursor: "pointer" }}>
-            Go to main
+            {
+              language === 'EN' ? 'Go to main' : 'На головну сторінку'
+            }
           </h3>
         </div>
       )}

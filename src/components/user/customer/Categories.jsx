@@ -31,7 +31,7 @@ const Categories = ({ categories, isSubCategoryOpened, categoriesPage, setCatego
 
   const renderCategories = (categories: Category[]) => {
     return categories.map((category) => (
-      <div key={category.categoryId} about={category.name} className="mb-3" style={{ width: 240 }}>
+      <div key={category.categoryId} about={category.name} className="mb-3 mx-1" style={{ width: 240, height: 300 }}>
         <div className="card h-100">
           {category.pictureUrl ? (
             <img
@@ -119,14 +119,14 @@ const Categories = ({ categories, isSubCategoryOpened, categoriesPage, setCatego
     <div className="w-100 py-0">
       <div className="row justify-content-center w-100 py-0">
         {list(categories)}
-        {categories.length < 1 && isSubCategoryOpened && productPresent && (
+        {categories.length < 1 && (
           <h4 className="w-100 text-center">
               {
                   language === 'EN' ? 'No categories were found...' : 'Не знайдено категорій...'
               }
           </h4>
         )}
-        {
+        { categoriesPage > 1 || (categories && categories.length > 0) ?
           <div className="w-100 d-flex justify-content-center">
             <Button
               className="mx-3"
@@ -153,6 +153,8 @@ const Categories = ({ categories, isSubCategoryOpened, categoriesPage, setCatego
               Next
             </Button>
           </div>
+            :
+            null
         }
       </div>
     </div>

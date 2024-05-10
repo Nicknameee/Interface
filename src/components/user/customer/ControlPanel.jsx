@@ -1,13 +1,13 @@
-import { Col, Nav } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircle } from "@fortawesome/free-solid-svg-icons";
-import React, { useEffect, useState } from "react";
-import { redirectToOrderHistory, redirectToWaitingList } from "../../../utilities/redirect";
+import {Col, Nav} from "react-bootstrap";
+import React, {useEffect, useState} from "react";
+import {redirectToOrderHistory, redirectToWaitingList} from "../../../utilities/redirect";
+import {useLanguage} from "../../../contexts/language/language-context";
 
 const ControlPanel = ({ showSidebar }) => {
   const [show, setShow] = useState(false);
   // const [incomingNotification, setIN] = useState(false);
   // const [incomingSupportMessage, setISM] = useState(false);
+  const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
     setShow(showSidebar);
@@ -34,19 +34,19 @@ const ControlPanel = ({ showSidebar }) => {
           style={{ fontSize: "30px", color: "#e2e6f1", width: "100%", textAlign: "center" }}
           onClick={() => redirectToOrderHistory()}
         >
-          My Orders
+            {
+                language === 'EN' ? 'My Orders' : 'Замовлення'
+            }
         </Nav.Link>
         <Nav.Link
           className="navLink"
           style={{ fontSize: "30px", color: "#e2e6f1", width: "100%", textAlign: "center" }}
           onClick={() => redirectToWaitingList()}
         >
-          Waiting List
+            {
+                language === 'EN' ? 'Waiting List' : 'Лист очікування'
+            }
         </Nav.Link>
-        {/*<Nav.Link className="navLink" style={{ fontSize: '30px', color: '#e2e6f1', width: '100%', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>*/}
-        {/*    Notification*/}
-        {/*    {incomingNotification && <FontAwesomeIcon icon={faCircle} color="white" className="notification-dot"/>}*/}
-        {/*</Nav.Link>*/}
       </Nav>
     </Col>
   );

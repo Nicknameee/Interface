@@ -1,11 +1,11 @@
-import { Button, Card, CardBody, CardHeader, Collapse, ListGroup, ListGroupItem } from "react-bootstrap";
-import { useEffect, useState } from "react";
-import React from "react";
-import { getTransactions } from "../../../../index.js";
-import { Transaction } from "../../../../schemas/responses/models/Transaction.ts";
-import { faAngleUp, faAngleDown } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {Button, Card, CardBody, CardHeader, Collapse, ListGroup, ListGroupItem} from "react-bootstrap";
+import React, {useEffect, useState} from "react";
+import {getTransactions} from "../../../../index.js";
+import {Transaction} from "../../../../schemas/responses/models/Transaction.ts";
+import {faAngleDown, faAngleUp} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import moment from "moment";
+import {useLanguage} from "../../../../contexts/language/language-context.jsx";
 
 const ViewTransactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -14,6 +14,8 @@ const ViewTransactions = () => {
 
   const [fromDate, setFromDate] = useState<string>();
   const [toDate, setToDate] = useState<string>();
+
+  const { language, setLanguage } = useLanguage();
 
   useEffect(() => {
     getTransactions(page, 5, fromDate, toDate).then((transactions) => {
@@ -25,7 +27,11 @@ const ViewTransactions = () => {
     <div style={{ display: "flex", padding: "0 100px", justifyContent: "space-between", marginTop: "20px" }}>
       <ListGroup style={{ width: "28%" }}>
         <ListGroupItem className="d-flex justify-content-between align-items-center">
-          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Issued at from:</div>
+          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
+              {
+                  language === 'EN' ? 'Issued at from:' : 'Час створення мін: '
+              }
+          </div>
           <input
             type="date"
             name="issuedAtFrom"
@@ -35,7 +41,11 @@ const ViewTransactions = () => {
           />
         </ListGroupItem>
         <ListGroupItem className="d-flex justify-content-between align-items-center">
-          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>Issued at to:</div>
+          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
+              {
+                  language === 'EN' ? 'Issued at to:' : 'Час створення макс: '
+              }
+          </div>
           <input
             type="date"
             name="issuedAtTo"
@@ -53,7 +63,9 @@ const ViewTransactions = () => {
               });
             }}
           >
-            Filter
+              {
+                  language === 'EN' ? 'Filter' : 'Фільтр'
+              }
           </Button>
           <Button
             color="primary"
@@ -65,7 +77,9 @@ const ViewTransactions = () => {
               });
             }}
           >
-            Drop Filters
+              {
+                  language === 'EN' ? 'Drop Filters' : 'Скинути фільтрацію'
+              }
           </Button>
         </ListGroupItem>
       </ListGroup>
@@ -91,14 +105,42 @@ const ViewTransactions = () => {
               <Collapse in={selectedTransactionId === transaction.id}>
                 <CardBody>
                   <ListGroup>
-                    <ListGroupItem>Customer ID: {transaction.customerId}</ListGroupItem>
-                    <ListGroupItem>Amount: {transaction.amount}</ListGroupItem>
-                    <ListGroupItem>Acquiring Currency: {transaction.acquiringCurrency}</ListGroupItem>
-                    <ListGroupItem>Type: {transaction.transactionType}</ListGroupItem>
-                    <ListGroupItem>Status: {transaction.status}</ListGroupItem>
-                    <ListGroupItem>Country: {transaction.transactionProcessingCountry}</ListGroupItem>
                     <ListGroupItem>
-                      Issued At: {moment(transaction.issuedAt).format("DD/MM/YYYY HH:mm:ss")}
+                        {
+                            language === 'EN' ? 'Customer ID: ' : 'Ідентифікатор клієнта: '
+                        }
+                        {transaction.customerId}
+                    </ListGroupItem>
+                    <ListGroupItem>
+                        {
+                            language === 'EN' ? 'Amount: ' : 'Сума: '
+                        }
+                        {transaction.amount}</ListGroupItem>
+                    <ListGroupItem>
+                        {
+                            language === 'EN' ? 'Acquiring Currency: ' : 'Придбано у валюті: '
+                        }
+                        {transaction.acquiringCurrency}</ListGroupItem>
+                    <ListGroupItem>
+                        {
+                            language === 'EN' ? 'Type: ' : 'Тип: '
+                        }
+                        {transaction.transactionType}</ListGroupItem>
+                    <ListGroupItem>
+                        {
+                            language === 'EN' ? 'Status: ' : 'Статус: '
+                        }
+                        {transaction.status}</ListGroupItem>
+                    <ListGroupItem>
+                        {
+                            language === 'EN' ? 'Country: ' : 'Країна: '
+                        }
+                        {transaction.transactionProcessingCountry}</ListGroupItem>
+                    <ListGroupItem>
+                        {
+                            language === 'EN' ? 'Issued At: ' : 'Зареєстровано о: '
+                        }
+                        {moment(transaction.issuedAt).format("DD/MM/YYYY HH:mm:ss")}
                     </ListGroupItem>
                   </ListGroup>
                 </CardBody>

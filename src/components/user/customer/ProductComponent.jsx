@@ -17,6 +17,7 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import {WaitingListProduct} from "../../../schemas/data/WaitingListProduct.ts";
 import {ToastContainer} from "react-toastify";
+import {useLanguage} from "../../../contexts/language/language-context";
 
 const ProductComponent = () => {
     const [product: Product, setProduct] = useState(null);
@@ -27,6 +28,7 @@ const ProductComponent = () => {
     const [mainPicture, setMainPicture] = useState(defaultImage);
     const imagesRef = useRef(null);
     const shoppingCart = useRef(null);
+    const { language, setLanguage } = useLanguage();
 
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
@@ -168,15 +170,35 @@ const ProductComponent = () => {
                                                 {Object.entries(product.parameters).map(([key, value]) => (
                                                     <p key={key} className="mb-3"><strong>{key}:</strong> {value || 'Unknown'}</p>
                                                 ))}
-                                                <p className="mb-3" style={{maxWidth: '900px'}}><strong>Description:</strong> {product.description || 'Unknown'}</p>
+                                                <p className="mb-3" style={{maxWidth: '900px'}}>
+                                                    <strong>
+                                                        {
+                                                            language === 'EN' ? 'Description:' : 'Опис:'
+                                                        }
+                                                    </strong>
+                                                    {product.description || 'Unknown'}
+                                                </p>
                                             </div>
                                             <div className="d-flex w-50 justify-content-between">
                                                 {product.blocked === false && product.itemsLeft > 0 ?
-                                                    <button className="btn btn-success" onClick={orderProduct}>Order <FontAwesomeIcon icon={faCartFlatbed}/></button>
+                                                    <button className="btn btn-success" onClick={orderProduct}>
+                                                        {
+                                                            language === 'EN' ? 'Order' : 'Замовити'
+                                                        }
+                                                        <FontAwesomeIcon icon={faCartFlatbed}/></button>
                                                     :
-                                                    <button className="btn btn-secondary" disabled={true}>Not Available</button>
+                                                    <button className="btn btn-secondary" disabled={true}>
+                                                        {
+                                                            language === 'EN' ? 'Not Available' : 'Недоступний'
+                                                        }
+                                                    </button>
                                                 }
-                                                <button className="btn btn-primary" onClick={() => addToWaitingList(WaitingListProduct.getOfProduct(product))}>Add To Waiting List <FontAwesomeIcon icon={faPenNib}/></button>
+                                                <button className="btn btn-primary" onClick={() => addToWaitingList(WaitingListProduct.getOfProduct(product))}>
+                                                    {
+                                                        language === 'EN' ? 'Add To Waiting List' : 'Зберегти у список очікування'
+                                                    }
+                                                    <FontAwesomeIcon icon={faPenNib}/>
+                                                </button>
                                             </div>
                                         </div>
                                         <img src={happyAssistant} style={{maxWidth: '30%', position: 'absolute', top: '10%', left: '50%'}} alt=""/>

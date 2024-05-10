@@ -3,10 +3,13 @@ import { useState } from "react";
 import React from "react";
 import { createTransaction } from "../../../..";
 import { notifySuccess, notifyError } from "../../../../utilities/notify";
+import { useLanguage } from "../../../../contexts/language/language-context";
 
 const AddTransaction = () => {
   const [number, setNumber] = useState("");
   const [paymentAmount, setPaymentAmount] = useState("");
+
+  const { language, setLanguage } = useLanguage();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +19,11 @@ const AddTransaction = () => {
     try {
       await createTransaction(number, Number(paymentAmount));
 
-      notifySuccess("Payment was created successfully");
+      if (language === 'EN') {
+        notifySuccess("Payment was created successfully");
+      } else {
+        notifySuccess("Ваш платіж було зареєстровано");
+      }
     } catch (e) {
       notifyError("Something went wrong");
     }
@@ -27,7 +34,9 @@ const AddTransaction = () => {
       <Form onSubmit={handleSubmit} style={{ background: "white", borderRadius: 8, padding: 20, width: 600 }}>
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label required style={{ fontSize: 16 }}>
-            Order number
+            {
+              language === 'EN' ? 'Order number' : 'Замовлення номер'
+            }
           </Form.Label>
           <Form.Control
             value={number}
@@ -40,7 +49,9 @@ const AddTransaction = () => {
         </Form.Group>
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label required style={{ fontSize: 16 }}>
-            Payment amount
+            {
+              language === 'EN' ? 'Payment amount' : 'Сума'
+            }
           </Form.Label>
           <Form.Control
             value={paymentAmount}

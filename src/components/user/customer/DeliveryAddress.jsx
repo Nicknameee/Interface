@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {getNovaPostCities, getNovaPostWarehouses} from "../../../index";
 import {FormCheck, FormGroup, ListGroup, ListGroupItem} from "react-bootstrap";
 import {DELIVERY_SERVICE_TYPE} from "../../../constants/constants";
+import {useLanguage} from "../../../contexts/language/language-context";
 
 const DeliveryAddress = ({country, deliveryData, setDeliveryTypeExt}) => {
     const [deliveryDetails, setDeliveryDetails] = useState('');
@@ -11,6 +12,8 @@ const DeliveryAddress = ({country, deliveryData, setDeliveryTypeExt}) => {
     const [deliveryType, setDeliveryType] = useState('NONE');
     const [cityInputFocused: boolean, setCityInputIsFocused] = useState(false);
     const [warehouseInputFocused: boolean, setWarehouseInputIsFocused] = useState(false);
+
+    const { language, setLanguage } = useLanguage();
 
     const handleCitySearchStringChange = (e) => {
         setSearchCityString(e.target.value)
@@ -54,7 +57,7 @@ const DeliveryAddress = ({country, deliveryData, setDeliveryTypeExt}) => {
                             <input className="w-100 search-input"
                                    type="text"
                                    id="novaPostCitySearch"
-                                   placeholder="Search for cities..."
+                                   placeholder={ language === 'EN' ? "Search for cities..." : 'Знайти місто...'}
                                    value={searchCityString}
                                    onClick={() => {}}
                                    onChange={handleCitySearchStringChange}
@@ -75,7 +78,7 @@ const DeliveryAddress = ({country, deliveryData, setDeliveryTypeExt}) => {
                             <div className="w-75 my-1 d-flex flex-wrap justify-content-center">
                                 <input className="w-100 search-input"
                                        type="text"
-                                       placeholder="Search for warehouses..."
+                                       placeholder={ language === 'EN' ? "Search for warehouses..." : 'Знайти місце доставки...'}
                                        value={deliveryDetails}
                                        readOnly={true}
                                        onFocus={() => setWarehouseInputIsFocused(true)}/>
@@ -97,7 +100,11 @@ const DeliveryAddress = ({country, deliveryData, setDeliveryTypeExt}) => {
             default: {
                 return (
                     <div className="w-100 d-flex justify-content-center flex-wrap">
-                        <h5>No delivery, order must be taken at pickup point</h5>
+                        <h5>
+                            {
+                                language === 'EN' ? 'No delivery, order must be taken at pickup point' : 'Доставка необрана, замовлення можна забрати у пункті видачі лише'
+                            }
+                        </h5>
                     </div>
                 )
             }

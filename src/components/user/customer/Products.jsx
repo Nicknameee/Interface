@@ -7,8 +7,11 @@ import { faFeather } from "@fortawesome/free-solid-svg-icons";
 import { addToWaitingList } from "../../../index";
 import { WaitingListProduct } from "../../../schemas/data/WaitingListProduct.ts";
 import { Button } from "react-bootstrap";
+import {useLanguage} from "../../../contexts/language/language-context";
 
 const Products = ({ products, productPage, setProductPage, categoriesPresent, managerMode }) => {
+  const { language, setLanguage } = useLanguage();
+
   const list = (products: Product[]) => {
     if (products.length > 0) {
       return products.map((product) => (
@@ -31,7 +34,9 @@ const Products = ({ products, productPage, setProductPage, categoriesPresent, ma
               </h5>
               {product.blocked || product.itemsLeft === 0 ? (
                 <button className="btn btn-dark" disabled={true}>
-                  Not Available
+                  {
+                    language === 'EN' ? 'Not Available' : 'Недоступно'
+                  }
                 </button>
               ) : (
                 <div>
@@ -41,7 +46,9 @@ const Products = ({ products, productPage, setProductPage, categoriesPresent, ma
                     onClick={() => redirectToProductPage(product.productId)}
                     title={"Check Up Product Page"}
                   >
-                    Check It Up
+                    {
+                      language === 'EN' ? 'Check It Up' : 'ВІдкрити'
+                    }
                   </button>
                   {(managerMode === undefined || managerMode === null || managerMode === false) && (
                     <button
@@ -66,7 +73,11 @@ const Products = ({ products, productPage, setProductPage, categoriesPresent, ma
     <div className="w-100 py-0">
       <div className="row justify-content-center w-100 py-0">
         {list(products)}
-        {products.length < 1 && categoriesPresent && <h4 className="w-100 text-center">No products were found....</h4>}
+        {products.length < 1 && <h4 className="w-100 text-center">
+          {
+            language === 'EN' ? 'No products were found....' : 'Не знайдено жодного продукта'
+          }
+        </h4>}
         {(categoriesPresent || products.length >= 1) && (
           <div className="w-100 d-flex justify-content-center align-items-center">
             <Button

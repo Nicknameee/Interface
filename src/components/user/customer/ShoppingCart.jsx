@@ -7,11 +7,13 @@ import {faTrash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import emptyCart from '../../../resources/emptyCart.png'
 import {redirectToPurchase, redirectToUI} from "../../../utilities/redirect";
+import {useLanguage} from "../../../contexts/language/language-context";
 
 const ShoppingCart = React.forwardRef(({showCartValue}, ref) => {
     const [cart, setCart] = useState([]);
     const [showCart, setShowCart] = useState(false);
     const [cartUpdate, setCartUpdate] = useState(1);
+    const { language, setLanguage } = useLanguage();
 
     useEffect(() => {
         let cartProducts: CartProduct[] = getCart();
@@ -96,8 +98,17 @@ const ShoppingCart = React.forwardRef(({showCartValue}, ref) => {
                                     <img src={item.introductionPictureUrl || defaultImage} alt={item.name} className="cart-item-image" style={{maxWidth: '150px', borderRadius: '15%'}} />
                                     <div className="cart-item-details w-100">
                                         <p className="font-monospace" style={{fontWeight: "bold"}}>{item.name}</p>
-                                        <p className="font-monospace" style={{fontWeight: "bold"}}>  Cost: {item.cost} {item.currency}</p>
-                                        <p className="font-monospace" style={{fontWeight: "bold"}}>Items: {item.itemsBooked}</p>
+                                        <p className="font-monospace" style={{fontWeight: "bold"}}>
+                                            {
+                                                language === 'EN' ? 'Cost:' : 'Ціна:'
+                                            }
+                                            {item.cost} {item.currency}
+                                        </p>
+                                        <p className="font-monospace" style={{fontWeight: "bold"}}>
+                                            {
+                                                language === 'EN' ? 'Items:' : 'К-сть:'
+                                            }
+                                            {item.itemsBooked}</p>
                                         <button className="btn btn-success w-25 m-1" onClick={() => handleChangeQuantity(item.productId, '+')}>+</button>
                                         <button className="btn btn-danger w-25 m-1" onClick={() => handleChangeQuantity(item.productId, '-')} disabled={item.itemsBooked === 0}>-</button>
                                     </div>
@@ -111,13 +122,26 @@ const ShoppingCart = React.forwardRef(({showCartValue}, ref) => {
                 ?
                 <FormGroup>
                     <ButtonGroup>
-                        <Button className="btn btn-success m-3" onClick={() => redirectToPurchase()}>Checkout</Button>
+                        <Button className="btn btn-success m-3" onClick={() => redirectToPurchase()}>
+                            {
+                                language === 'EN' ? 'Checkout' : 'Замовити'
+                            }
+                        </Button>
                     </ButtonGroup>
                 </FormGroup>
                 :
                 <div className="w-100 d-flex justify-content-center flex-wrap py-3">
                     <img src={emptyCart} style={{maxWidth: '11vw', height: 'auto', marginBottom: '1em'}} alt="Empty"/>
-                    <p className="w-100 font-monospace px-3" style={{fontStyle: 'italic', fontSize: '19px' }}>Cart is empty, but it's never too late to <span title={'Go to products'} style={{cursor: 'pointer', textDecoration: 'underline'}} onClick={() => redirectToUI()}>fill it up</span></p>
+                    <p className="w-100 font-monospace px-3" style={{fontStyle: 'italic', fontSize: '19px' }}>
+                        {
+                            language === 'EN' ? 'Cart is empty, but it\'s never too late to' : 'Кошик пустий, але завжди можна'
+                        }
+                        <span title={'Go to products'} style={{cursor: 'pointer', textDecoration: 'underline'}} onClick={() => redirectToUI()}>
+                            {
+                                language === 'EN' ? ' fill it up' : ' заповнити його'
+                            }
+                        </span>
+                    </p>
                 </div>
             }
         </Col>
