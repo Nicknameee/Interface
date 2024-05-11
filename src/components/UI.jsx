@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { getCookie } from "../index.js";
-import Operator from "../components/user/Operator";
+import {useEffect, useState} from "react";
+import {getCookie} from "../index.js";
 import CustomerDashboard from "./user/customer/CustomerDashboard";
-import { redirectToPersonal } from "../utilities/redirect";
+import {redirectToPersonal} from "../utilities/redirect";
+import NotFound from "./components/NotFound";
 
 const UI = () => {
   const [userInfo, setUserInfo] = useState({});
@@ -21,11 +21,11 @@ const UI = () => {
         case "ROLE_MANAGER":
           return redirectToPersonal();
         case "ROLE_SUPPORT":
-          return null;
+          return <NotFound />;
         case "ROLE_VENDOR":
-          return null;
+          return <NotFound />;
         case "ROLE_OPERATOR":
-          return <Operator />;
+          return <NotFound />;
         case "ROLE_CUSTOMER":
           return <CustomerDashboard />;
         default:

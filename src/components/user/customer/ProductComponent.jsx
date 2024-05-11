@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {addToCart, addToWaitingList, getProducts} from "../../../index";
+import {addToCart, addToWaitingList, getProducts, isLoggedIn} from "../../../index";
 import {ProductFilter} from "../../../schemas/requests/filters/ProductFilter.ts";
 import {Product} from "../../../schemas/responses/models/Product.ts";
 import {Col, Container, Row} from "react-bootstrap";
@@ -193,12 +193,15 @@ const ProductComponent = () => {
                                                         }
                                                     </button>
                                                 }
-                                                <button className="btn btn-primary" onClick={() => addToWaitingList(WaitingListProduct.getOfProduct(product))}>
-                                                    {
-                                                        language === 'EN' ? 'Add To Waiting List' : 'Зберегти у список очікування'
-                                                    }
-                                                    <FontAwesomeIcon icon={faPenNib}/>
-                                                </button>
+                                                {
+                                                    isLoggedIn() &&
+                                                    <button className="btn btn-primary" onClick={() => addToWaitingList(WaitingListProduct.getOfProduct(product))}>
+                                                        {
+                                                            language === 'EN' ? 'Add To Waiting List' : 'Зберегти у список очікування'
+                                                        }
+                                                        <FontAwesomeIcon icon={faPenNib}/>
+                                                    </button>
+                                                }
                                             </div>
                                         </div>
                                         <img src={happyAssistant} style={{maxWidth: '30%', position: 'absolute', top: '10%', left: '50%'}} alt=""/>

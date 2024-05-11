@@ -4,7 +4,7 @@ import { redirectToProductPage } from "../../../utilities/redirect";
 import { Product } from "../../../schemas/responses/models/Product.ts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFeather } from "@fortawesome/free-solid-svg-icons";
-import { addToWaitingList } from "../../../index";
+import {addToWaitingList, isLoggedIn} from "../../../index";
 import { WaitingListProduct } from "../../../schemas/data/WaitingListProduct.ts";
 import { Button } from "react-bootstrap";
 import {useLanguage} from "../../../contexts/language/language-context";
@@ -33,7 +33,7 @@ const Products = ({ products, productPage, setProductPage, categoriesPresent, ma
                 {product.cost} {product.currency}
               </h5>
               {product.blocked || product.itemsLeft === 0 ? (
-                <button className="btn btn-dark" disabled={true}>
+                <button className="btn btn-dark" style={{ marginRight: "10px" }} disabled={true}>
                   {
                     language === 'EN' ? 'Not Available' : 'Недоступно'
                   }
@@ -50,17 +50,18 @@ const Products = ({ products, productPage, setProductPage, categoriesPresent, ma
                       language === 'EN' ? 'Check It Up' : 'ВІдкрити'
                     }
                   </button>
-                  {(managerMode === undefined || managerMode === null || managerMode === false) && (
+                </div>
+              )}
+              {
+                isLoggedIn() &&
                     <button
-                      className="btn btn-primary"
-                      onClick={() => addToWaitingList(WaitingListProduct.getOfProduct(product))}
-                      title={"Add Product To Waiting List"}
+                        className="btn btn-primary"
+                        onClick={() => addToWaitingList(WaitingListProduct.getOfProduct(product))}
+                        title={"Add Product To Waiting List"}
                     >
                       <FontAwesomeIcon icon={faFeather} />
                     </button>
-                  )}
-                </div>
-              )}
+              }
             </div>
           </div>
         </div>
@@ -78,7 +79,9 @@ const Products = ({ products, productPage, setProductPage, categoriesPresent, ma
             language === 'EN' ? 'No products were found....' : 'Не знайдено жодного продукта'
           }
         </h4>}
-        {(categoriesPresent || products.length >= 1) && (
+        {
+          // (categoriesPresent || products.length >= 1) &&
+            (
           <div className="w-100 d-flex justify-content-center align-items-center">
             <Button
               className="mx-3"
