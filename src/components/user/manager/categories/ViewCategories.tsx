@@ -76,7 +76,16 @@ const ViewCategories = () => {
           </Button>
         </ListGroupItem>
       </ListGroup>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "30px 2%", marginTop: "20px", marginBottom: "13vh" }}>
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          flexWrap: "wrap",
+          gap: "30px 2%",
+          marginTop: "20px",
+          marginBottom: "13vh",
+        }}
+      >
         {categories?.map((category) => (
           <Card style={{ width: "23.5%" }}>
             <Card.Img

@@ -9,6 +9,7 @@ import { useLanguage } from "../../../../contexts/language/language-context";
 
 const ViewTopLeads = () => {
   const [topLeads, setTopLeads] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
   const [selectedLeadId, setSelectedLeadId] = useState<any>();
   const { language } = useLanguage();
 
@@ -17,10 +18,10 @@ const ViewTopLeads = () => {
   const [currency, setCurrency] = useState<string>("UAH");
 
   useEffect(() => {
-    getTopLeads(undefined, undefined, "UAH")
+    getTopLeads(page, undefined, undefined, "UAH")
       .then((res) => setTopLeads(res))
       .catch(() => notifyError("Something went wrong"));
-  }, []);
+  }, [page]);
 
   return (
     <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
@@ -144,6 +145,32 @@ const ViewTopLeads = () => {
             </h3>
           </div>
         )}
+        <div className="w-100 d-flex justify-content-center align-items-center">
+          <Button
+            className="mx-3"
+            style={{ width: "100px" }}
+            disabled={page <= 1}
+            onClick={() => {
+              if (page > 1) {
+                setPage(page - 1);
+              }
+            }}
+          >
+            Prev
+          </Button>
+          <h3 className="font-monospace">{page}</h3>
+          <Button
+            className="mx-3"
+            style={{ width: "100px" }}
+            onClick={() => {
+              if (topLeads?.length > 0) {
+                setPage(page + 1);
+              }
+            }}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );
