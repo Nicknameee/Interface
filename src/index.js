@@ -212,6 +212,34 @@ export async function createCategory(name: string, parentCategoryId?: string): P
   return (await res.json()).data;
 }
 
+export async function updateCategory(categoryId: string, name: string): Promise<Category> {
+  const res = await fetch(endpoints.updateCategoryEndpoint, {
+    method: "PUT",
+    headers: getDefaultHeaders(),
+    body: JSON.stringify({ categoryId, name }),
+  });
+
+  if (!res.ok) throw new Error("Something went wrong");
+
+  return (await res.json()).data;
+}
+
+export async function changeCategoryState(categoryId: string, state: boolean): Promise<Category> {
+  const queryParams = new URLSearchParams({ categoryId, state }).toString();
+
+  const res = await fetch(
+    process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/categories/switch/state?" + queryParams,
+    {
+      method: "PUT",
+      headers: getDefaultHeaders(),
+    }
+  );
+
+  if (!res.ok) throw new Error("Something went wrong");
+
+  return (await res.json()).data;
+}
+
 export async function setCategoryPicture(categoryId: string, picture: File): Promise<Category> {
   const formData = new FormData();
 
@@ -239,7 +267,7 @@ export async function setCategoryPicture(categoryId: string, picture: File): Pro
  */
 export async function getCategories(categoryFilter: CategoryFilter): Promise<Category[]> {
   if (categoryFilter === undefined) {
-    categoryFilter = CategoryFilter.build({ enabled: false });
+    categoryFilter = CategoryFilter.build({ enabled: null });
   }
 
   if (process.env.REACT_APP_PROFILE === "test") {
@@ -307,7 +335,7 @@ export async function getCategories(categoryFilter: CategoryFilter): Promise<Cat
         notifyError("Error in fetching categories detected: " + error);
       });
 
-    const categories = response.data.map((categoryData: any) => ({
+    const categories = response.data?.map((categoryData: any) => ({
       id: categoryData.id,
       name: categoryData.name,
       categoryId: categoryData.categoryId,
@@ -505,22 +533,44 @@ export async function getProductStatistics(productId: number): Promise<any> {
   return (await res.json()).data;
 }
 
-export async function getProfitStatistics(): Promise<any> {
-  const res = await fetch(process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/statistic/profit", {
-    method: "GET",
-    headers: getDefaultHeaders(),
-  });
+export async function getProfitStatistics(from, to, currency): Promise<any> {
+  const query = {};
+
+  if (from) query.from = from;
+  if (to) query.to = to;
+  if (currency) query.currency = currency;
+
+  const queryParams = new URLSearchParams(query).toString();
+
+  const res = await fetch(
+    process.env.REACT_APP_ORDER_SERVICE_ADDRESS + `/api/v1/products/statistic/profit?${queryParams}`,
+    {
+      method: "GET",
+      headers: getDefaultHeaders(),
+    }
+  );
 
   if (!res.ok) throw new Error("Something went wrong");
 
   return (await res.json()).data;
 }
 
-export async function getTopLeads(): Promise<any> {
-  const res = await fetch(process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/users/profit", {
-    method: "GET",
-    headers: getDefaultHeaders(),
-  });
+export async function getTopLeads(from?: string, to?: string, currency): Promise<any> {
+  const query = {};
+
+  if (from) query.from = from;
+  if (to) query.to = to;
+  if (currency) query.currency = currency;
+
+  const queryParams = new URLSearchParams(query).toString();
+
+  const res = await fetch(
+    process.env.REACT_APP_ORDER_SERVICE_ADDRESS + `/api/v1/products/users/profit?${queryParams}`,
+    {
+      method: "GET",
+      headers: getDefaultHeaders(),
+    }
+  );
 
   if (!res.ok) throw new Error("Something went wrong");
 

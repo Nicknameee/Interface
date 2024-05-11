@@ -13,6 +13,7 @@ export const certificationEndpoint =
 export const requestAdditionalApprovalUserMessage =
   process.env.REACT_APP_USER_SERVICE_ADDRESS + "/api/v1/users/approving/request/allowed";
 export const createCategoryEndpoint = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/categories/save"; //GET
+export const updateCategoryEndpoint = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/categories/update"; //GET
 export const setCategoryPictureEndpoint = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/categories/picture"; //GET
 export const getCategoriesEndpoint = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/categories/allowed"; //GET
 export const getProductsEndpoint = process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/allowed"; //GET

@@ -1,9 +1,9 @@
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import {Container, Row} from "react-bootstrap";
-import {useLocation} from "react-router-dom";
-import React, {useEffect, useState} from "react";
-import {getQueryParam} from "../../../index";
+import { Container, Row } from "react-bootstrap";
+import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { getQueryParam } from "../../../index";
 import ManagerControlPanel from "./ManagerControlPanel";
 import OutsideClickHandler from "../../handlers/OutsideClickHandler";
 import ViewUsers from "./user/ViewUsers";
@@ -17,6 +17,7 @@ import ViewTransactions from "./transactions/ViewTransactions.tsx";
 import AddTransaction from "./transactions/AddTransaction.tsx";
 import ViewProfitStatistics from "./statistics/ViewProfitStatistics.tsx";
 import ViewTopLeads from "./user/ViewTopLeads.tsx";
+import UpdateCategory from "./categories/UpdateCategory.tsx";
 
 const ManagerPersonalCabinet = () => {
   const location = useLocation();
@@ -52,6 +53,9 @@ const ManagerPersonalCabinet = () => {
       }
       case "addCategory": {
         return <AddCategory />;
+      }
+      case "updateCategory": {
+        return <UpdateCategory />;
       }
       case "viewPayment": {
         return <ViewTransactions />;
