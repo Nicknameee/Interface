@@ -577,9 +577,10 @@ export async function getProfitStatistics(from, to, currency): Promise<any> {
   return (await res.json()).data;
 }
 
-export async function getTopLeads(from?: string, to?: string, currency): Promise<any> {
+export async function getTopLeads(page, from?: string, to?: string, currency): Promise<any> {
   const query = {};
 
+  if (page) query.page = page;
   if (from) query.from = from;
   if (to) query.to = to;
   if (currency) query.currency = currency;
