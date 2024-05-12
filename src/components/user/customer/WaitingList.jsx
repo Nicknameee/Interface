@@ -7,10 +7,12 @@ import defaultImage from "../../../resources/imageNotFoundResource.png";
 import nothingHereSeems from "../../../resources/oh.png";
 import {redirectToProductPage, redirectToUI} from "../../../utilities/redirect";
 import {Button, Card} from "react-bootstrap";
+import {useLanguage} from "../../../contexts/language/language-context";
 
 const WaitingList = () => {
     const [waitingList: WaitingListProduct[], setWaitingList] = useState([]);
     const [updateCount, setUpdateCount] = useState(1);
+    const { language, setLanguage } = useLanguage();
 
     useEffect(() => {
         const init = async () => {
@@ -50,8 +52,16 @@ const WaitingList = () => {
                     :
                 <div className="w-100 h-100 d-flex justify-content-center align-items-center flex-wrap">
                     <img src={nothingHereSeems} className="w-auto mb-5" alt="Nothing Here"/>
-                    <h1 className="w-100 d-flex justify-content-center">You have no products in your waiting list...</h1>
-                    <h3 onClick={() => redirectToUI()} className="text-decoration-underline" style={{cursor: 'pointer'}}>Go to main</h3>
+                    <h1 className="w-100 d-flex justify-content-center">
+                        {
+                            language === 'EN' ? 'You have no products in your waiting list...' : 'У списку очікування немає жодного продукта'
+                        }
+                    </h1>
+                    <h3 onClick={() => redirectToUI()} className="text-decoration-underline" style={{cursor: 'pointer'}}>
+                        {
+                            language === 'EN' ? 'Go to main' : 'На головну сторінку'
+                        }
+                    </h3>
                 </div>
             }
         </div>

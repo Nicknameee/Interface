@@ -216,7 +216,7 @@ const CheckoutOrder = () => {
                 });
             };
         }
-    }, [cartUpdate]);
+    }, [cartUpdate, user]);
 
     useEffect(() => {
         if (paid) {
@@ -256,8 +256,16 @@ const CheckoutOrder = () => {
                                             <img src={item.introductionPictureUrl || defaultImage} alt={item.name} className="cart-item-image" style={{maxWidth: '150px', maxHeight: '150px', borderRadius: '15%', marginRight: '1em'}} />
                                             <div className="cart-item-details w-100">
                                                 <p className="font-monospace" style={{fontWeight: "bold"}}>{item.name}</p>
-                                                <p className="font-monospace" style={{fontWeight: "bold"}}>  Cost: {item.cost} {item.currency}</p>
-                                                <p className="font-monospace" style={{fontWeight: "bold"}}>Items: {item.itemsBooked}</p>
+                                                <p className="font-monospace" style={{fontWeight: "bold"}}>
+                                                    {
+                                                        language === 'EN' ? 'Cost: ' : 'Ціна(вартість): '
+                                                    }
+                                                    {item.cost} {item.currency}</p>
+                                                <p className="font-monospace" style={{fontWeight: "bold"}}>
+                                                    {
+                                                        language === 'EN' ? 'Items: ' : 'Кількість: '
+                                                    }
+                                                    {item.itemsBooked}</p>
                                                 <button className="btn btn-success w-50 m-1" onClick={() => handleChangeQuantity(item.productId, '+')} disabled={paid}>+</button>
                                                 <button className="btn btn-danger w-50 m-1" onClick={() => handleChangeQuantity(item.productId, '-')} disabled={item.itemsBooked === 0 || paid}>-</button>
                                             </div>

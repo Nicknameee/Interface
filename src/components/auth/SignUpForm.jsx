@@ -57,7 +57,7 @@ const SignUpForm = () => {
             if (language === 'EN') {
                 setUsernameException('Invalid username')
             } else {
-                setUsernameException('Юзернейм невалідний')
+                setUsernameException('Ім я користувача невалідне')
             }
         } else {
             setUsernameException('')
@@ -75,7 +75,7 @@ const SignUpForm = () => {
             if (language === 'EN') {
                 setEmailException('Invalid email')
             } else {
-                setEmailException('Емейл невалідний')
+                setEmailException('Електронна пошта невалідна')
             }
         } else {
             setEmailException('')
@@ -181,7 +181,7 @@ const SignUpForm = () => {
                 if (language === 'EN') {
                     setUsernameException('Invalid username')
                 } else {
-                    setUsernameException('Невалідний юзернейм')
+                    setUsernameException('Ім я користувача невалідне')
                 }
             }
             if (!email && !showTelegramInput) {
@@ -209,7 +209,7 @@ const SignUpForm = () => {
                 if (language === 'EN' ) {
                     setTelegramUsernameException('Invalid telegram username')
                 } else {
-                    setTelegramUsernameException('Телеграм юзернейм невалідний')
+                    setTelegramUsernameException('Телеграм ідентифікатор невалідний')
                 }
             }
         }
@@ -370,13 +370,13 @@ const SignUpForm = () => {
                      <Form.Group controlId="formUsername" className="m-3">
                          <Form.Label>
                              {
-                                 language === 'EN' ? 'Username' : 'Введіть ваш юзернейм...'
+                                 language === 'EN' ? 'Username' : 'Ім\'я користувача...'
                              }
                          </Form.Label>
                          <div className="input-container">
                              <Form.Control
                                  type="text"
-                                 placeholder={ language === 'EN' ? "Enter your username" : 'Введіть ваш юзернейм...'}
+                                 placeholder={ language === 'EN' ? "Enter your username" : 'Введіть ім\'я користувача...'}
                                  style={{paddingLeft: '30px'}}
                                  value={username}
                                  onChange={(e) => handleUsernameChange(e.target.value) } />
@@ -458,7 +458,7 @@ const SignUpForm = () => {
                                  <FontAwesomeIcon icon={faAsterisk} className="required-field" title='This field is required'/>
                                  <Form.Control
                                      type="text"
-                                     placeholder={language === 'EN' ? "Enter your Telegram nickname => TELEGRAM" : 'Телеграм юзернейм'}
+                                     placeholder={language === 'EN' ? "Enter your Telegram nickname => TELEGRAM" : 'Телеграм ім\'я користувача'}
                                      style={{paddingLeft: '30px'}}
                                      value={telegramUsername}
                                      onChange={(e) => handleTelegramNicknameChange(e.target.value)}

@@ -24,11 +24,11 @@ const ViewCategories = () => {
   }, []);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 20 }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: 'center', paddingTop: 20 }}>
       <ListGroup style={{ width: "600px" }}>
         <ListGroupItem className="d-flex justify-content-between align-items-center">
           <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
-            {language === "EN" ? "Category ID:" : "ІД категорії:"}
+            {language === "EN" ? "Category ID:" : "Ідентифікатор категорії:"}
           </div>
           <input
             type="text"
@@ -39,7 +39,7 @@ const ViewCategories = () => {
           />
         </ListGroupItem>
         <ListGroupItem className="d-flex justify-content-between align-items-center">
-          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>{language === "EN" ? "Status:" : "Статус:"}</div>
+          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>{language === "EN" ? "Status: " : "Статус: "}</div>
           <Form.Select value={isBlocked} onChange={(e) => setIsBlocked(e.target.value)} size="lg">
             <option value="ALL">{language === "EN" ? "All" : "Всі"}</option>
             <option value="BLOCKED">{language === "EN" ? "Blocked" : "Заблоковано"}</option>
@@ -76,65 +76,74 @@ const ViewCategories = () => {
           </Button>
         </ListGroupItem>
       </ListGroup>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "30px 2%", marginTop: "20px", marginBottom: "13vh" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: 'center', gap: "30px 2%", marginTop: "20px", marginBottom: "13vh" }}>
         {categories?.map((category) => (
-          <Card style={{ width: "23.5%" }}>
+          <Card style={{ width: "23.5%", minWidth: '450px' }}>
             <Card.Img
               src={category.pictureUrl ?? "https://info.renome.ua/wp-content/uploads/2021/09/placeholder.png"}
             />
             <Card.Body>
               <Card.Title>{category.name}</Card.Title>
             </Card.Body>
-            <Button
-              style={{ marginTop: 4 }}
-              onClick={() =>
-                (window.location.href = `/manager/personal?option=updateCategory&categoryId=${category.categoryId}&name=${category.name}`)
-              }
-            >
-              {language === "EN" ? "Update category" : "Оновити категорію"}
-            </Button>
-            {category.enabled ? (
-              <Button
-                style={{ marginTop: 4 }}
-                onClick={async () => {
-                  await changeCategoryState(category.categoryId, false);
-                  category.enabled = false;
-                  setCategories([...categories]);
-                }}
-              >
-                {language === "EN" ? "Block category" : "Заблокувати категорію"}
-              </Button>
-            ) : (
-              <Button
-                style={{ marginTop: 4 }}
-                onClick={async () => {
-                  await changeCategoryState(category.categoryId, true);
-                  category.enabled = true;
-                  setCategories([...categories]);
-                }}
-              >
-                {language === "EN" ? "Unblock category" : "Розблокувати категорію"}
-              </Button>
-            )}
-            <Button
-              style={{ marginTop: 4 }}
-              onClick={() =>
-                (window.location.href = `/manager/personal?option=viewProduct&categoryId=${category.categoryId}`)
-              }
-            >
-              {language === "EN" ? "View categories products" : "Список продуктів категорії"}
-            </Button>
-            <Button style={{ marginTop: 4 }} onClick={() => navigate(`/product/new?categoryId=${category.categoryId}`)}>
-              {language === "EN" ? "Add product to category" : "Новий продукт у категорію"}
-            </Button>
-            <Button
-              style={{ marginTop: 4 }}
-              onClick={() =>
-                (window.location.href = `/manager/personal?option=addCategory&parentCategoryId=${category.categoryId}`)
-              }
-            >
-              {language === "EN" ? "Add child category" : "Нова субкатегорія"}
-            </Button>
+            <div className="d-flex flex-wrap gap-1 justify-content-center">
+                <Button
+                    style={{ marginTop: 4, width: '49%' }}
+                    onClick={() =>
+                        (window.location.href = `/manager/personal?option=updateCategory&categoryId=${category.categoryId}&name=${category.name}`)
+                    }
+                >
+                    {language === "EN" ? "Update category" : "Оновити категорію"}
+                </Button>
+                {category.enabled ? (
+                    <Button
+                        style={{ marginTop: 4, width: '49%' }}
+                        className="btn-danger"
+                        onClick={async () => {
+                            if (await changeCategoryState(category.categoryId, false)) {
+                                category.enabled = false;
+                                setCategories([...categories]);
+                                window.location.reload()
+                            }
+                        }}
+                    >
+                        {language === "EN" ? "Block category" : "Заблокувати категорію"}
+                    </Button>
+                ) : (
+                    <Button
+                        style={{ marginTop: 4, width: '49%' }}
+                        className="btn-success"
+                        onClick={async () => {
+                            if (await changeCategoryState(category.categoryId, true)) {
+                                category.enabled = true;
+                                setCategories([...categories]);
+                                window.location.reload()
+                            }
+                        }}
+                    >
+                        {language === "EN" ? "Unblock category" : "Розблокувати категорію"}
+                    </Button>
+                )}
+                <Button
+                    style={{ marginTop: 4, width: '49%' }}
+                    onClick={() =>
+                        (window.location.href = `/manager/personal?option=viewProduct&categoryId=${category.categoryId}`)
+                    }
+                >
+                    {language === "EN" ? "View categories products" : "Список продуктів категорії"}
+                </Button>
+                <Button style={{ marginTop: 4, width: '50%' }} onClick={() => navigate(`/product/new?categoryId=${category.categoryId}`)}>
+                    {language === "EN" ? "Add product to category" : "Створити новий продукт у категорію"}
+                </Button>
+                <Button
+                    className="btn-info"
+                    style={{ marginTop: 4, width: '100%' }}
+                    onClick={() =>
+                        (window.location.href = `/manager/personal?option=addCategory&parentCategoryId=${category.categoryId}`)
+                    }
+                >
+                    {language === "EN" ? "Add child category" : "Нова субкатегорія"}
+                </Button>
+            </div>
           </Card>
         ))}
       </div>

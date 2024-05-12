@@ -102,7 +102,7 @@ const DeliveryAddress = ({country, deliveryData, setDeliveryTypeExt}) => {
                     <div className="w-100 d-flex justify-content-center flex-wrap">
                         <h5>
                             {
-                                language === 'EN' ? 'No delivery, order must be taken at pickup point' : 'Доставка необрана, замовлення можна забрати у пункті видачі лише'
+                                language === 'EN' ? 'No delivery, order must be taken at pickup point' : 'Доставка недоступна, замовлення можна забрати у пункті видачі лише'
                             }
                         </h5>
                     </div>

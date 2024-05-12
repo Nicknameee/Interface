@@ -165,7 +165,11 @@ const ProductComponent = () => {
                                         <div>
                                             <h2 className="mb-4">{product.name}</h2>
                                             <div className="p-3 rounded" style={{ backgroundColor: '#252626' }}>
-                                                <p className="mb-3"><strong>Brand:</strong> {product.brand || 'Unknown'}</p>
+                                                <p className="mb-3"><strong>
+                                                    {
+                                                        language === 'EN' ? 'Brand: ' : 'Бренд'
+                                                    }
+                                                </strong> {product.brand || 'Unknown'}</p>
                                                 <p className="mb-3"><strong>Price:</strong> {product.cost} {product.currency}</p>
                                                 {Object.entries(product.parameters).map(([key, value]) => (
                                                     <p key={key} className="mb-3"><strong>{key}:</strong> {value || 'Unknown'}</p>

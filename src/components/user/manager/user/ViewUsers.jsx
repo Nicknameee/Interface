@@ -117,12 +117,12 @@ const ViewUsers = () => {
 
   return (
     <div className="w-100 h-100 d-flex justify-content-around py-3">
-      <Col md={3} className="position-sticky">
+      <Col md={4} className="position-sticky">
         <ListGroup>
           <ListGroupItem className="d-flex justify-content-between align-items-center">
             <span>
               {
-                 'Username: '
+                 language === 'EN' ? 'Username: ' : 'Ім\'я користувача: '
               }
             </span>
             <input
@@ -130,13 +130,19 @@ const ViewUsers = () => {
               name="usernamePrompt"
               value={filters.usernamePrompt}
               className="form-control"
-              placeholder="Username"
+              placeholder={language === 'EN' ? 'Username' : 'Ім\'я користувача'}
               onChange={(e) => updateFilterUsername(e.target.value)}
             />
             <FontAwesomeIcon
               icon={faQuestion}
               style={{ color: "orange", cursor: "pointer" }}
-              onClick={() => notifySuccess("Your prompt is used as prefix to search usernames")}
+              onClick={() => {
+                if (language === 'EN') {
+                  notifySuccess("Your prompt is used as prefix to search usernames")
+                } else {
+                  notifySuccess('Ваш запит буде використано для пошуку користувача за префіксом імені')
+                }
+            }}
             />
           </ListGroupItem>
           <ListGroupItem className="d-flex justify-content-between align-items-center">
@@ -152,7 +158,14 @@ const ViewUsers = () => {
             <FontAwesomeIcon
               icon={faQuestion}
               style={{ color: "orange", cursor: "pointer" }}
-              onClick={() => notifySuccess("Your prompt is used as prefix to search email")}
+              onClick={() => {
+                if (language === 'EN') {
+                  notifySuccess("Your prompt is used as prefix to search email")
+                } else {
+                  notifySuccess('Ваш запит буде використано для поушку користувача за префіксом пошти')
+                }
+              }
+              }
             />
           </ListGroupItem>
           <ListGroupItem className="d-flex justify-content-between align-items-center">
@@ -168,7 +181,14 @@ const ViewUsers = () => {
             <FontAwesomeIcon
               icon={faQuestion}
               style={{ color: "orange", cursor: "pointer" }}
-              onClick={() => notifySuccess("Your prompt is used as prefix to search telegram")}
+              onClick={() => {
+                if (language === 'EN') {
+                  notifySuccess("Your prompt is used as prefix to search telegram")
+                } else {
+                  notifySuccess('Ваш запит буде використано для поушку користувача за префіксом телеграму')
+                }
+              }
+            }
             />
           </ListGroupItem>
           <ListGroupItem className="d-flex justify-content-between align-items-center flex-wrap">
@@ -231,7 +251,6 @@ const ViewUsers = () => {
               {
                 language === 'EN' ? 'Drop Filters' : 'Скинути фільтрацію'
               }
-
             </Button>
           </ListGroupItem>
         </ListGroup>
@@ -244,7 +263,7 @@ const ViewUsers = () => {
                 <div className="d-flex justify-content-between align-items-center">
                   <span>
                     {
-                      language === 'EN' ? 'Username: ' : 'Юзернейм: '
+                      language === 'EN' ? 'Username: ' : 'Ім\'я: '
                     }
                     {user.username} | Status: {user.status} | Online:{" "}
                     {String(user.loginTime > user.logoutTime).toUpperCase()}
@@ -257,7 +276,7 @@ const ViewUsers = () => {
                   <ListGroup>
                     <ListGroupItem>
                       {
-                        language === 'EN' ? 'Username: ' : 'Юзернейм: '
+                        language === 'EN' ? 'Username: ' : 'Ім\'я: '
                       }
                       {user.username}</ListGroupItem>
                     <ListGroupItem>Email: {user.email || "UNKNOWN"}</ListGroupItem>
@@ -309,7 +328,11 @@ const ViewUsers = () => {
           ))
         ) : (
           <div>
-            <h1 className="font-monospace my-3">No users...</h1>
+            <h1 className="font-monospace my-3">
+              {
+                language === 'EN' ? 'No users...' : 'Немає користувачів'
+              }
+            </h1>
             <h3 onClick={() => redirectToUI()} className="text-decoration-underline" style={{ cursor: "pointer" }}>
               {
                 language === 'EN' ? 'Go to main' : 'Відкрити головну сторінку'

@@ -25,7 +25,11 @@ const AddTransaction = () => {
         notifySuccess("Ваш платіж було зареєстровано");
       }
     } catch (e) {
-      notifyError("Something went wrong");
+      if (language === 'EN') {
+        notifyError("Something went wrong");
+      } else {
+        notifyError('Щось пішло не так')
+      }
     }
   };
 
@@ -44,7 +48,7 @@ const AddTransaction = () => {
             required
             size="lg"
             type="text"
-            placeholder="Enter order number"
+            placeholder={ language === 'EN' ? "Enter order number" : 'Уведіть номер замовлення'}
           />
         </Form.Group>
         <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -59,11 +63,13 @@ const AddTransaction = () => {
             required
             size="lg"
             type="number"
-            placeholder="Enter payment amount"
+            placeholder={ language === 'EN' ? "Enter payment amount" : 'Уведіть суму транзакції'}
           />
         </Form.Group>
         <Button size="lg" type="submit">
-          Add Payment
+          {
+            language === 'EN' ? 'Add Payment' : 'Зареєструвати транзакцію'
+          }
         </Button>
       </Form>
     </div>

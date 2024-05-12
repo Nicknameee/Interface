@@ -53,7 +53,11 @@ const ViewProducts = () => {
         setStatistics(statistics.slice(0, 16));
       })
       .catch(() => {
-        notifyError("Something went wrong");
+        if (language === 'EN') {
+            notifyError("Something went wrong");
+        } else {
+            notifyError('Щось пішло не так')
+        }
       });
   }, [isModalOpen, selectedProductId]);
 
@@ -111,7 +115,7 @@ const ViewProducts = () => {
         <ListGroupItem className="d-flex justify-content-between align-items-center" style={{ backgroundColor: 'pink' }}>
           <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
               {
-                  language === 'EN' ? 'Price to:' : 'Ціна макс:'
+                  language === 'EN' ? 'Price to: ' : 'Ціна макс: '
               }
           </div>
           <input
@@ -125,7 +129,7 @@ const ViewProducts = () => {
         <ListGroupItem className="d-flex align-items-center" style={{ backgroundColor: 'pink' }}>
           <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
               {
-                  language === 'EN' ? 'Is blocked:' : 'Заблоковано'
+                  language === 'EN' ? 'Is blocked: ' : 'Заблоковано: '
               }
           </div>
           <div className="d-flex">
@@ -140,7 +144,7 @@ const ViewProducts = () => {
         <ListGroupItem className="d-flex align-items-center" style={{ backgroundColor: 'pink' }}>
           <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>
               {
-                  language === 'EN' ? 'Is present:' : 'Чи доступний:'
+                  language === 'EN' ? 'Is present: ' : 'Чи доступний: '
               }
           </div>
           <div className="d-flex">
@@ -297,7 +301,7 @@ const ViewProducts = () => {
                         {product.categoryId}</ListGroupItem>
                     <ListGroupItem key={crypto.randomUUID()}>
                         {
-                            language === 'EN' ? 'Margin Rate:' : 'Відношення виручки'
+                            language === 'EN' ? 'Margin Rate: ' : 'Відношення виручки: '
                         }
                         {product.marginRate}</ListGroupItem>
                     <ListGroupItem key={crypto.randomUUID()}>
@@ -378,7 +382,8 @@ const ViewProducts = () => {
             {
                 language === 'EN' ? 'No products were found....' : 'Не знайдено жодного продукта....'
             }
-        </h4>}
+        </h4>
+        }
         {
           <div className="w-100 d-flex justify-content-center align-items-center">
             <Button

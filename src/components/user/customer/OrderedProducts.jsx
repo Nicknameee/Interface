@@ -26,7 +26,9 @@ const OrderedProducts = ({orderedProducts, toggleProduct, selectedProductId}) =>
                                     {
                                         language === 'EN' ? 'Product Name: ' : 'Назва продукції: '
                                     }
-                                    <strong title={'Go to product page'} onClick={() => redirectToProductPage(orderedProduct.product.productId)} style={{cursor: 'pointer', textDecoration: 'underline'}}> {orderedProduct.product.name}</strong>
+                                    <strong title={'Go to product page'}
+                                            onClick={() => redirectToProductPage(orderedProduct.product.productId)}
+                                            style={{cursor: 'pointer', textDecoration: 'underline'}}> {orderedProduct.product.name}</strong>
                                 </ListGroupItem>
                                 <ListGroupItem key={crypto.randomUUID()}>
                                     {
@@ -44,7 +46,8 @@ const OrderedProducts = ({orderedProducts, toggleProduct, selectedProductId}) =>
                                     {
                                         language === 'EN' ? 'Total Cost: ' : 'Загальна вартість: '
                                     }
-                                    {orderedProduct.productAmount} * {orderedProduct.product.cost} = > {orderedProduct.productAmount * orderedProduct.product.cost} {orderedProduct.product.currency}
+                                    {orderedProduct.productAmount} * {orderedProduct.product.cost} = >
+                                    {orderedProduct.productAmount * orderedProduct.product.cost} {orderedProduct.product.currency}
                                 </ListGroupItem>
                             </ListGroup>
                         </CardBody>

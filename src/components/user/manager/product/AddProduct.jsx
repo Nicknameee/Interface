@@ -1,13 +1,13 @@
-import { useLocation } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { addProduct, setProductPicture, setProductPictures, getQueryParam } from "../../../../index";
-import { notifyError, notifySuccess } from "../../../../utilities/notify";
+import {useLocation} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {addProduct, getQueryParam, setProductPicture, setProductPictures} from "../../../../index";
+import {notifyError, notifySuccess} from "../../../../utilities/notify";
 import OutsideClickHandler from "../../../handlers/OutsideClickHandler";
 import Header from "../../../components/Header";
-import { Button, Col, Form, FormCheck } from "react-bootstrap";
+import {Button, Col, Form, FormCheck} from "react-bootstrap";
 import ManagerControlPanel from "../ManagerControlPanel";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAsterisk } from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faAsterisk} from "@fortawesome/free-solid-svg-icons";
 import Footer from "../../../components/Footer";
 import {useLanguage} from "../../../../contexts/language/language-context";
 
@@ -37,7 +37,7 @@ const AddProduct = () => {
       return;
     }
 
-    if (!/^[a-zA-Z0-9\s]{3,33}$/.test(value) && value) {
+    if (!value || String(value).length > 64) {
       if (language === 'EN') {
         setProductNameException("Invalid product name");
       } else {
@@ -58,11 +58,11 @@ const AddProduct = () => {
       return;
     }
 
-    if (!/^[a-zA-Z0-9\s]{5,33}$/.test(value) && value) {
+    if (!value || String(value).length > 64) {
       if (language === 'EN'     ) {
         setProductBrandException("Invalid product brand");
       } else {
-        setProductBrandException("Невалідна бренд продукту");
+        setProductBrandException("Невалідний бренд продукту");
       }
     } else {
       setProductBrandException("");
@@ -79,11 +79,11 @@ const AddProduct = () => {
       return;
     }
 
-    if (value && String(value).length > 300) {
+    if (value && String(value).length > 400) {
       if (language === 'EN') {
-        setDescriptionException("Invalid description, text must be not longer than 300 symbols");
+        setDescriptionException("Invalid description, text must be not longer than 400 symbols");
       } else {
-        setDescriptionException("Невалідний опис так як текст не може бути довше за 300 символів");
+        setDescriptionException("Невалідний опис так як текст не може бути довше за 400 символів");
       }
     } else {
       setDescriptionException("");
@@ -151,7 +151,7 @@ const AddProduct = () => {
         if (language === 'EN') {
           notifyError("Duplicate key, can not allow same param name");
         } else {
-          notifyError("Заборонено додати параметр, це ім я вже зайняте");
+          notifyError("Заборонено додати параметр, це ім\'я вже зайняте");
         }
       } else {
         setParameters((prevParameters) => ({
@@ -188,19 +188,35 @@ const AddProduct = () => {
     parametersException = [];
     if (validity) {
       if (parameters["height"] === undefined || parameters["height"] === null || parameters["height"] < 1) {
-        parametersException.push('Parameter "height" is absent or invalid value');
+        if (language === 'EN') {
+          parametersException.push('Parameter "height" is absent or invalid value');
+        } else {
+          parametersException.push('Обов\'язковий параметр "height" відсутній або має значення менше 1');
+        }
         validity = false;
       }
       if (parameters["width"] === undefined || parameters["width"] === null || parameters["width"] < 1) {
-        parametersException.push('Parameter "width" is absent or invalid value');
+        if (language === 'EN') {
+          parametersException.push('Parameter "width" is absent or invalid value');
+        } else {
+          parametersException.push('Обов\'язковий параметр "width" відсутній або має значення менше 1');
+        }
         validity = false;
       }
       if (parameters["length"] === undefined || parameters["length"] === null || parameters["length"] < 1) {
-        parametersException.push('Parameter "length" is absent or invalid value');
+        if (language === 'EN') {
+          parametersException.push('Parameter "length" is absent or invalid value');
+        } else {
+          parametersException.push('Обов\'язковий параметр "length" відсутній або має значення менше 1');
+        }
         validity = false;
       }
       if (parameters["weight"] === undefined || parameters["weight"] === null || parameters["weight"] < 1) {
-        parametersException.push('Parameter "weight" is absent or invalid value');
+        if (language === 'EN') {
+          parametersException.push('Parameter "weight" is absent or invalid value');
+        } else {
+          parametersException.push('Обов\'язковий параметр "weight" відсутній або має значення менше 1');
+        }
         validity = false;
       }
     }
@@ -220,7 +236,7 @@ const AddProduct = () => {
       if (language === 'EN') {
         setItemsLeftException("Invalid remaining items number");
       } else {
-        setItemsLeftException('Невалідна кількість')
+        setItemsLeftException('Невалідна кількість залишку товару')
       }
     } else {
       setItemsLeftException("");
@@ -243,13 +259,19 @@ const AddProduct = () => {
 
     if (result) {
       if (picture) {
-        await setProductPicture(result.data.productId, picture);
+        await setProductPicture(result.data.productId, picture).then();
+        notifySuccess('Introduction picture saved successfully')
       }
       if (pictures) {
         await setProductPictures(result.data.productId, Array.from(pictures));
+        notifySuccess('Extra pictures saved successfully')
       }
 
-      notifySuccess("Product saved");
+      if (language === 'EN') {
+        notifySuccess("Product saved");
+      } else {
+        notifySuccess("Успішно збережено продукт, очікуйте...");
+      }
 
       window.location.reload();
     }
@@ -283,6 +305,14 @@ const AddProduct = () => {
   };
 
   const handleRemoveParam = (key) => {
+    if (['height', 'weight', 'width', 'length'].includes(key)) {
+      if (language === 'EN') {
+        notifyError('You can not remove required param, only edit')
+      } else {
+        notifyError('Ви не можете прибрати обов язкові параметри, лише змінити значення')
+      }
+      return;
+    }
     const { [key]: _, ...rest } = parameters;
     setParameters(rest);
   };
@@ -324,7 +354,7 @@ const AddProduct = () => {
                 <div className="input-container">
                   <Form.Control
                     type="text"
-                    placeholder="Enter product name"
+                    placeholder={ language === 'EN' ? "Enter product name" : 'Уведіть назву продукту'}
                     style={{ paddingLeft: "30px" }}
                     value={productName}
                     onChange={(e) => handleProductNameChange(e.target.value)}
@@ -347,7 +377,7 @@ const AddProduct = () => {
                 <div className="input-container">
                   <Form.Control
                     type="text"
-                    placeholder="Enter product brand"
+                    placeholder={ language === 'EN' ? "Enter product brand" : 'Уведіть продуктовий бренд'}
                     style={{ paddingLeft: "30px" }}
                     value={productBrand}
                     onChange={(e) => handleProductBrandChange(e.target.value)}
@@ -355,7 +385,7 @@ const AddProduct = () => {
                   <FontAwesomeIcon
                     icon={faAsterisk}
                     className="required-field"
-                    title="This field is required if telegram is not specified"
+                    title="This field is required"
                   />
                 </div>
                 <p
@@ -374,7 +404,7 @@ const AddProduct = () => {
                 </Form.Label>
                 <div className="input-container">
                   <textarea
-                    placeholder="Enter product description"
+                    placeholder={ language === 'EN' ? "Enter product description" : 'Уведіть опис продукту'}
                     style={{
                       paddingLeft: "30px",
                       height: "100px",
@@ -493,7 +523,7 @@ const AddProduct = () => {
                   <div className="input-container">
                     <Form.Control
                       type="number"
-                      placeholder="Enter product margin rate"
+                      placeholder={ language === 'EN' ? "Enter product margin rate" : 'Уведіть відношення виручки'}
                       min={1}
                       style={{ paddingLeft: "30px" }}
                       value={marginRate}
@@ -520,7 +550,7 @@ const AddProduct = () => {
                     <Form.Control
                       type="number"
                       min={0}
-                      placeholder="Enter number of remaining items"
+                      placeholder={ language === 'EN' ? "Enter number of remaining items" : 'Уведіть к-сть товарів'}
                       style={{ paddingLeft: "30px" }}
                       value={itemsLeft}
                       onChange={(e) => handleItemsLeftUpdate(e.target.value)}
@@ -587,7 +617,9 @@ const AddProduct = () => {
                       />
                     </Form.Group>
                     <Button variant="danger" onClick={() => handleRemoveParam(key)}>
-                      Remove
+                      {
+                        language === 'EN' ? 'Remove' : 'Прибрати'
+                      }
                     </Button>
                     <hr />
                   </div>

@@ -297,7 +297,7 @@ const EditProduct = () => {
                 <div className="input-container">
                   <Form.Control
                     type="text"
-                    placeholder="Enter product name"
+                    placeholder={ language === 'EN' ? "Enter product name" : 'Уведіть Ім\'я продукту'}
                     style={{ paddingLeft: "30px" }}
                     value={productName}
                     onChange={(e) => handleProductNameChange(e.target.value)}
@@ -328,7 +328,7 @@ const EditProduct = () => {
                   <FontAwesomeIcon
                     icon={faAsterisk}
                     className="required-field"
-                    title="This field is required if telegram is not specified"
+                    title="This field is required"
                   />
                 </div>
                 <p
@@ -347,7 +347,7 @@ const EditProduct = () => {
                  </Form.Label>
                 <div className="input-container">
                   <textarea
-                    placeholder="Enter product brand"
+                    placeholder={ language === 'EN' ? "Enter product brand" : 'Уведіть бренд продукту'}
                     style={{
                       paddingLeft: "30px",
                       height: "100px",
@@ -378,7 +378,7 @@ const EditProduct = () => {
                   <Form.Control
                     type="number"
                     min={1}
-                    placeholder="Enter products cost"
+                    placeholder={ language === 'EN' ? "Enter products cost" : 'Уведіть ціну продукту'}
                     style={{ paddingLeft: "30px" }}
                     value={cost}
                     readOnly={costException !== ""}
@@ -402,7 +402,11 @@ const EditProduct = () => {
                     }
                   </Form.Label>
                   <div className="input-container">
-                    <span>Status:</span>
+                    <span>
+                      {
+                        language === 'EN' ? 'Status: ' : 'Статус: '
+                      }
+                    </span>
                     <div className="d-flex">
                       <FormCheck
                         className="w-25"
@@ -467,7 +471,7 @@ const EditProduct = () => {
                   <div className="input-container">
                     <Form.Control
                       type="number"
-                      placeholder="Enter product margin rate"
+                      placeholder={ language === 'EN' ? "Enter product margin rate" : 'Уведіть відношення виручки продукту'}
                       min={1}
                       style={{ paddingLeft: "30px" }}
                       value={marginRate}
@@ -494,7 +498,7 @@ const EditProduct = () => {
                     <Form.Control
                       type="number"
                       min={0}
-                      placeholder="Enter number of remaining items"
+                      placeholder={ language === 'EN' ? "Enter number of remaining items" : 'Уведіть к-сть залишку продукції' }
                       style={{ paddingLeft: "30px" }}
                       value={itemsLeft}
                       onChange={(e) => handleItemsLeftUpdate(e.target.value)}

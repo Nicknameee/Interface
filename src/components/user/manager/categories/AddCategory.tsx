@@ -4,6 +4,7 @@ import {createCategory, setCategoryPicture} from "../../../..";
 import {notifyError, notifySuccess} from "../../../../utilities/notify";
 import {useSearchParams} from "react-router-dom";
 import { useLanguage } from "../../../../contexts/language/language-context";
+import { redirectToViewCategory } from "../../../../utilities/redirect";
 
 const AddCategory = () => {
   const [name, setName] = useState("");
@@ -24,14 +25,23 @@ const AddCategory = () => {
         await setCategoryPicture(category?.categoryId, picture);
       }
 
-      notifySuccess("Category was created successfully");
+      if (language === 'EN') {
+        notifySuccess("Category was created successfully");
+      } else {
+        notifySuccess('Успішно створено категорію')
+      }
+      setTimeout(() => window.location.reload(), 1500);
     } catch (e) {
-      notifyError("Something went wrong");
+      if (language === 'EN') {
+        notifyError("Something went wrong");
+      } else {
+        notifyError("Щось пішло не так!")
+      }
     }
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+    <div style={{ display: "flex", flexWrap: 'wrap', justifyContent: "center", marginTop: "20px" }}>
       <Form onSubmit={handleSubmit} style={{ background: "white", borderRadius: 8, padding: 20, width: 600 }}>
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label required style={{ fontSize: 16 }}>
@@ -62,6 +72,9 @@ const AddCategory = () => {
           }
         </Button>
       </Form>
+      <Button style={{width: '70%', marginTop: '30px'}} onClick={() => redirectToViewCategory()}>
+        {language === 'EN' ? 'Go back to view categories' : 'На сторінку перегляду категорій'}
+      </Button>
     </div>
   );
 };

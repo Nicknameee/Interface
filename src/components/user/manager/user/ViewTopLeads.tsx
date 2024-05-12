@@ -19,7 +19,14 @@ const ViewTopLeads = () => {
   useEffect(() => {
     getTopLeads(undefined, undefined, "UAH")
       .then((res) => setTopLeads(res))
-      .catch(() => notifyError("Something went wrong"));
+      .catch(() => {
+            if (language === 'EN') {
+              notifyError("Something went wrong")
+            } else {
+              notifyError('Щось пішло не так')
+            }
+          }
+      );
   }, []);
 
   return (
@@ -58,7 +65,14 @@ const ViewTopLeads = () => {
             onClick={() => {
               getTopLeads(fromDate, toDate, currency)
                 .then((res) => setTopLeads(res))
-                .catch(() => notifyError("Something went wrong"));
+                .catch(() => {
+                      if (language === 'EN') {
+                        notifyError("Something went wrong")
+                      } else {
+                        notifyError('Щось пішло не така')
+                      }
+                    }
+                );
             }}
           >
             {language === "EN" ? "Filter" : "Фільтр"}
@@ -90,7 +104,7 @@ const ViewTopLeads = () => {
               >
                 <div className="d-flex justify-content-between align-items-center">
                   <span>
-                    {language === "EN" ? " Customer ID: " : " Ідентифікатор користуачач: "}
+                    {language === "EN" ? " Customer ID: " : " Ідентифікатор користувача: "}
                     {lead.customerId} |{language === "EN" ? " Total Profit: " : " Загальна виручка: "}
                     {lead.totalProfit} |{language === "EN" ? " Currency: " : " Валюта виручки: "}
                     {lead.currency}{" "}

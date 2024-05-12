@@ -39,6 +39,10 @@ const root: Root = ReactDOM.createRoot(document.getElementById("root"));
  * Function that return new Headers() {Content-Type and Auth if user is authenticated}
  * @returns {Headers} - Default headers for communication with backend
  */
+function getLanguage() {
+  return localStorage.getItem('language') ?? 'EN';
+}
+
 export function getDefaultHeaders(): Headers {
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
@@ -103,6 +107,7 @@ export const signIn = async (login, password): boolean => {
     body: JSON.stringify(requestData),
   };
 
+  let expiresAt;
   let isSuccessful: boolean = await fetch(`${endpoints.signInEndpoint}?${queryParams}`, requestOptions)
     .then((response) => {
       if (!response.ok) {
@@ -113,6 +118,7 @@ export const signIn = async (login, password): boolean => {
     })
     .then((json) => {
       if (json && json.status === "OK") {
+        expiresAt = json.data["expires_at"];
         setCookie("token", json.data["token"], json.data["expires_at"]);
 
         return true;
@@ -127,7 +133,7 @@ export const signIn = async (login, password): boolean => {
     });
 
   if (isSuccessful) {
-    await fetchUserInfo();
+    await fetchUserInfo(expiresAt);
   }
 
   return isSuccessful;
@@ -224,7 +230,7 @@ export async function updateCategory(categoryId: string, name: string): Promise<
   return (await res.json()).data;
 }
 
-export async function changeCategoryState(categoryId: string, state: boolean): Promise<Category> {
+export async function changeCategoryState(categoryId: string, state: boolean): Promise<boolean> {
   const queryParams = new URLSearchParams({ categoryId, state }).toString();
 
   const res = await fetch(
@@ -237,7 +243,23 @@ export async function changeCategoryState(categoryId: string, state: boolean): P
 
   if (!res.ok) throw new Error("Something went wrong");
 
-  return (await res.json()).data;
+  const data = (await res.json());
+
+  if (data) {
+    if (data['exception']) {
+      notifyError(data['exception']['exception'])
+    } else {
+      if (localStorage.getItem('language') === 'EN') {
+        notifySuccess('Category state changed successfully')
+      } else {
+        notifySuccess('Категорію змінено успішно')
+      }
+
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export async function setCategoryPicture(categoryId: string, picture: File): Promise<Category> {
@@ -1032,7 +1054,7 @@ export async function updateOrder(orderId: number, nextStatus: string) {
   return data.data;
 }
 
-export async function fetchUserInfo(): User {
+export async function fetchUserInfo(expiresAt): User {
   const requestOptions = {
     method: "GET",
     headers: getDefaultHeaders(),
@@ -1049,7 +1071,7 @@ export async function fetchUserInfo(): User {
     .then((data) => {
       if (data && data.status === "OK") {
         if (data["data"]) {
-          setCookie("userInfo", JSON.stringify(data["data"]));
+          setCookie("userInfo", JSON.stringify(data["data"], expiresAt));
 
           return User.build(data["data"]);
         }
@@ -1109,7 +1131,11 @@ export async function searchForProducts(searchBy: string, page: number): Product
     })
     .then((data) => {
       if (!data || data.length < 1) {
-        notifyError("No products were found by your prompt");
+        if (getLanguage() === 'EN') {
+          notifyError("No products were found by your prompt");
+        } else {
+          notifyError('Не знайдено продуктів за вашим пошуком')
+        }
       }
 
       return data;
@@ -1143,7 +1169,11 @@ export async function checkTelegramUsernameExists(telegramUsername: string): boo
     .then((data) => {
       if (data.status === "OK") {
         if (!data["data"]) {
-          notifyError("Telegram username was not found as known");
+          if (getLanguage() === 'EN') {
+            notifyError("Telegram username was not found as known");
+          } else {
+            notifyError('Ім я користувача Telegram не було знайдено')
+          }
         }
 
         return data["data"];
@@ -1242,7 +1272,11 @@ export async function getOrderHistory(orderFilter: OrderFilter): OrderHistory[] 
     })
     .then((history) => {
       if (!history || history.length < 1) {
-        notifyError("Order history was not found for this order");
+        if (getLanguage() === 'EN') {
+          notifyError("Order history was not found for this order");
+        } else {
+          notifyError('Історія замовлення відсутня')
+        }
       }
 
       return history;
@@ -1272,7 +1306,11 @@ export async function requestAdditionalApprovalCode(identifier: string): boolean
     })
     .then((data) => {
       if (data && data.status === "OK") {
-        notifySuccess("Additional verification code was requested, wait please...");
+        if (getLanguage() === 'EN') {
+          notifySuccess("Additional verification code was requested, wait please...");
+        } else {
+          notifySuccess('Запит на отримання додаткового коду було виконано очікуйте будь ласка')
+        }
 
         return true;
       } else {
@@ -1319,15 +1357,32 @@ export async function initiateCredentialsAvailabilityChecking(
     })
     .then((json) => {
       if (json.data.email === false && email !== "") {
-        setEmailException("User with this email already exists");
-        result = false;
+          if (getLanguage() === 'EN') {
+            setEmailException("User with this email already exists");
+          } else {
+            setEmailException('Поштова адреса зайнята')
+          }
+
+          result = false;
       }
+
+
       if (json.data.username === false) {
-        setUsernameException("User with this username already exists");
-        result = false;
+          if (getLanguage() === 'EN') {
+            setUsernameException("User with this username already exists");
+          } else {
+            setUsernameException('Ім я користувача зайняте')
+          }
+
+          result = false;
       }
+
       if (json.data.telegramUsername === false && telegramUsername !== "") {
-        setTelegramUsernameException("User with this telegram already exists");
+          if (getLanguage() === 'EN') {
+            setTelegramUsernameException("User with this telegram already exists");
+          } else {
+            setTelegramUsernameException('Ім я telegram зайняте')
+          }
         result = false;
       }
     })
@@ -1428,7 +1483,12 @@ export async function getUsersForManagementPanel(userFilter: UserFilter): UserMa
 
   const queryParams: string = new URLSearchParams(userFilter.query()).toString();
 
-  notifySuccess("Filtering users, wait...");
+  if (getLanguage() === 'EN') {
+    notifySuccess("Filtering users, wait...");
+  } else {
+    notifySuccess('Фільтрація користувачів, очікуйте...')
+  }
+
   return await fetch(`${endpoints.getUsersForManagement}?${queryParams}`, requestOptions)
     .then((response) => {
       if (!response.ok) {
@@ -1523,7 +1583,11 @@ export async function addUser(data: {
     })
     .then((data) => {
       if (data && data.status === "OK") {
-        notifySuccess("User added successfully");
+        if (getLanguage() === 'EN') {
+          notifySuccess("User added successfully");
+        } else {
+          notifySuccess('Користувача створено успішно')
+        }
 
         return true;
       } else {
@@ -1604,7 +1668,11 @@ export async function addProduct(data: any): boolean {
     })
     .then((data) => {
       if (data && data.status === "OK") {
-        notifySuccess("Product saved successfully");
+        if (getLanguage() === 'EN') {
+          notifySuccess("Product saved successfully");
+        } else {
+          notifySuccess('Успішно продукт створено')
+        }
 
         return data;
       } else {
@@ -1668,7 +1736,11 @@ export async function updateProduct(data: any): boolean {
     })
     .then((data) => {
       if (data && data.status === "OK") {
-        notifySuccess("Product updated successfully");
+        if (getLanguage() === 'EN') {
+          notifySuccess("Product updated successfully");
+        } else {
+          notifySuccess('Успішно продукт оновлено')
+        }
 
         return data;
       } else {

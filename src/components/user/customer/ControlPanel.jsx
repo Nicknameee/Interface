@@ -5,8 +5,6 @@ import {useLanguage} from "../../../contexts/language/language-context";
 
 const ControlPanel = ({ showSidebar }) => {
   const [show, setShow] = useState(false);
-  // const [incomingNotification, setIN] = useState(false);
-  // const [incomingSupportMessage, setISM] = useState(false);
   const { language, setLanguage } = useLanguage();
 
   useEffect(() => {

@@ -36,7 +36,7 @@ const AddUsers = () => {
             if (language === 'EN') {
                 setUsernameException('Invalid username')
             } else {
-                setUsernameException('Невалідний нікнейм')
+                setUsernameException('Невалідне ім\'я користувача')
             }
         } else {
             setUsernameException('')
@@ -143,7 +143,7 @@ const AddUsers = () => {
             });
 
             if (success) {
-                setTimeout(() => window.location.reload(), 3000);
+                setTimeout(() => window.location.reload(), 1500);
             }
         }
     }
@@ -162,13 +162,13 @@ const AddUsers = () => {
                 <Form.Group controlId="formUsername" className="m-3">
                     <Form.Label>
                         {
-                            language === 'EN' ? 'Username' : 'Юзернейм'
+                            language === 'EN' ? 'Username' : 'Ім\'я користувача'
                         }
                     </Form.Label>
                     <div className="input-container">
                         <Form.Control
                             type="text"
-                            placeholder="Enter your username"
+                            placeholder={ language === 'EN' ? "Enter your username" : 'Уведіть ім\'я користувача'}
                             style={{paddingLeft: '30px'}}
                             value={username}
                             onChange={(e) => handleUsernameChange(e.target.value) } />
@@ -177,11 +177,15 @@ const AddUsers = () => {
                     <p style={{wordBreak: 'break-word', marginTop: '1em', color: 'white', fontSize: '1.1em'}} hidden={usernameException === ''}>{usernameException}</p>
                 </Form.Group>
                 <Form.Group controlId="formEmail" className="m-3">
-                    <Form.Label>Email</Form.Label>
+                    <Form.Label>
+                        {
+                            language === 'EN' ? 'Email' : 'Ваша пошта'
+                        }
+                    </Form.Label>
                     <div className="input-container">
                         <Form.Control
                             type="text"
-                            placeholder="Enter your email"
+                            placeholder={ language === 'EN' ? "Enter your email" : 'Уведіть вашу поштову адреса'}
                             style={{paddingLeft: '30px'}}
                             value={email}
                             onChange={(e) => handleEmailChange(e.target.value)} />
@@ -217,7 +221,7 @@ const AddUsers = () => {
                     <div className="input-container">
                         <Form.Control
                             type={'text'}
-                            placeholder="Repeat user's password"
+                            placeholder={ language === 'EN' ? "Repeat user's password" : 'Уведіть пароль повторно будь ласка'}
                             style={{paddingLeft: '30px'}}
                             value={passwordConfirmation}
                             readOnly={passwordException !== ''}
@@ -233,7 +237,7 @@ const AddUsers = () => {
                         <div className="input-container">
                             <Form.Control
                                 type="text"
-                                placeholder="Enter user's telegram username"
+                                placeholder={ language === 'EN' ? "Enter user's telegram username" : 'Уведіть ім\'я користувача телеграма'}
                                 style={{paddingLeft: '30px'}}
                                 value={telegramUsername}
                                 onChange={(e) => handleTelegramNicknameChange(e.target.value)} />

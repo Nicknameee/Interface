@@ -217,7 +217,7 @@ const Orders = ({ orders, setOrders, managerMode }) => {
           onClick={() => exportOrders(OrderFilter.build({ customerId: user.role === 'ROLE_MANAGER' ? null : user.id }))}
         >
           {
-            language === 'EN' ? 'Export orders' : 'Експортувати'
+            language === 'EN' ? 'Export orders' : 'Експортувати замовлення'
           }
         </Button>
       )}
@@ -458,7 +458,7 @@ const Orders = ({ orders, setOrders, managerMode }) => {
                             </ListGroupItem>
                             <ListGroupItem key={crypto.randomUUID()}>
                               {
-                                language === 'EN' ? 'Payment Type: ' : 'Шлях оплати: '
+                                language === 'EN' ? 'Payment Type: ' : 'Тип оплати: '
                               }
                               {view.oldOrder.paymentType} {view.isParamChanged("paymentType") ? "->" : ""}
                             </ListGroupItem>
@@ -530,7 +530,7 @@ const Orders = ({ orders, setOrders, managerMode }) => {
                               className={view.isParamChanged("paymentType") ? "text-decoration-underline" : ""}
                             >
                               {
-                                language === 'EN' ? 'Payment Type: ' : 'Шлях оплати: '
+                                language === 'EN' ? 'Payment Type: ' : 'Тип оплати: '
                               }
                               {view.updatedOrder.paymentType}
                             </ListGroupItem>

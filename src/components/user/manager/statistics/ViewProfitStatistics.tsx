@@ -25,14 +25,20 @@ const ViewProfitStatistic = () => {
             .slice(0, 16)
         );
       })
-      .catch(() => notifyError("Something went wrong"));
+      .catch(() => {
+          if (language === 'EN') {
+              notifyError("Something went wrong")
+          } else {
+              notifyError('Щось пішло не так')
+          }
+      });
   }, []);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingBottom: 160 }}>
       <ListGroup style={{ width: "500px", marginTop: 20 }}>
         <ListGroupItem className="d-flex justify-content-between align-items-center">
-          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>{language === "EN" ? "Date from:" : "Дата від:"}</div>
+          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>{language === "EN" ? "Date from: " : "Дата від: "}</div>
           <input
             type="date"
             name="issuedAtFrom"
@@ -42,7 +48,7 @@ const ViewProfitStatistic = () => {
           />
         </ListGroupItem>
         <ListGroupItem className="d-flex justify-content-between align-items-center">
-          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>{language === "EN" ? "Date to:" : "Дата до: "}</div>
+          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>{language === "EN" ? "Date to: " : "Дата до: "}</div>
           <input
             type="date"
             name="issuedAtTo"
@@ -52,7 +58,7 @@ const ViewProfitStatistic = () => {
           />
         </ListGroupItem>
         <ListGroupItem className="d-flex justify-content-between align-items-center">
-          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>{language === "EN" ? "Currency:" : "Валюта: "}</div>
+          <div style={{ whiteSpace: "nowrap", marginRight: 5 }}>{language === "EN" ? "Currency: " : "Валюта: "}</div>
           <Form.Select value={currency} onChange={(e) => setCurrency(e.target.value)} size="lg">
             <option>USD</option>
             <option>UAH</option>
@@ -70,7 +76,13 @@ const ViewProfitStatistic = () => {
                       .slice(0, 16)
                   );
                 })
-                .catch(() => notifyError("Something went wrong"));
+                .catch(() => {
+                    if (language === 'EN') {
+                        notifyError("Something went wrong")
+                    } else {
+                        notifyError('Щось пішло не так')
+                    }
+            })
             }}
           >
             {language === "EN" ? "Filter" : "Фільтр"}
@@ -89,7 +101,13 @@ const ViewProfitStatistic = () => {
                       .slice(0, 16)
                   );
                 })
-                .catch(() => notifyError("Something went wrong"));
+                .catch(() => {
+                    if (language === 'EN') {
+                        notifyError("Something went wrong")
+                    } else {
+                        notifyError('Щось пішло не так')
+                    }
+                })
             }}
           >
             {language === "EN" ? "Drop Filters" : "Скинути фільтрацію"}
@@ -109,10 +127,10 @@ const ViewProfitStatistic = () => {
             {
               data: statistics.map((item) => item.date),
               scaleType: "band",
-              label: "Date",
+              label: language === 'EN' ? "Date" : 'Дата',
             },
           ]}
-          yAxis={[{ label: "Profit" }]}
+          yAxis={[{ label: language === 'EN' ? "Profit" : 'Виручка' }]}
         />
       </div>
     </div>
