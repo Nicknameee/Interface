@@ -21,8 +21,8 @@ import { useLocation } from "react-router-dom";
 import {useLanguage} from "../../../../contexts/language/language-context";
 
 const ViewUsers = () => {
+  const [page, setPage] = useState(1);
   const [users: UserManagementModel[], setUsers] = useState([]);
-  const [usersPage: number, setUsersPage] = useState(1);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [filters, setFilters] = useState({
     usernamePrompt: "",
@@ -30,7 +30,7 @@ const ViewUsers = () => {
     telegramPrompt: "",
     roles: [],
     statuses: [],
-    page: usersPage,
+    page: page,
   });
   const location = useLocation();
   const {language} = useLanguage();
@@ -42,6 +42,11 @@ const ViewUsers = () => {
   const getUsers = async () => {
     setUsers(await getUsersForManagementPanel(UserFilter.build(filters)));
   };
+
+  useEffect(() => {
+    filters.page = page
+    getUsers()
+  }, [page])
 
   const updateFilterStatus = (status) => {
     if (filters.statuses.includes(status)) {
@@ -93,13 +98,14 @@ const ViewUsers = () => {
   };
 
   const dropFilters = () => {
+    setPage(1)
     setFilters({
       usernamePrompt: "",
       emailPrompt: "",
       telegramPrompt: "",
       roles: [],
       statuses: [],
-      page: usersPage,
+      page: page,
     });
   };
 
@@ -340,6 +346,33 @@ const ViewUsers = () => {
             </h3>
           </div>
         )}
+
+        <div className="w-100 d-flex justify-content-center align-items-center">
+          <Button
+              className="mx-3"
+              style={{ width: "100px" }}
+              disabled={page <= 1}
+              onClick={() => {
+                if (page > 1) {
+                  setPage(page - 1);
+                }
+              }}
+          >
+            Prev
+          </Button>
+          <h3 className="font-monospace">{page}</h3>
+          <Button
+              className="mx-3"
+              style={{ width: "100px" }}
+              onClick={() => {
+                if (users?.length > 0) {
+                  setPage(page + 1);
+                }
+              }}
+          >
+            Next
+          </Button>
+        </div>
       </Col>
     </div>
   );
