@@ -178,51 +178,58 @@ const CheckoutOrder = () => {
         }
 
         setUserCountry(getCookie('country'));
-
-        if (user) {
-            const client = new Client({
-                brokerURL: process.env.REACT_APP_ORDER_SERVICE_WEB_SOCKET_ADDRESS,
-                debug: function (str) {
-                    console.debug(str);
-                },
-                reconnectDelay: 5000,
-                heartbeatIncoming: 1000,
-                heartbeatOutgoing: 1000,
-            });
-
-            client.activate();
-
-            client.onConnect = () => {
-                client.subscribe('/topic/transaction/state/' + user.id, (message) => {
-                    console.log(`Socket message /topic/transaction/state/${user.id} ${message.body}`);
-                    let transactionState: TransactionState = JSON.parse(message.body).data;
-
-                    if (transactionState.authorized && transactionState.settled) {
-                        if (language === 'EN') {
-                            setTransactionStatusMessage('Transaction settle process is completed, payment is processed');
-                        } else {
-                            setTransactionStatusMessage('Обробка транзакції завершена, платіж проведено успішно');
-                        }
-                        setPaid(true);
-                    } else {
-                        if (language === 'EN') {
-                            setTransactionStatusMessage('Transaction settle process has not succeeded, payment is not processed');
-                        } else {
-                            setTransactionStatusMessage('Обробка транзакції не пройшла успішно, ваш платіж не зафіксовано');
-                        }
-                        console.log('Transaction status ', transactionState.status);
-                        setPaid(false);
-                    }
-                });
-            };
-        }
-    }, [cartUpdate, user]);
+    }, [cartUpdate]);
 
     useEffect(() => {
         if (paid) {
             initiateOrderCreation();
         }
     }, [transactionId]);
+
+    useEffect(() => {
+        if (paymentType === 'PREPAYMENT') {
+            if (user) {
+                const client = new Client({
+                    brokerURL: process.env.REACT_APP_ORDER_SERVICE_WEB_SOCKET_ADDRESS,
+                    debug: function (str) {
+                        console.debug(str);
+                    },
+                    reconnectDelay: 5000,
+                    heartbeatIncoming: 1000,
+                    heartbeatOutgoing: 1000,
+                    connectHeaders: null
+                });
+
+
+                if (user && user.id) {
+                    client.activate();
+                    client.onConnect = () => {
+                        client.subscribe('/topic/transaction/state/' + user.id, (message) => {
+                            console.log(`Socket message /topic/transaction/state/${user.id} ${message.body}`);
+                            let transactionState: TransactionState = JSON.parse(message.body).data;
+
+                            if (transactionState.authorized && transactionState.settled) {
+                                if (language === 'EN') {
+                                    setTransactionStatusMessage('Transaction settle process is completed, payment is processed');
+                                } else {
+                                    setTransactionStatusMessage('Обробка транзакції завершена, платіж проведено успішно');
+                                }
+                                setPaid(true);
+                            } else {
+                                if (language === 'EN') {
+                                    setTransactionStatusMessage('Transaction settle process has not succeeded, payment is not processed');
+                                } else {
+                                    setTransactionStatusMessage('Обробка транзакції не пройшла успішно, ваш платіж не зафіксовано');
+                                }
+                                console.log('Transaction status ', transactionState.status);
+                                setPaid(false);
+                            }
+                        });
+                    };
+                }
+            }
+        }
+    }, [paymentType])
 
     return (
         <div className="page" style={{background: '#cea4a4'}}>

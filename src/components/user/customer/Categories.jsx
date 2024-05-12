@@ -80,7 +80,7 @@ const Categories = ({ categories, isSubCategoryOpened, categoriesPage, setCatego
                 overflowX: "auto",
                 WebkitOverflowScrolling: "touch",
                 alignItems: "center",
-                justifyContent: "space-between",
+                justifyContent: "left",
                 marginTop: "3em",
               }}
               ref={box}

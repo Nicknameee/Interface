@@ -13,6 +13,7 @@ import {useLocation} from "react-router-dom";
 import WaitingList from "./WaitingList";
 
 const CustomerPersonalCabinet = () => {
+    const [page, setPage] = useState(1);
     const [customer: User, setCustomer] = useState(null);
     const [orders: CustomerOrder[], setOrders] = useState([]);
     const [showSidebar, setShowSidebar] = useState(false);
@@ -52,7 +53,7 @@ const CustomerPersonalCabinet = () => {
         switch (mode) {
             case 'orders': {
                 return (
-                    <Orders orders={orders} />
+                    <Orders orders={orders} setPage={setPage} page={page}/>
                 )
             }
             case 'waitingList': {

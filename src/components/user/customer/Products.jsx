@@ -16,18 +16,20 @@ const Products = ({ products, productPage, setProductPage, categoriesPresent, ma
     if (products.length > 0) {
       return products.map((product) => (
         <div key={product.productId} about={product.name} className="mb-3" style={{ width: 250 }}>
-          <div className="card h-100">
+          <div className="card h-100" style={{minWidth: '100px'}}>
             {product.introductionPictureUrl ? (
-              <img
-                src={product.introductionPictureUrl}
-                className="card-img-top"
-                alt={product.name}
-                style={{ minHeight: "50%", height: "60%", maxHeight: "70%", width: "auto" }}
-              />
+                <div className="h-50 d-flex justify-content-center">
+                  <img
+                      src={product.introductionPictureUrl}
+                      className="card-img-top"
+                      alt={product.name}
+                      style={{  height: "auto", width: "auto" }}
+                  />
+                </div>
             ) : (
               <img src={defaultImage} className="card-img-top" alt={product.name} style={{ maxHeight: "50%" }} />
             )}
-            <div className="card-body" style={{ maxHeight: "50%" }}>
+            <div className="card-body" style={{  }}>
               <h5 className="card-title">{product.name}</h5>
               <h5 className="card-title">
                 {product.cost} {product.currency}

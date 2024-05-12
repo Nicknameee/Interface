@@ -7,20 +7,22 @@ import { getOrdersCompleteData } from "../../../../index";
 
 const ViewOrders = () => {
   const [orders: Order[], setOrders] = useState([]);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const initOrders = async () => {
       const orderFilter: OrderFilter = new OrderFilter();
       orderFilter.direction = "DESC";
+      orderFilter.page = page;
       const orders: CustomerOrder[] = await getOrdersCompleteData(orderFilter);
 
       setOrders(orders);
     };
 
     initOrders().then(() => {});
-  }, []);
+  }, [page]);
 
-  return <Orders orders={orders} setOrders={setOrders} managerMode={true} />;
+  return <Orders orders={orders} setOrders={setOrders} setPage={setPage} page={page} managerMode={true} />;
 };
 
 export default ViewOrders;

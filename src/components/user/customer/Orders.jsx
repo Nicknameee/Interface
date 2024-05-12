@@ -13,7 +13,7 @@ import {Box, Modal, Typography} from "@mui/material";
 import {notifyError, notifySuccess} from "../../../utilities/notify.js";
 import {useLanguage} from "../../../contexts/language/language-context";
 
-const Orders = ({ orders, setOrders, managerMode }) => {
+const Orders = ({ orders, setOrders, managerMode, page, setPage }) => {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
@@ -616,6 +616,33 @@ const Orders = ({ orders, setOrders, managerMode }) => {
             </h3>
           </div>
         )}
+      </div>
+
+      <div className="w-100 d-flex justify-content-center align-items-center">
+        <Button
+            className="mx-3"
+            style={{ width: "100px" }}
+            disabled={page <= 1}
+            onClick={() => {
+              if (page > 1) {
+                setPage(page - 1);
+              }
+            }}
+        >
+          Prev
+        </Button>
+        <h3 className="font-monospace">{page}</h3>
+        <Button
+            className="mx-3"
+            style={{ width: "100px" }}
+            onClick={() => {
+              if (orders?.length > 0) {
+                setPage(page + 1);
+              }
+            }}
+        >
+          Next
+        </Button>
       </div>
     </div>
   );

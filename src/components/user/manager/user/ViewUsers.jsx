@@ -45,7 +45,10 @@ const ViewUsers = () => {
 
   useEffect(() => {
     filters.page = page
-    getUsers()
+    const query: string = getQueryParam("option", location);
+    if (!query || query === "" || query === "viewUser") {
+      getUsers()
+    }
   }, [page])
 
   const updateFilterStatus = (status) => {
@@ -346,7 +349,6 @@ const ViewUsers = () => {
             </h3>
           </div>
         )}
-
         <div className="w-100 d-flex justify-content-center align-items-center">
           <Button
               className="mx-3"
