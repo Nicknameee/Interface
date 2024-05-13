@@ -211,11 +211,11 @@ const AddProduct = () => {
         }
         validity = false;
       }
-      if (parameters["weight"] === undefined || parameters["weight"] === null || parameters["weight"] < 0.3) {
+      if (parameters["weight"] === undefined || parameters["weight"] === null || parameters["weight"] < 1) {
         if (language === 'EN') {
-          parametersException.push('Parameter "weight" is absent or invalid value lower than 300 grams');
+          parametersException.push('Parameter "weight" is absent or invalid value lower than 1 kg');
         } else {
-          parametersException.push('Обов\'язковий параметр "weight" відсутній або має значення менше 300 грам');
+          parametersException.push('Обов\'язковий параметр "weight" відсутній або має значення менше 1 kg');
         }
         validity = false;
       }
