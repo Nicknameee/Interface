@@ -211,11 +211,11 @@ const AddProduct = () => {
         }
         validity = false;
       }
-      if (parameters["weight"] === undefined || parameters["weight"] === null || parameters["weight"] < 1) {
+      if (parameters["weight"] === undefined || parameters["weight"] === null || parameters["weight"] < 0.3) {
         if (language === 'EN') {
-          parametersException.push('Parameter "weight" is absent or invalid value');
+          parametersException.push('Parameter "weight" is absent or invalid value lower than 300 grams');
         } else {
-          parametersException.push('Обов\'язковий параметр "weight" відсутній або має значення менше 1');
+          parametersException.push('Обов\'язковий параметр "weight" відсутній або має значення менше 300 грам');
         }
         validity = false;
       }
@@ -262,6 +262,7 @@ const AddProduct = () => {
         await setProductPicture(result.data.productId, picture).then();
         notifySuccess('Introduction picture saved successfully')
       }
+
       if (pictures) {
         await setProductPictures(result.data.productId, Array.from(pictures));
         notifySuccess('Extra pictures saved successfully')
@@ -599,6 +600,11 @@ const AddProduct = () => {
               className="custom-form py-3 my-1 d-flex flex-wrap w-50"
               style={{ marginBottom: "13vh", height: "fit-content" }}
             >
+              <h5 className="w-100">
+                {
+                  language === 'EN' ? 'Metrics, size measurement in SM, weight measured in KG' : 'Одиниці виміру, розміри у СМ, вага у КГ'
+                }
+              </h5>
               {parameters &&
                 Object.entries(parameters).map(([key, value]) => (
                   <div key={key} className="w-25 mx-1">

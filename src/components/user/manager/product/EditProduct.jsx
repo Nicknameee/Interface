@@ -547,6 +547,11 @@ const EditProduct = () => {
               className="custom-form py-3 my-1 d-flex flex-wrap w-50"
               style={{ marginBottom: "13vh", height: "fit-content" }}
             >
+              <h5 className="w-100">
+                {
+                  language === 'EN' ? 'Metrics, size measurement in SM, weight measured in KG' : 'Одиниці виміру, розміри у СМ, вага у КГ'
+                }
+              </h5>
               {parameters &&
                 Object.entries(parameters).map(([key, value]) => (
                   <div key={key} className="w-25 mx-1">

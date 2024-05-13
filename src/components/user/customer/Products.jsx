@@ -35,35 +35,47 @@ const Products = ({ products, productPage, setProductPage, categoriesPresent, ma
                 {product.cost} {product.currency}
               </h5>
               {product.blocked || product.itemsLeft === 0 ? (
-                <button className="btn btn-dark" style={{ marginRight: "10px" }} disabled={true}>
-                  {
-                    language === 'EN' ? 'Not Available' : 'Недоступно'
-                  }
-                </button>
-              ) : (
-                <div>
-                  <button
-                    className="btn btn-success"
-                    style={{ marginRight: "10px" }}
-                    onClick={() => redirectToProductPage(product.productId)}
-                    title={"Check Up Product Page"}
-                  >
-                    {
-                      language === 'EN' ? 'Check It Up' : 'ВІдкрити'
-                    }
-                  </button>
-                </div>
-              )}
-              {
-                isLoggedIn() &&
-                    <button
-                        className="btn btn-primary"
-                        onClick={() => addToWaitingList(WaitingListProduct.getOfProduct(product))}
-                        title={"Add Product To Waiting List"}
-                    >
-                      <FontAwesomeIcon icon={faFeather} />
+                  <div>
+                    <button className="btn btn-dark" style={{ marginRight: "10px" }} disabled={true}>
+                      {
+                        language === 'EN' ? 'Not Available' : 'Недоступно'
+                      }
                     </button>
-              }
+                    {
+                        isLoggedIn() &&
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => addToWaitingList(WaitingListProduct.getOfProduct(product))}
+                            title={"Add Product To Waiting List"}
+                        >
+                          <FontAwesomeIcon icon={faFeather} />
+                        </button>
+                    }
+                  </div>
+              ) : (
+                  <div>
+                    <button
+                      className="btn btn-success"
+                      style={{ marginRight: "10px" }}
+                      onClick={() => redirectToProductPage(product.productId)}
+                      title={"Check Up Product Page"}
+                    >
+                      {
+                        language === 'EN' ? 'Check It Up' : 'ВІдкрити'
+                      }
+                    </button>
+                    {
+                        isLoggedIn() &&
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => addToWaitingList(WaitingListProduct.getOfProduct(product))}
+                            title={"Add Product To Waiting List"}
+                        >
+                          <FontAwesomeIcon icon={faFeather} />
+                        </button>
+                    }
+                  </div>
+              )}
             </div>
           </div>
         </div>
