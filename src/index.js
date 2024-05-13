@@ -1697,7 +1697,7 @@ export async function setProductPicture(productId: string, picture: File) {
   const headers = getDefaultHeaders();
   headers.delete("Content-Type");
 
-  fetch(process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/picture", {
+  return fetch(process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/picture", {
     method: "POST",
     headers,
     body: formData,
@@ -1713,7 +1713,7 @@ export async function setProductPictures(productId: string, pictures: File[]) {
   const headers = getDefaultHeaders();
   headers.delete("Content-Type");
 
-  fetch(process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/pictures", {
+  return fetch(process.env.REACT_APP_ORDER_SERVICE_ADDRESS + "/api/v1/products/pictures", {
     method: "POST",
     headers,
     body: formData,
